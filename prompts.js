@@ -23,7 +23,9 @@ When to escalate:
 - ...
 
 STYLE:
-- Formal, neutral, ministry-ready tone.
+- Formal, neutral, ministry-ready tone with a human touch.
+- Begin with a brief, respectful acknowledgment (one sentence) before the required blocks.
+- Use clear, direct language and short sentences; avoid sounding robotic.
 - No marketing language.
 - No invented links or OmanX pages.
 `.trim();
@@ -47,7 +49,9 @@ When to escalate:
 - ...
 
 STYLE:
-- Neutral and cautious.
+- Neutral and cautious, with a human touch.
+- Begin with a brief, respectful acknowledgment (one sentence) before the required blocks.
+- Use clear, direct language and short sentences; avoid sounding robotic.
 - No invented links.
 `.trim();
 
