@@ -6,7 +6,7 @@
     <title>OmanX</title>
     <meta
       name="description"
-      content="Government-grade onboarding and compliance guidance for Omani scholars in the United States."
+      content="Minimal, source-constrained onboarding guidance for Omani scholars in the United States."
     />
     <link rel="stylesheet" href="/styles.css" />
     <link rel="icon" href="data:," />
@@ -18,21 +18,18 @@
         <div class="brand">
           <div class="logo" aria-hidden="true">OX</div>
           <div class="brand-text">
-            <div class="brand-row">
-              <h1>OmanX</h1>
-              <span class="badge">MVP</span>
-            </div>
-            <p>Government-grade onboarding and guidance for Omani scholars in the United States.</p>
+            <h1>OmanX</h1>
+            <p>Minimal onboarding and compliance guidance for Omani scholars in the United States.</p>
           </div>
         </div>
 
         <div class="top-actions">
           <div class="mode" role="tablist" aria-label="Response policy mode">
             <button class="mode-btn on" id="modeOfficial" type="button" role="tab" aria-selected="true">
-              Official Mode
+              Official
             </button>
             <button class="mode-btn" id="modeCommunity" type="button" role="tab" aria-selected="false">
-              Community Mode
+              Community
             </button>
           </div>
 
@@ -43,46 +40,13 @@
         </div>
       </header>
 
-      <section class="hero">
-        <div class="hero-copy">
-          <p class="mission">
-            OmanX provides structured, source-constrained, auditable guidance for Omani scholars abroad—reducing
-            confusion, risk, and institutional load.
-          </p>
-
-          <div class="pillars">
-            <div class="pillar">
-              <h2>Clarity</h2>
-              <p>Checklist-driven steps aligned to official sources and defined escalation points.</p>
-            </div>
-            <div class="pillar">
-              <h2>Compliance</h2>
-              <p>Guidance is constrained to approved knowledge and non-negotiable regulatory requirements.</p>
-            </div>
-            <div class="pillar">
-              <h2>Continuity</h2>
-              <p>Consistent onboarding across ministries, embassies, and universities—without data retention.</p>
-            </div>
+      <section class="layout">
+        <aside class="flows">
+          <div class="section-head">
+            <h2>Onboarding flows</h2>
+            <p class="muted">Pick a flow and track completion.</p>
           </div>
-        </div>
 
-        <div class="how">
-          <h2>How it works</h2>
-          <ol>
-            <li>Choose a flow (arrival, compliance, or academic setup).</li>
-            <li>Complete the checklist with source categories attached to every step.</li>
-            <li>Ask the assistant for constrained guidance or escalation.</li>
-          </ol>
-        </div>
-      </section>
-
-      <section class="section">
-        <div class="section-head">
-          <h2>Onboarding flows (minimal scope)</h2>
-          <p class="muted">Each step is tagged as Official or Advisory and has an explicit completion state.</p>
-        </div>
-
-        <div class="flow-grid">
           <article class="flow" data-flow="arrival">
             <header>
               <h3>Arrival (First 72 Hours)</h3>
@@ -129,7 +93,7 @@
               </li>
             </ul>
             <button class="ghost flow-action" data-prompt="Provide a 72-hour arrival checklist with official vs advisory steps and escalation triggers.">
-              Use this flow in the assistant
+              Use this flow
             </button>
           </article>
 
@@ -179,7 +143,7 @@
               </li>
             </ul>
             <button class="ghost flow-action" data-prompt="Summarize the compliance checklist for an Omani scholar (visa, SEVIS, scholarship obligations) with escalation guidance.">
-              Use this flow in the assistant
+              Use this flow
             </button>
           </article>
 
@@ -229,109 +193,62 @@
               </li>
             </ul>
             <button class="ghost flow-action" data-prompt="Provide an academic and living setup checklist with official vs advisory steps.">
-              Use this flow in the assistant
+              Use this flow
             </button>
           </article>
-        </div>
-      </section>
+        </aside>
 
-      <section class="section">
-        <div class="section-head">
-          <h2>Constrained assistant</h2>
-          <p class="muted">Responses are structured and source-linked. If confidence is low, OmanX escalates.</p>
-        </div>
-
-        <div class="assistant-grid">
-          <div class="assistant-spec">
-            <h3>Response format</h3>
-            <ul>
-              <li><strong>What you should do</strong> — step-by-step actions.</li>
-              <li><strong>Why this matters</strong> — policy or compliance rationale.</li>
-              <li><strong>Source / Authority</strong> — Official or Advisory source category.</li>
-              <li><strong>When to escalate</strong> — who to contact if risk is high.</li>
-            </ul>
-
-            <div class="callout">
-              <p>
-                Official Mode is MoHE-aligned and source-constrained. Community Mode is flagged as non-authoritative
-                and must be verified with official offices.
-              </p>
+        <section class="assistant-panel">
+          <div class="chat-head">
+            <div>
+              <h2>OmanX Assistant</h2>
+              <p class="muted">Structured steps. Sources. Escalation triggers.</p>
             </div>
+            <button class="ghost" id="clearBtn" type="button">Clear</button>
+          </div>
 
-            <div class="callout muted">
-              OmanX does not collect or store sensitive personal data. The MVP is stateless and minimizes logging.
+          <div class="mode-notes">
+            <p><strong>Official:</strong> source-constrained, MoHE-aligned guidance.</p>
+            <p><strong>Community:</strong> non-authoritative; verify with official offices.</p>
+          </div>
+
+          <div id="statusBanner" class="status-banner" hidden>
+            <span class="status-banner-text">
+              Service unavailable. We will not guess—please contact the relevant office.
+            </span>
+          </div>
+
+          <div id="chat" class="chat-scroll" role="log" aria-live="polite"></div>
+
+          <form id="form" class="composer">
+            <label class="input-label" for="input">Ask about arrival, compliance, or academic setup</label>
+            <textarea
+              id="input"
+              rows="3"
+              placeholder="Example: What should I do in the first 48 hours to remain compliant?"
+            ></textarea>
+            <div class="composer-actions">
+              <p class="hint"><kbd>Enter</kbd> send · <kbd>Shift</kbd>+<kbd>Enter</kbd> newline</p>
+              <button id="send" class="primary" type="submit">
+                <span class="send-text">Send</span>
+              </button>
             </div>
-          </div>
+          </form>
 
-          <div class="assistant-panel">
-            <div class="chat-head">
-              <div>
-                <h3>OmanX Assistant</h3>
-                <p class="muted">Clear steps. References. Escalation triggers.</p>
-              </div>
-              <button class="ghost" id="clearBtn" type="button">Clear</button>
-            </div>
-
-            <div id="statusBanner" class="status-banner" hidden>
-              <span class="status-banner-text">
-                Service unavailable. We will not guess—please contact the relevant office.
-              </span>
-            </div>
-            <div id="chat" class="chat-scroll" role="log" aria-live="polite"></div>
-
-            <form id="form" class="composer">
-              <label class="input-label" for="input">Ask about arrival, compliance, or academic setup</label>
-              <textarea
-                id="input"
-                rows="3"
-                placeholder="Example: What should I do in the first 48 hours to remain compliant?"
-              ></textarea>
-              <div class="composer-actions">
-                <p class="hint"><kbd>Enter</kbd> send · <kbd>Shift</kbd>+<kbd>Enter</kbd> newline</p>
-                <button id="send" class="primary" type="submit">
-                  <span class="send-text">Send</span>
-                </button>
-              </div>
-            </form>
-
-            <p class="disclaimer">
-              Disclaimer: informational guidance only. For immigration/legal/medical matters, follow official
-              instructions and contact the appropriate office.
-            </p>
-          </div>
-        </div>
-      </section>
-
-      <section class="section governance">
-        <div class="section-head">
-          <h2>Governance & trust layer</h2>
-          <p class="muted">Visible controls that emphasize auditability and ministry-safe operation.</p>
-        </div>
-        <div class="governance-grid">
-          <div>
-            <h3>Mode controls</h3>
-            <p>Official Mode is MoHE-approved content only. Community Mode is flagged, non-authoritative guidance.</p>
-          </div>
-          <div>
-            <h3>Data minimization</h3>
-            <p>No user accounts, no stored chat history, no collection of sensitive personal data.</p>
-          </div>
-          <div>
-            <h3>Audit-ready</h3>
-            <p>Structured responses, source categories, escalation rules, and no raw prompt storage.</p>
-          </div>
-        </div>
+          <p class="disclaimer">
+            Informational guidance only. For immigration/legal/medical matters, follow official instructions and
+            contact the appropriate office.
+          </p>
+        </section>
       </section>
     </main>
 
     <footer class="footer">
-      <div>
-        © <span id="year"></span> OmanX · Government-grade onboarding MVP
-      </div>
+      <div>© <span id="year"></span> OmanX</div>
       <div class="footer-links">
-        <span>Legal/immigration/medical guidance must be validated by official offices.</span>
+        <span>Verify official guidance with MoHE, embassy, and university offices.</span>
         <span class="dot">•</span>
-        <a href="/pitch">Investor & Ministry brief</a>
+        <a href="/pitch">Brief</a>
       </div>
     </footer>
 
