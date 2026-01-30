@@ -21,7 +21,7 @@ body{
 }
 
 .shell{
-  max-width: 1200px;
+  max-width: 860px;
   margin: 28px auto 40px;
   padding: 0 20px;
 }
@@ -103,89 +103,9 @@ body{
 }
 
 .layout{
-  display:grid;
-  grid-template-columns: minmax(280px, 1fr) minmax(340px, 1.2fr);
-  gap:24px;
+  display:block;
   padding: 24px 0;
 }
-
-.section-head h2{ margin:0 0 6px; font-size:18px; }
-.section-head p{ margin:0; color: var(--muted); }
-
-.flows{
-  display:flex;
-  flex-direction:column;
-  gap:18px;
-}
-
-.flow{
-  border:1px solid var(--border);
-  border-radius:12px;
-  padding: 14px;
-  display:flex;
-  flex-direction:column;
-  gap:12px;
-}
-
-.flow header{
-  display:flex;
-  flex-direction:column;
-  gap:6px;
-}
-
-.flow-meta{
-  display:flex;
-  gap:10px;
-  font-size:12px;
-  color: var(--muted);
-}
-
-.flow-status{
-  padding: 2px 8px;
-  border-radius:999px;
-  border:1px solid var(--border);
-  background: var(--accent-muted);
-}
-.flow-state{
-  font-weight:600;
-}
-
-.checklist{
-  list-style:none;
-  padding:0;
-  margin:0;
-  display:flex;
-  flex-direction:column;
-  gap:10px;
-}
-
-.checklist li{
-  display:flex;
-  align-items:flex-start;
-  justify-content:space-between;
-  gap:12px;
-  border:1px solid var(--border);
-  border-radius:10px;
-  padding: 10px 12px;
-}
-
-.checklist label{
-  display:flex;
-  gap:8px;
-  font-size:14px;
-}
-
-.checklist input{ margin-top:3px; }
-
-.tag{
-  font-size:11px;
-  border-radius:999px;
-  padding: 2px 8px;
-  border:1px solid var(--border);
-  white-space:nowrap;
-}
-.tag.official{ color: var(--accent); background: var(--accent-muted); }
-.tag.advisory{ color: var(--warning); background: #fef3c7; border-color: #fcd34d; }
 
 .ghost, .primary{
   border-radius:10px;
@@ -203,11 +123,12 @@ body{
 
 .assistant-panel{
   border:1px solid var(--border);
-  border-radius:14px;
-  padding: 16px;
+  border-radius:16px;
+  padding: 18px;
   display:flex;
   flex-direction:column;
   gap:12px;
+  background: var(--panel);
 }
 
 .chat-head{
@@ -219,9 +140,9 @@ body{
 
 .mode-notes{
   border:1px solid var(--border);
-  border-radius:10px;
+  border-radius:12px;
   padding: 10px 12px;
-  background: #f8fafc;
+  background: #f9fafb;
   font-size:13px;
   color: var(--muted);
 }
@@ -229,11 +150,11 @@ body{
 .mode-notes p:last-child{ margin-bottom:0; }
 
 .chat-scroll{
-  min-height: 240px;
-  max-height: 340px;
+  min-height: 320px;
+  max-height: 460px;
   overflow-y:auto;
   border:1px solid var(--border);
-  border-radius:12px;
+  border-radius:14px;
   padding: 12px;
   background: #fbfbfc;
 }
@@ -254,7 +175,7 @@ body{
 .bubble{
   background: var(--panel);
   border:1px solid var(--border);
-  border-radius:10px;
+  border-radius:12px;
   padding: 8px 10px;
   font-size:14px;
   color: var(--text);
@@ -322,7 +243,7 @@ textarea{
 .muted{ color: var(--muted); }
 
 @media (max-width: 960px){
-  .layout{
-    grid-template-columns: 1fr;
+  .shell{
+    margin-top: 20px;
   }
 }
