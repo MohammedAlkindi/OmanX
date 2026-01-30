@@ -1,7 +1,6 @@
 // app.js — OmanX MVP (frontend)
 // Goals:
-// - Deterministic assistant UI with structured responses
-// - Checklist flow completion tracking
+// - Minimal assistant UI with structured responses
 // - Health check + graceful offline banner
 
 const chatEl = document.getElementById("chat");
@@ -222,48 +221,6 @@ if (clearBtn && chatEl) {
     chatEl.innerHTML = "";
   });
 }
-
-const promptButtons = document.querySelectorAll(".flow-action[data-prompt]");
-promptButtons.forEach((button) => {
-  button.addEventListener("click", () => {
-    if (!inputEl) return;
-    inputEl.value = button.dataset.prompt || "";
-    inputEl.focus();
-  });
-});
-
-// -----------------------------
-// Checklist tracking
-// -----------------------------
-const flows = document.querySelectorAll("[data-flow]");
-flows.forEach((flow) => {
-  const list = flow.querySelector("[data-flow-list]");
-  const statusEl = flow.querySelector("[data-flow-status]");
-  const stateEl = flow.querySelector("[data-flow-state]");
-  if (!list || !statusEl || !stateEl) return;
-
-  const inputs = Array.from(list.querySelectorAll("input[type='checkbox']"));
-
-  const updateStatus = () => {
-    const total = inputs.length;
-    const done = inputs.filter((i) => i.checked).length;
-    statusEl.textContent = `${done}/${total} complete`;
-
-    if (done === 0) {
-      stateEl.textContent = "Not started";
-    } else if (done === total) {
-      stateEl.textContent = "Complete";
-    } else {
-      stateEl.textContent = "In progress";
-    }
-  };
-
-  inputs.forEach((input) => {
-    input.addEventListener("change", updateStatus);
-  });
-
-  updateStatus();
-});
 
 // -----------------------------
 // Boot
