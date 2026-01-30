@@ -1,208 +1,800 @@
 {
   "items": [
     {
-      "title": "Arrival (First 72 Hours) — Official",
-      "summary": "Authoritative, non-optional onboarding procedures for Omani Ministry of Higher Education scholars upon physical arrival in the United States. This section governs border entry, SEVIS activation, institutional registration, and immediate post-arrival compliance.",
+      "title": "F-1 Employment Authorization — Official",
+      "summary": "All employment for F-1 students is prohibited unless explicitly authorized in advance by the DSO and/or USCIS. Unauthorized work is a severe status violation. Different work types have distinct rules, application windows, and limitations.",
+      "scope": {
+        "applies_to": ["F-1"],
+        "audience": ["Sponsored Omani students"],
+        "risk_level": "Critical",
+        "failure_impact": "SEVIS termination, deportation, future visa ineligibility, scholarship revocation, permanent bar from U.S. re-entry"
+      },
+      "timeline": {
+        "T0": "First semester enrollment",
+        "T+1 Academic Year": "Eligibility for off-campus CPT/OPT begins",
+        "T-90 days (OPT)": "Earliest OPT application date",
+        "T+60 days (Post-OPT)": "Grace period ends after OPT"
+      },
+      "bullets": [
+        {
+          "rule": "On-Campus Employment",
+          "details": [
+            "Maximum 20 hours/week during academic sessions; full-time during official breaks.",
+            "Work must be physically on-campus or at an off-campus location educationally affiliated with the school.",
+            "Employment begins only after classes start and SEVIS registration is complete.",
+            "Must cease on-campus work if student withdraws or transfers."
+          ],
+          "authorization_sources": ["University DSO", "On-campus employer"],
+          "failure_modes": [
+            "Exceeding 20-hour limit during session",
+            "Working before program start date",
+            "Continuing work after SEVIS termination"
+          ],
+          "mitigation": [
+            "DSO consultation before accepting any offer",
+            "Time-tracking and self-auditing",
+            "Immediate reporting of employment to DSO for SEVIS update"
+          ]
+        },
+        {
+          "rule": "Curricular Practical Training (CPT)",
+          "details": [
+            "CPT must be an integral part of the established curriculum (internship, practicum, co-op).",
+            "Requires a specific course for credit or a mandatory degree requirement.",
+            "Must have DSO authorization and a new I-20 with CPT notation before work begins.",
+            "Full-time CPT for 12 months or more eliminates eligibility for post-completion OPT."
+          ],
+          "authorization_sources": ["University DSO (I-20 endorsement)", "Academic advisor/department"],
+          "common_violations": [
+            "Beginning work before I-20 with CPT is issued",
+            "Working beyond dates authorized on I-20",
+            "CPT for a job unrelated to major field of study"
+          ],
+          "controls": [
+            "Apply for CPT at least 10 business days before intended start date",
+            "Ensure job offer letter meets DSO requirements",
+            "Verify CPT authorization dates match employment dates exactly"
+          ]
+        },
+        {
+          "rule": "Optional Practical Training (OPT)",
+          "details": [
+            "Pre-completion OPT: Limited to 20 hours/week while school is in session.",
+            "Post-completion OPT: Full-time after degree completion.",
+            "Requires USCIS Form I-765 filing fee and adjudication (90+ day processing).",
+            "Maximum 12 months of standard OPT per educational level.",
+            "Unemployment limit: 90 days total during standard OPT."
+          ],
+          "authorization_sources": ["USCIS (EAD card)", "University DSO (OPT I-20 recommendation)"],
+          "failure_modes": [
+            "Starting work before receiving EAD card",
+            "Exceeding 90-day unemployment limit",
+            "Failure to report employment or address changes to DSO within 10 days"
+          ],
+          "mitigation": [
+            "Apply for OPT up to 90 days before program end date, no later than 60 days after",
+            "Maintain detailed records of all employment (I-983 for STEM OPT)",
+            "Set calendar alerts for reporting deadlines and unemployment day counter"
+          ]
+        },
+        {
+          "rule": "STEM OPT Extension (24-Month)",
+          "details": [
+            "Eligibility: Degree in DHS STEM-designated program, employer enrolled in E-Verify.",
+            "Requires formal training plan (Form I-983) signed by employer and student.",
+            "Must apply before initial 12-month OPT EAD expires.",
+            "Unemployment limit: 150 days total (including initial OPT period).",
+            "Mandatory self-evaluations and employer reporting to DSO every 6 months."
+          ],
+          "authorization_sources": ["USCIS", "University DSO", "E-Verify employer"],
+          "common_violations": [
+            "Working for a non-E-Verify employer",
+            "Failing to submit timely I-983 evaluations",
+            "Material changes to training plan without DSO approval"
+          ],
+          "controls": [
+            "Confirm employer's E-Verify number before accepting offer",
+            "Submit STEM OPT application 90-100 days before current EAD expiry",
+            "Schedule bi-annual reporting reminders in calendar"
+          ]
+        },
+        {
+          "rule": "Severe Economic Hardship Employment",
+          "details": [
+            "Available only due to severe, unforeseen economic circumstances beyond student's control.",
+            "Requires demonstration of efforts to find on-campus work and severe need.",
+            "Must file Form I-765 with USCIS based on DSO recommendation and evidence.",
+            "Authorization is for off-campus work, up to 20 hours/week during sessions."
+          ],
+          "authorization_sources": ["USCIS", "University DSO (recommendation)"],
+          "failure_modes": [
+            "Insufficient documentary evidence of hardship",
+            "Working before USCIS approval"
+          ],
+          "mitigation": [
+            "Immediate consultation with DSO upon financial crisis",
+            "Document all circumstances (currency devaluation, sponsor loss, medical emergency)",
+            "Explore all other financial aid options first"
+          ]
+        },
+        {
+          "rule": "Employment for International Organizations",
+          "details": [
+            "Available if employment is with a recognized international organization (e.g., UN, IMF, World Bank).",
+            "Requires Form I-765 filing with USCIS and DSO recommendation."
+          ],
+          "authorization_sources": ["USCIS", "University DSO"]
+        }
+      ],
+      "links": [
+        "Authority: U.S. DHS SEVP Policy Guidance: Practical Training",
+        "Authority: University DSO/International Office",
+        "Authority: USCIS Form I-765 Instructions",
+        "Authority: DHS STEM Designated Degree Program List",
+        "Authority: Ministry of Higher Education employment approval policy"
+      ]
+    },
+    {
+      "title": "I-20 Maintenance & Updates — Official",
+      "summary": "The Form I-20 is the legal document certifying F-1 status and must be accurate, valid, and updated for all status-impacting changes. Students are responsible for requesting updates through DSO; failure to maintain current I-20 constitutes status violation.",
+      "scope": {
+        "applies_to": ["F-1"],
+        "audience": ["Sponsored Omani students"],
+        "risk_level": "High",
+        "failure_impact": "Loss of legal status, inability to travel/re-enter, employment authorization invalidation, scholarship suspension"
+      },
+      "timeline": {
+        "T0": "Receipt of initial I-20",
+        "Within 10 days": "Address/name change reporting",
+        "By program end date": "Extension request submission",
+        "Before travel": "Travel signature validation"
+      },
+      "bullets": [
+        {
+          "rule": "Personal Information Updates",
+          "details": [
+            "Legal name changes must be reported with supporting documents (passport, marriage certificate).",
+            "U.S. residential address changes must be reported within 10 days of moving.",
+            "Emergency contact information must remain current in SEVIS and university systems."
+          ],
+          "authorization_sources": ["University DSO (SEVIS update)"],
+          "failure_modes": [
+            "I-20 name/passport mismatch causing travel denial",
+            "SEVIS termination for address non-compliance",
+            "University holds on registration"
+          ],
+          "mitigation": [
+            "Update address through university portal immediately upon move",
+            "Request updated I-20 after any legal name change",
+            "Quarterly review of all personal information in SEVIS"
+          ]
+        },
+        {
+          "rule": "Program Extension",
+          "details": [
+            "Required if unable to complete program by I-20 end date due to compelling academic or medical reasons.",
+            "Must apply before current I-20 expires with DSO recommendation.",
+            "Requires financial documentation showing continued support for extended period.",
+            "Academic advisor letter explaining delay necessity is mandatory."
+          ],
+          "authorization_sources": ["University DSO (new I-20)", "Academic department"],
+          "common_violations": [
+            "Applying after I-20 expiration date",
+            "Insufficient financial documentation for extension period",
+            "Continuing studies with expired I-20"
+          ],
+          "controls": [
+            "Monitor program progress against I-20 end date quarterly",
+            "Initiate extension request 60 days before expiration",
+            "Maintain communication with academic advisor about completion timeline"
+          ]
+        },
+        {
+          "rule": "School Transfer Procedures",
+          "details": [
+            "Must be accepted to new school before initiating transfer.",
+            "Must complete current term or obtain authorized early withdrawal.",
+            "Transfer release date must be coordinated between old and new DSOs.",
+            "Cannot begin classes at new school until transfer is complete in SEVIS."
+          ],
+          "authorization_sources": ["Current DSO (release)", "New DSO (transfer in)", "MoHE approval"],
+          "failure_modes": [
+            "Starting classes at new school before SEVIS transfer",
+            "Failure to obtain MoHE approval for transfer",
+            "Missing transfer release deadline (typically 60 days after program end)"
+          ],
+          "mitigation": [
+            "Obtain written MoHE approval before initiating transfer",
+            "Submit transfer request to current DSO 30+ days before intended start",
+            "Confirm SEVIS transfer completion with new DSO before registration"
+          ]
+        },
+        {
+          "rule": "Travel Signatures",
+          "details": [
+            "Travel signature on page 2 of I-20 must be less than 12 months old at re-entry (6 months for active OPT).",
+            "Signatures are valid for multiple entries within their validity period.",
+            "Emergency travel signatures may be available but require justification."
+          ],
+          "authorization_sources": ["University DSO"],
+          "failure_modes": [
+            "Denied boarding by airline due to expired signature",
+            "CBP denial of entry at port of entry",
+            "Stranded outside U.S. requiring emergency DSO contact"
+          ],
+          "mitigation": [
+            "Check travel signature validity before booking any international travel",
+            "Request new signature if current one expires within 30 days of planned return",
+            "Carry all previous I-20s as backup documentation"
+          ]
+        },
+        {
+          "rule": "Financial Updates",
+          "details": [
+            "Significant changes in funding source (new sponsor, loss of funding) must be reported.",
+            "Updated financial documents showing ability to cover remaining program costs required.",
+            "MoHE-sponsored students must report any changes to both DSO and MoHE."
+          ],
+          "authorization_sources": ["University DSO", "MoHE sponsorship office"]
+        },
+        {
+          "rule": "Major/Level Changes",
+          "details": [
+            "Changing educational level (Bachelor's to Master's) requires new I-20.",
+            "Substantial change in major may require new I-20 and financial documentation.",
+            "Change in thesis/dissertation topic that substantially alters program may require update."
+          ],
+          "authorization_sources": ["University DSO", "Academic department", "MoHE approval for level changes"]
+        }
+      ],
+      "links": [
+        "Authority: U.S. DHS SEVP Policy Guidance: Maintaining Status",
+        "Authority: University DSO/International Office",
+        "Authority: Ministry of Higher Education transfer/extension policies",
+        "Authority: SEVIS Help Hub: Transferring Schools"
+      ]
+    },
+    {
+      "title": "Grace Periods & Status Termination — Official",
+      "summary": "Grace periods provide limited lawful presence after program completion or status loss. Understanding triggers for status termination and restoration procedures is critical to avoid unlawful presence accrual.",
+      "scope": {
+        "applies_to": ["F-1", "J-1"],
+        "audience": ["Sponsored Omani students", "Visiting scholars"],
+        "risk_level": "Critical",
+        "failure_impact": "Unlawful presence accrual, 3/10-year re-entry bars, scholarship forfeiture, deportation proceedings"
+      },
+      "timeline": {
+        "T0": "Program completion date or status violation",
+        "T+15 days": "DSO must report termination in SEVIS after violation",
+        "T+60 days (F-1)": "Post-completion grace period ends",
+        "T+30 days (J-1)": "Post-completion grace period ends",
+        "T+0 days (Violation)": "Unlawful presence begins immediately upon termination"
+      },
+      "bullets": [
+        {
+          "rule": "Post-Completion Grace Period (F-1)",
+          "details": [
+            "60-day period to depart U.S., transfer schools, or change status after program completion.",
+            "Program completion date is earlier of: final exam date, thesis defense date, or I-20 end date.",
+            "Cannot work during grace period except if on authorized OPT.",
+            "Travel outside U.S. during grace period ends the period; cannot re-enter."
+          ],
+          "authorization_sources": ["Automatic by regulation"],
+          "failure_modes": [
+            "Overstaying beyond 60 days",
+            "Attempting to re-enter during grace period",
+            "Beginning new program after grace period expires"
+          ],
+          "mitigation": [
+            "Mark calendar with exact grace period end date",
+            "Initiate transfer/change of status applications well before grace period ends",
+            "Confirm departure flight booked before grace period expiration"
+          ]
+        },
+        {
+          "rule": "Post-Completion Grace Period (J-1)",
+          "details": [
+            "30-day period for travel and departure after program end date on DS-2019.",
+            "Cannot work or study during this period.",
+            "Time cannot be extended for any reason."
+          ],
+          "authorization_sources": ["Automatic by regulation"]
+        },
+        {
+          "rule": "Common Status Termination Triggers",
+          "details": [
+            "Failure to maintain full course load without authorization",
+            "Unauthorized employment (including unpaid internships)",
+            "Failure to report address change within 10 days",
+            "Failure to extend I-20/DS-2019 before expiration",
+            "Failure to enroll in classes by program start date",
+            "Substantial violation of school conduct policies leading to dismissal"
+          ],
+          "authorization_sources": ["SEVIS automated termination", "DSO/RO manual termination"],
+          "common_violations": [
+            "Dropping below full-time without DSO approval",
+            "Working on-campus more than 20 hours/week",
+            "Forgetting to request program extension"
+          ]
+        },
+        {
+          "rule": "Reinstatement to F-1 Status",
+          "details": [
+            "Available if: violation was beyond student's control, student intends to complete studies, has not worked illegally, and is not deportable.",
+            "Must file Form I-539 with USCIS with supporting evidence and fee.",
+            "Processing time 6-12 months; cannot travel or work while application pending.",
+            "Cannot apply if out of status more than 5 months unless exceptional circumstances."
+          ],
+          "authorization_sources": ["USCIS adjudication", "University DSO recommendation"],
+          "failure_modes": [
+            "USCIS denial leading to accrual of unlawful presence",
+            "Applying after 5-month deadline without exceptional circumstances",
+            "Traveling while reinstatement pending (abandons application)"
+          ],
+          "mitigation": [
+            "Consult DSO immediately upon discovering status violation",
+            "Document all evidence showing violation was beyond control",
+            "Consider departing U.S. and re-entering with new I-20 if eligible"
+          ]
+        },
+        {
+          "rule": "Reinstatement to J-1 Status",
+          "details": [
+            "More restrictive than F-1; requires sponsoring agency recommendation.",
+            "Must apply within 30 days of status violation discovery.",
+            "Requires showing violation was minor or technical and beyond scholar's control."
+          ],
+          "authorization_sources": ["USCIS", "J-1 program sponsor"]
+        },
+        {
+          "rule": "Departure After Status Loss",
+          "details": [
+            "Departing U.S. after status termination stops unlawful presence accrual.",
+            "May apply for new visa after departure but must disclose previous violation.",
+            "Re-entry bar periods: 180 days unlawful presence = 3-year bar; 365+ days = 10-year bar."
+          ],
+          "authorization_sources": ["CBP admission determination"]
+        }
+      ],
+      "links": [
+        "Authority: 8 CFR 214.2(f)(5) - F-1 grace periods",
+        "Authority: 22 CFR 62.22 - J-1 grace periods",
+        "Authority: USCIS Policy Manual: F-1 Reinstatement",
+        "Authority: University DSO/International Office",
+        "Authority: Ministry of Higher Education grace period policies"
+      ]
+    },
+    {
+      "title": "Travel & Re-entry Rules — Official",
+      "summary": "International travel while maintaining F-1/J-1 status requires specific documentation validation and timing considerations. Re-entry is never guaranteed and is at CBP discretion. Advance preparation is mandatory.",
       "scope": {
         "applies_to": ["F-1", "J-1"],
         "audience": ["Sponsored Omani students", "Visiting scholars"],
         "risk_level": "High",
-        "failure_impact": "Visa status termination, SEVIS record invalidation, scholarship suspension"
+        "failure_impact": "Denied entry to U.S., SEVIS termination, stranded outside U.S., scholarship interruption"
       },
       "timeline": {
-        "T0": "Landing at U.S. port of entry",
-        "T+24h": "Local address stabilization",
-        "T+72h": "DSO check-in completed"
+        "T-30 days": "Begin travel document preparation",
+        "T-10 days": "Confirm all documents valid",
+        "T-1 day": "Final document check before travel",
+        "T+0": "Port of entry inspection",
+        "Within 10 days": "Report return to DSO if required"
       },
       "bullets": [
         {
-          "rule": "Document Accessibility",
+          "rule": "Required Travel Documents",
           "details": [
-            "Carry passport, U.S. visa, and I-20 (F-1) or DS-2019 (J-1) in hand luggage, not checked baggage.",
-            "Documents must be presented to CBP officers upon request without delay.",
-            "Do not surrender original documents to third parties except authorized CBP officers or university officials."
+            "Valid passport (6+ months validity for most countries, including Oman)",
+            "Valid U.S. visa stamp (except for automatic revalidation cases)",
+            "Current I-20 with valid travel signature (F-1) or DS-2019 with travel validation (J-1)",
+            "Proof of financial support (current bank statements, sponsor letter)",
+            "Proof of enrollment/employment (transcript, enrollment verification, employment letter for OPT)",
+            "I-94 record from previous entry"
           ],
+          "authorization_sources": ["CBP officer inspection"],
           "failure_modes": [
-            "Secondary inspection delays",
-            "Temporary admission under deferred inspection",
-            "Incorrect I-94 classification"
+            "Expired visa stamp (except automatic revalidation)",
+            "I-20 travel signature >12 months old (>6 months for OPT)",
+            "Insufficient financial documentation",
+            "Passport expiry within 6 months"
           ],
           "mitigation": [
-            "Pre-flight document checklist",
-            "Digital backups stored securely",
-            "Immediate correction request if error is detected at entry"
+            "Create travel document checklist and verify each item 72 hours before departure",
+            "Request new travel signatures if current will expire during travel",
+            "Carry both physical and digital copies of all documents"
           ]
         },
         {
-          "rule": "CBP Admission Verification",
+          "rule": "Visa Revalidation Process",
           "details": [
-            "Confirm correct visa class (F-1 or J-1) is recorded upon entry.",
-            "Verify that the I-94 admission record lists 'D/S' (Duration of Status).",
-            "If admitted incorrectly, request correction immediately before leaving the inspection area."
+            "Must apply at U.S. Embassy/Consulate outside U.S., typically in home country (Oman).",
+            "Requires visa interview appointment and all supporting documents.",
+            "Administrative processing (security checks) can add weeks/months to processing.",
+            "Visa denial does not affect current status if still inside U.S."
           ],
-          "post_entry_actions": [
-            "Retrieve I-94 record online within 24 hours",
-            "Archive entry stamp and electronic record",
-            "Report discrepancies to DSO immediately"
-          ]
-        },
-        {
-          "rule": "University DSO Check-In",
-          "details": [
-            "Check-in with the Designated School Official is mandatory for SEVIS activation.",
-            "Check-in methods may include in-person appointment, online portal submission, or hybrid process.",
-            "Failure to check in may result in automatic SEVIS termination."
-          ],
-          "required_inputs": [
-            "U.S. local address",
-            "Active phone number",
-            "Copy of entry stamp and I-94",
-            "Signed I-20 or DS-2019"
-          ]
-        },
-        {
-          "rule": "Local Address Registration",
-          "details": [
-            "A valid U.S. residential address must be reported to the university and SEVIS.",
-            "Temporary housing (hotel, Airbnb) is acceptable initially but must be updated once permanent housing is secured.",
-            "Address changes must be reported within 10 days."
-          ]
-        }
-      ],
-      "links": [
-        "Authority: University Designated School Official (DSO)",
-        "Authority: U.S. DHS SEVP (Study in the States)",
-        "Authority: Ministry of Higher Education scholarship guidance",
-        "Authority: U.S. Customs and Border Protection (CBP)"
-      ]
-    },
-    {
-      "title": "Immigration & Compliance — Official",
-      "summary": "Binding immigration, employment, and status-maintenance obligations. No discretionary interpretation is permitted. When in doubt, escalation is mandatory.",
-      "scope": {
-        "risk_level": "Critical",
-        "governing_bodies": ["DHS", "SEVP", "University DSO", "Omani MoHE"]
-      },
-      "core_principles": [
-        "Status is activity-based, not time-based",
-        "Authorization must precede action",
-        "Silence is not approval"
-      ],
-      "bullets": [
-        {
-          "rule": "Employment Prohibition Without Authorization",
-          "details": [
-            "Any form of employment, paid or unpaid, on-campus or off-campus, requires prior written authorization.",
-            "This includes internships, research assistantships, fellowships, startups, consulting, freelancing, and remote work.",
-            "Volunteer work is not exempt if it resembles a paid role."
-          ],
-          "authorization_sources": [
-            "University DSO",
-            "USCIS (if applicable)",
-            "Ministry of Higher Education sponsor approval"
-          ],
+          "authorization_sources": ["U.S. Department of State (Consular Officer)"],
           "common_violations": [
-            "Unpaid internships without CPT",
-            "Equity-based startup work",
-            "Online freelance work for non-U.S. entities"
-          ]
-        },
-        {
-          "rule": "Document Validity and Expiry Tracking",
-          "details": [
-            "Passport must remain valid at least six months into the future unless exempt by treaty.",
-            "I-20 or DS-2019 end date must always reflect actual program duration.",
-            "Visa expiry affects re-entry, not lawful presence, but must still be tracked."
+            "Applying for visa in third country without strong ties",
+            "Insufficient documentation of continued ties to home country",
+            "Misrepresenting employment or study plans"
           ],
           "controls": [
-            "Quarterly document audit",
-            "Calendar-based expiry alerts",
-            "Early renewal initiation (90–180 days)"
+            "Schedule visa appointment well in advance of planned travel",
+            "Prepare updated evidence of MoHE sponsorship and intent to return to Oman",
+            "Consult with DSO about timing and documentation before visa appointment"
           ]
         },
         {
-          "rule": "Status-Impacting Changes",
+          "rule": "Automatic Revalidation",
           "details": [
-            "Changes in major, funding source, study level, or enrollment status must be approved in advance.",
-            "Unauthorized reduced course loads are a status violation.",
-            "Leave of absence requires coordinated DSO and sponsor approval."
+            "Allows re-entry with expired visa when traveling to contiguous territory (Canada, Mexico, adjacent islands) for <30 days.",
+            "Requirements: Valid I-20/DS-2019 with travel signature, valid passport, valid I-94, not applying for new visa during trip.",
+            "Not available if: from designated state sponsor of terrorism country (does not include Oman), previously denied visa, or out of status.",
+            "Cannot visit other countries beyond contiguous territory during trip."
+          ],
+          "authorization_sources": ["8 CFR 214.1(f)(3)", "CBP officer discretion"],
+          "failure_modes": [
+            "Applying for new visa while in contiguous territory",
+            "Staying beyond 30 days",
+            "Visiting non-contiguous countries during trip"
+          ],
+          "mitigation": [
+            "Print and carry automatic revalidation regulations",
+            "Confirm all eligibility criteria before travel",
+            "Have DSO contact information available at port of entry"
           ]
+        },
+        {
+          "rule": "Travel During OPT/STEM OPT",
+          "details": [
+            "Must have: valid passport, valid visa (unless automatic revalidation), EAD card, I-20 with valid travel signature (<6 months old), job offer letter or employment verification.",
+            "Unemployed OPT students may be denied re-entry if exceeding 90-day unemployment limit.",
+            "STEM OPT requires I-20 with current employer information and valid travel signature."
+          ],
+          "authorization_sources": ["CBP officer discretion"],
+          "failure_modes": [
+            "Traveling while unemployed on OPT beyond 90-day limit",
+            "Missing employment verification letter",
+            "EAD card lost/stolen while abroad"
+          ],
+          "controls": [
+            "Obtain employment verification letter before travel",
+            "Calculate unemployment days before departure",
+            "Carry multiple copies of EAD card separately"
+          ]
+        },
+        {
+          "rule": "Travel During Academic Breaks",
+          "details": [
+            "Permitted during summer/winter breaks if returning for next term.",
+            "Must be enrolled full-time before departure and intending to enroll full-time upon return.",
+            "Final semester travel is high-risk; consider completing all requirements before travel."
+          ],
+          "authorization_sources": ["CBP officer discretion"]
+        },
+        {
+          "rule": "Emergency Travel Planning",
+          "details": [
+            "Death/illness in family requires: proof of emergency, DSO consultation, potential expedited travel signature.",
+            "Document all communications with DSO about emergency.",
+            "Consider impact on exams, assignments, and enrollment status."
+          ],
+          "authorization_sources": ["University DSO emergency procedures"]
         }
       ],
       "links": [
-        "Authority: University Designated School Official (DSO)",
-        "Authority: U.S. DHS SEVP (Study in the States)",
-        "Authority: Ministry of Higher Education scholarship compliance"
+        "Authority: U.S. CBP Travel Requirements for F/J Students",
+        "Authority: U.S. Department of State Visa Information",
+        "Authority: Automatic Revalidation - CBP Website",
+        "Authority: University DSO Travel Advisory",
+        "Authority: Ministry of Higher Education travel approval procedures"
       ]
     },
     {
-      "title": "Academic & Living Setup — Official",
-      "summary": "Operational setup requirements tied directly to legal status, scholarship continuity, and academic standing.",
+      "title": "J-1 Two-Year Home Residency Requirement — Official",
+      "summary": "Section 212(e) of the Immigration and Nationality Act mandates that certain J-1 exchange visitors return to their home country for two years after program completion before being eligible for certain U.S. immigration benefits. Determination is made at visa issuance.",
+      "scope": {
+        "applies_to": ["J-1"],
+        "audience": ["Visiting scholars", "J-1 students"],
+        "risk_level": "Critical",
+        "failure_impact": "Ineligible for H/L/K visas, immigrant visas, or change of status to most nonimmigrant categories; must fulfill requirement or obtain waiver"
+      },
+      "timeline": {
+        "T0": "J-1 visa issuance/DS-2019 issuance",
+        "Before program completion": "Waiver application consideration",
+        "After program completion": "2-year period begins",
+        "During 2-year period": "Cannot access barred immigration benefits"
+      },
       "bullets": [
         {
-          "rule": "University System Onboarding",
+          "rule": "Determining Factors for 212(e) Application",
           "details": [
-            "University ID issuance, email activation, and learning platform access are mandatory.",
-            "Orientation attendance may be legally required for international students.",
-            "Missed onboarding deadlines can delay enrollment verification."
+            "Government-funded: Receiving funding from U.S. or home country government (including MoHE).",
+            "Skills list: Field appears on Exchange Visitor Skills List for home country (Oman maintains list).",
+            "Graduate medical education: Receiving medical training in U.S.",
+            "Check DS-2019 box 2 to see if subject to requirement."
+          ],
+          "authorization_sources": ["U.S. Department of State (visa annotation)", "DS-2019 notation"],
+          "failure_modes": [
+            "Misinterpreting DS-2019 notation",
+            "Assuming no requirement without verification",
+            "Accepting barred immigration benefit and being denied"
+          ],
+          "mitigation": [
+            "Review DS-2019 box 2 upon receipt",
+            "Consult with J-1 program sponsor for clarification",
+            "Verify with MoHE if funding triggers requirement"
           ]
         },
         {
-          "rule": "Health Insurance Compliance",
+          "rule": "Consequences of 212(e) Requirement",
           "details": [
-            "Continuous health insurance coverage meeting university and sponsor standards is mandatory.",
-            "Waivers require formal approval and documented equivalency.",
-            "Coverage gaps may trigger registration holds or sponsor sanctions."
+            "Cannot change status inside U.S. to H, L, or K nonimmigrant categories.",
+            "Cannot obtain immigrant visa or adjustment of status to permanent resident.",
+            "Can return on B, F, or new J visa during 2-year period.",
+            "Time outside home country does not count toward 2-year requirement."
+          ],
+          "authorization_sources": ["U.S. Department of State interpretation", "Consular officer determination"],
+          "common_violations": [
+            "Applying for H-1B while subject to requirement",
+            "Marrying U.S. citizen and applying for adjustment without waiver",
+            "Attempting to change to F-1 without waiver if subject"
           ]
         },
         {
-          "rule": "Academic Reporting",
+          "rule": "Waiver Application Process",
           "details": [
-            "Minimum full-time enrollment must be maintained each term.",
-            "Grades, progress reports, and transcripts may be required by MoHE on a fixed cadence.",
-            "Academic probation must be reported immediately."
+            "No objection statement: Omani government (through MoFA) submits no objection to U.S. Department of State.",
+            "Exceptional hardship: To U.S. citizen or permanent resident spouse/child.",
+            "Persecution: Reasonable fear of persecution in home country.",
+            "Interested government agency: U.S. federal agency requests waiver.",
+            "Conrad State 30: For physicians working in underserved areas."
+          ],
+          "authorization_sources": ["U.S. Department of State Waiver Review Division", "MoFA of Oman"],
+          "failure_modes": [
+            "Incomplete waiver application leading to denial",
+            "Applying for waiver without consulting MoHE",
+            "Beginning new immigration process before waiver approval"
+          ],
+          "mitigation": [
+            "Consult with immigration attorney experienced in J-1 waivers",
+            "Obtain MoHE approval before pursuing waiver",
+            "Submit complete documentation with waiver application"
           ]
+        },
+        {
+          "rule": "Fulfilling the Two-Year Requirement",
+          "details": [
+            "Physical presence in Oman for aggregate of 2 years after program completion.",
+            "Short trips abroad (<30 days) generally permitted but consult with attorney.",
+            "Document proof of physical presence (passport stamps, employment records, residence proofs).",
+            "MoHE employment in Oman counts toward requirement."
+          ],
+          "authorization_sources": ["Consular officer evaluation", "USCIS adjudication"],
+          "controls": [
+            "Maintain detailed records of all time spent in Oman",
+            "Obtain employment verification letters from Omani employers",
+            "Consult with immigration attorney before applying for barred benefits"
+          ]
+        },
+        {
+          "rule": "Impact on Dependents (J-2)",
+          "details": [
+            "J-2 dependents are subject to same 2-year requirement if J-1 principal is subject.",
+            "J-2 waiver must be applied for separately but typically granted with J-1 waiver.",
+            "J-2 children who turn 21 may need separate waiver evaluation."
+          ],
+          "authorization_sources": ["U.S. Department of State"]
         }
       ],
       "links": [
-        "Authority: University international office",
-        "Authority: University health services",
-        "Authority: Ministry of Higher Education scholarship guidance"
+        "Authority: Immigration and Nationality Act Section 212(e)",
+        "Authority: U.S. Department of State J-1 Waiver Information",
+        "Authority: Ministry of Foreign Affairs of Oman",
+        "Authority: Ministry of Higher Education J-1 policies",
+        "Authority: Exchange Visitor Skills List - Federal Register"
       ]
     },
     {
-      "title": "Escalation Rules — Official",
-      "summary": "Non-negotiable escalation hierarchy for uncertainty, emergencies, or compliance ambiguity.",
+      "title": "Dependent Status (F-2/J-2) — Official",
+      "summary": "Spouses and unmarried children under 21 may accompany F-1/J-1 holders as dependents. Their status is derivative and contingent on principal's status. Specific rules govern their activities and benefits in U.S.",
+      "scope": {
+        "applies_to": ["F-2", "J-2"],
+        "audience": ["Dependents of sponsored students/scholars"],
+        "risk_level": "High",
+        "failure_impact": "Dependent status termination, unlawful presence accrual, separation from family, immigration violations"
+      },
+      "timeline": {
+        "T0": "Dependent visa issuance",
+        "Within 30 days": "School enrollment for children (varies by state)",
+        "Before employment": "J-2 work authorization approval",
+        "Upon principal status change": "Dependent status must be adjusted"
+      },
       "bullets": [
         {
-          "rule": "Immigration and Legal Uncertainty",
+          "rule": "F-2 Dependent Rules",
           "details": [
-            "Do not rely on peer advice, online forums, or assumptions.",
-            "Escalate directly to the DSO and MoHE sponsor contact.",
-            "Written confirmation is required before acting."
+            "Cannot work in any capacity, paid or unpaid.",
+            "Can study part-time at SEVP-certified institutions (full-time requires change to F-1).",
+            "May engage in volunteer activities that are truly voluntary (not displacing paid workers).",
+            "Must maintain health insurance as required by university/policy.",
+            "Status automatically terminates if F-1 principal loses status."
+          ],
+          "authorization_sources": ["8 CFR 214.2(f)(15)", "University DSO"],
+          "common_violations": [
+            "F-2 spouse engaging in unpaid internship",
+            "F-2 child attending public school full-time without change of status",
+            "F-2 dependent remaining in U.S. after principal departs"
+          ],
+          "mitigation": [
+            "Clear understanding of employment prohibitions",
+            "Consult DSO before any study enrollment",
+            "Coordinate travel with principal's status maintenance"
           ]
         },
         {
-          "rule": "Medical and Safety Emergencies",
+          "rule": "J-2 Dependent Rules",
           "details": [
-            "Contact local emergency services (911) immediately.",
-            "Notify university emergency contacts after safety is secured.",
-            "Do not attempt self-diagnosis or peer medical guidance."
+            "May study full-time or part-time without restriction.",
+            "May apply for work authorization from USCIS (Form I-765) for self-support, not principal.",
+            "Employment must not be necessary for principal's support.",
+            "Can engage in volunteer activities.",
+            "Status contingent on J-1 principal maintaining status."
+          ],
+          "authorization_sources": ["USCIS (employment)", "J-1 program sponsor"],
+          "failure_modes": [
+            "Working without EAD approval",
+            "Employment income used to support J-1 principal",
+            "Failing to maintain health insurance"
+          ],
+          "controls": [
+            "Apply for work authorization 90+ days in advance of desired start date",
+            "Maintain separate finances showing self-support",
+            "Carry proof of health insurance at all times"
           ]
         },
         {
-          "rule": "Insufficient Knowledge",
+          "rule": "School Enrollment for Dependents",
           "details": [
-            "If official guidance is unclear or unavailable, explicitly pause action.",
-            "Document the question and request formal clarification.",
-            "Proceed only after receiving authoritative instruction."
+            "F-2/J-2 children may attend K-12 public schools full-time.",
+            "F-2 adults/children may attend college/university part-time; full-time requires status change.",
+            "J-2 dependents may study full-time without restriction.",
+            "Some states require immunizations and residency proofs for K-12 enrollment."
+          ],
+          "authorization_sources": ["State education departments", "SEVP-certified institutions"],
+          "mitigation": [
+            "Research school district enrollment requirements before arrival",
+            "Obtain school records and immunization records from Oman",
+            "Consult with DSO/RO before college enrollment for F-2s"
+          ]
+        },
+        {
+          "rule": "Travel Requirements for Dependents",
+          "details": [
+            "Must have own visa stamp (unless Canadian citizen).",
+            "F-2: Need principal's valid I-20 with dependent listing and travel signature.",
+            "J-2: Need principal's DS-2019 with dependent listing and travel validation.",
+            "Cannot travel without principal unless for very short periods with documentation."
+          ],
+          "authorization_sources": ["CBP officer inspection"],
+          "failure_modes": [
+            "Traveling with expired dependent visa",
+            "Traveling without principal's signed document",
+            "Re-entering after principal has completed program"
+          ]
+        },
+        {
+          "rule": "Status Change for Dependents",
+          "details": [
+            "F-2 to F-1: Must apply for change of status to study full-time.",
+            "J-2 to F-1: Possible but complex due to potential 212(e) applicability.",
+            "Upon principal's change: Dependents must change status concurrently or depart.",
+            "Divorce/separation: Dependent status terminates; must change status or depart."
+          ],
+          "authorization_sources": ["USCIS", "Consular processing"]
+        }
+      ],
+      "links": [
+        "Authority: 8 CFR 214.2(f) - F-2 regulations",
+        "Authority: 22 CFR Part 62 - J-2 regulations",
+        "Authority: USCIS Form I-765 Instructions for J-2",
+        "Authority: University DSO/International Office",
+        "Authority: Ministry of Higher Education dependent policies"
+      ]
+    },
+    {
+      "title": "Change of Status Procedures — Official",
+      "summary": "Changing from one nonimmigrant category to another (e.g., F-1 to H-1B) requires careful planning, timing, and adherence to specific procedures. Some changes can be done within U.S., others require consular processing. Unauthorized change attempts constitute status violation.",
+      "scope": {
+        "applies_to": ["F-1", "J-1"],
+        "audience": ["Sponsored Omani students", "Visiting scholars"],
+        "risk_level": "Critical",
+        "failure_impact": "Status gap leading to unlawful presence, employment authorization loss, deportation risk, future immigration benefit denial"
+      },
+      "timeline": {
+        "T-6 months": "Begin planning for status change",
+        "T-90 days": "File change of status application (varies by category)",
+        "T0": "Current status expiration",
+        "T+240 days (H-1B)": "Maximum cap-gap extension period"
+      },
+      "bullets": [
+        {
+          "rule": "F-1 to H-1B Change (Cap-Gap)",
+          "details": [
+            "H-1B petition must be filed while F-1 status is valid.",
+            "Cap-gap provision automatically extends F-1 status and OPT work authorization until October 1 if selected.",
+            "If not selected: Must depart by end of 60-day grace period or maintain other status.",
+            "Change occurs on October 1 when H-1B status begins."
+          ],
+          "authorization_sources": ["USCIS H-1B petition approval", "Automatic cap-gap regulation"],
+          "failure_modes": [
+            "H-1B petition filed after OPT expiration",
+            "Traveling during cap-gap period without proper documentation",
+            "Assuming H-1B approval before October 1"
+          ],
+          "mitigation": [
+            "Coordinate with employer's immigration attorney on timing",
+            "Obtain updated I-20 with cap-gap notation from DSO",
+            "Avoid international travel between April 1 and October 1 unless necessary"
+          ]
+        },
+        {
+          "rule": "F-1/J-1 to Other Statuses",
+          "details": [
+            "F-1 to J-1: Possible but may have 212(e) implications.",
+            "J-1 to F-1: Requires waiver if subject to 2-year home residency requirement.",
+            "To B-1/B-2: For temporary stay after studies; cannot study or work.",
+            "To O-1: For individuals with extraordinary ability; high evidence threshold."
+          ],
+          "authorization_sources": ["USCIS Form I-539 (change within U.S.)", "Consular processing (change abroad)"],
+          "common_violations": [
+            "Beginning work in new status before approval",
+            "Continuing studies after applying for change to non-student status",
+            "Overstaying while change application pending"
+          ]
+        },
+        {
+          "rule": "Change of Status Within U.S. (Form I-539)",
+          "details": [
+            "Must file before current status expires.",
+            "Can remain in U.S. while application pending but cannot work or study unless specifically authorized.",
+            "Filing fee required; premium processing available for some categories.",
+            "Denial results in accrual of unlawful presence from original status expiration."
+          ],
+          "authorization_sources": ["USCIS adjudication"],
+          "failure_modes": [
+            "Filing after status expiration (only allowed within 30 days with good cause)",
+            "Departing U.S. while application pending (abandons application)",
+            "Assuming continued authorization during pending period"
+          ],
+          "mitigation": [
+            "File application at least 45 days before status expiration",
+            "Maintain copies of filing receipt and all supporting documents",
+            "Do not travel internationally until status change is approved"
+          ]
+        },
+        {
+          "rule": "Consular Processing for Status Change",
+          "details": [
+            "Departing U.S. and applying for new visa category at consulate abroad.",
+            "Advantage: Faster processing in some cases, guaranteed status change date.",
+            "Risk: Visa denial leaves you outside U.S., re-entry not guaranteed.",
+            "Required for some categories that cannot change status within U.S."
+          ],
+          "authorization_sources": ["U.S. Department of State", "Consular officer"],
+          "controls": [
+            "Confirm eligibility for consular processing before departing U.S.",
+            "Prepare complete visa application packet before leaving",
+            "Have backup plan if visa is denied or delayed"
           ]
         }
       ],
       "links": [
-        "Authority: University international office/DSO",
-        "Authority: Ministry of Higher Education",
-        "Authority: Embassy of Oman"
+        "Authority: USCIS Form I-539 Instructions",
+        "Authority: USCIS H-1B Cap-Gap Guidance",
+        "Authority: U.S. Department of State Visa Processing",
+        "Authority: University DSO/International Office",
+        "Authority: Ministry of Higher Education status change approval"
       ]
     }
   ]
