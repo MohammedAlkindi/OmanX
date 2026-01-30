@@ -1,13 +1,15 @@
 :root{
-  --bg:#ffffff;
+  --bg:#f7f7f8;
   --panel:#ffffff;
   --border:#e5e7eb;
-  --text:#111827;
+  --text:#0f172a;
   --muted:#6b7280;
-  --accent:#0b3a6a;
-  --accent-muted:#f1f5f9;
-  --success:#16a34a;
+  --accent:#10a37f;
+  --accent-strong:#0b7a5f;
+  --accent-muted:#ecfdf5;
+  --success:#10b981;
   --warning:#b45309;
+  --shadow: 0 10px 40px rgba(15, 23, 42, 0.08);
   --font: "Inter", "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
 }
 
@@ -18,22 +20,26 @@ body{
   font-family: var(--font);
   background: var(--bg);
   color: var(--text);
+  -webkit-font-smoothing: antialiased;
 }
 
 .shell{
-  max-width: 860px;
-  margin: 28px auto 40px;
-  padding: 0 20px;
+  max-width: 980px;
+  margin: 36px auto 48px;
+  padding: 0 24px;
 }
 
 .topbar{
   display:flex;
-  align-items:flex-start;
+  align-items:center;
   justify-content:space-between;
   gap:24px;
   flex-wrap:wrap;
-  border-bottom: 1px solid var(--border);
-  padding-bottom: 18px;
+  border: 1px solid var(--border);
+  border-radius:18px;
+  padding: 18px 20px;
+  background: var(--panel);
+  box-shadow: var(--shadow);
 }
 
 .brand{
@@ -45,13 +51,13 @@ body{
 .logo{
   width:44px;
   height:44px;
-  border-radius:10px;
+  border-radius:12px;
   border:1px solid var(--border);
   display:grid;
   place-items:center;
   font-weight:700;
-  color: var(--accent);
-  background: var(--panel);
+  color: var(--accent-strong);
+  background: var(--accent-muted);
 }
 
 .brand-text h1{ margin:0; font-size:20px; letter-spacing:-0.01em; }
@@ -69,19 +75,24 @@ body{
   border:1px solid var(--border);
   border-radius:999px;
   overflow:hidden;
+  background: #f3f4f6;
+  padding: 2px;
 }
 
 .mode-btn{
   border:0;
   background: transparent;
-  padding: 8px 14px;
+  padding: 7px 14px;
   font-size:13px;
   cursor:pointer;
   color: var(--muted);
+  border-radius:999px;
+  transition: all 0.2s ease;
 }
 .mode-btn.on{
-  background: var(--text);
-  color:#fff;
+  background: var(--panel);
+  color: var(--text);
+  box-shadow: 0 1px 3px rgba(15, 23, 42, 0.12);
 }
 
 .pill{
@@ -91,7 +102,7 @@ body{
   padding: 8px 12px;
   border-radius:999px;
   border:1px solid var(--border);
-  background: var(--panel);
+  background: #f9fafb;
   font-size:13px;
   color: var(--muted);
 }
@@ -104,31 +115,40 @@ body{
 
 .layout{
   display:block;
-  padding: 24px 0;
+  padding: 28px 0;
 }
 
 .ghost, .primary{
   border-radius:10px;
-  padding: 10px 12px;
+  padding: 10px 14px;
   font-size:13px;
   border:1px solid var(--border);
   background: var(--panel);
   cursor:pointer;
+  transition: all 0.2s ease;
+}
+.ghost:hover{
+  border-color: #cbd5f5;
 }
 .primary{
-  background: var(--text);
+  background: var(--accent);
   color:#fff;
-  border-color: var(--text);
+  border-color: var(--accent);
+}
+.primary:hover{
+  background: var(--accent-strong);
+  border-color: var(--accent-strong);
 }
 
 .assistant-panel{
   border:1px solid var(--border);
-  border-radius:16px;
-  padding: 18px;
+  border-radius:18px;
+  padding: 20px;
   display:flex;
   flex-direction:column;
-  gap:12px;
+  gap:14px;
   background: var(--panel);
+  box-shadow: var(--shadow);
 }
 
 .chat-head{
@@ -155,8 +175,8 @@ body{
   overflow-y:auto;
   border:1px solid var(--border);
   border-radius:14px;
-  padding: 12px;
-  background: #fbfbfc;
+  padding: 14px;
+  background: #f9fafb;
 }
 
 .msg{
@@ -176,7 +196,7 @@ body{
   background: var(--panel);
   border:1px solid var(--border);
   border-radius:12px;
-  padding: 8px 10px;
+  padding: 10px 12px;
   font-size:14px;
   color: var(--text);
   white-space: pre-wrap;
@@ -192,10 +212,11 @@ body{
 textarea{
   resize: vertical;
   border:1px solid var(--border);
-  border-radius:10px;
-  padding: 10px;
+  border-radius:12px;
+  padding: 12px;
   font-size:14px;
   font-family: var(--font);
+  background: #fbfbfc;
 }
 
 .composer-actions{
@@ -227,13 +248,14 @@ textarea{
 
 .footer{
   border-top: 1px solid var(--border);
-  padding: 20px;
+  padding: 24px;
   display:flex;
   flex-wrap:wrap;
   gap:8px 16px;
   justify-content:space-between;
   font-size:12px;
   color: var(--muted);
+  background: #f8fafc;
 }
 
 .footer a{ color: var(--text); text-decoration:none; }
@@ -245,5 +267,9 @@ textarea{
 @media (max-width: 960px){
   .shell{
     margin-top: 20px;
+  }
+
+  .topbar{
+    padding: 16px;
   }
 }
