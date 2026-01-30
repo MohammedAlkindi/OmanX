@@ -2,25 +2,132 @@
   "items": [
     {
       "title": "Arrival (First 72 Hours) — Official",
-      "summary": "Authoritative onboarding steps for Omani scholars upon arrival in the United States.",
+      "summary": "Authoritative, non-optional onboarding procedures for Omani Ministry of Higher Education scholars upon physical arrival in the United States. This section governs border entry, SEVIS activation, institutional registration, and immediate post-arrival compliance.",
+      "scope": {
+        "applies_to": ["F-1", "J-1"],
+        "audience": ["Sponsored Omani students", "Visiting scholars"],
+        "risk_level": "High",
+        "failure_impact": "Visa status termination, SEVIS record invalidation, scholarship suspension"
+      },
+      "timeline": {
+        "T0": "Landing at U.S. port of entry",
+        "T+24h": "Local address stabilization",
+        "T+72h": "DSO check-in completed"
+      },
       "bullets": [
-        "Keep passport, visa, and I-20/DS-2019 accessible at all times during entry and initial travel.",
-        "Confirm the university international office/DSO check-in procedure and complete it immediately upon arrival.",
-        "Maintain accurate local address and emergency contact details; report updates to the university and sponsor as required."
+        {
+          "rule": "Document Accessibility",
+          "details": [
+            "Carry passport, U.S. visa, and I-20 (F-1) or DS-2019 (J-1) in hand luggage, not checked baggage.",
+            "Documents must be presented to CBP officers upon request without delay.",
+            "Do not surrender original documents to third parties except authorized CBP officers or university officials."
+          ],
+          "failure_modes": [
+            "Secondary inspection delays",
+            "Temporary admission under deferred inspection",
+            "Incorrect I-94 classification"
+          ],
+          "mitigation": [
+            "Pre-flight document checklist",
+            "Digital backups stored securely",
+            "Immediate correction request if error is detected at entry"
+          ]
+        },
+        {
+          "rule": "CBP Admission Verification",
+          "details": [
+            "Confirm correct visa class (F-1 or J-1) is recorded upon entry.",
+            "Verify that the I-94 admission record lists 'D/S' (Duration of Status).",
+            "If admitted incorrectly, request correction immediately before leaving the inspection area."
+          ],
+          "post_entry_actions": [
+            "Retrieve I-94 record online within 24 hours",
+            "Archive entry stamp and electronic record",
+            "Report discrepancies to DSO immediately"
+          ]
+        },
+        {
+          "rule": "University DSO Check-In",
+          "details": [
+            "Check-in with the Designated School Official is mandatory for SEVIS activation.",
+            "Check-in methods may include in-person appointment, online portal submission, or hybrid process.",
+            "Failure to check in may result in automatic SEVIS termination."
+          ],
+          "required_inputs": [
+            "U.S. local address",
+            "Active phone number",
+            "Copy of entry stamp and I-94",
+            "Signed I-20 or DS-2019"
+          ]
+        },
+        {
+          "rule": "Local Address Registration",
+          "details": [
+            "A valid U.S. residential address must be reported to the university and SEVIS.",
+            "Temporary housing (hotel, Airbnb) is acceptable initially but must be updated once permanent housing is secured.",
+            "Address changes must be reported within 10 days."
+          ]
+        }
       ],
       "links": [
         "Authority: University Designated School Official (DSO)",
         "Authority: U.S. DHS SEVP (Study in the States)",
-        "Authority: Ministry of Higher Education scholarship guidance"
+        "Authority: Ministry of Higher Education scholarship guidance",
+        "Authority: U.S. Customs and Border Protection (CBP)"
       ]
     },
     {
       "title": "Immigration & Compliance — Official",
-      "summary": "High-stakes compliance obligations for visa status, SEVIS, and scholarship rules.",
+      "summary": "Binding immigration, employment, and status-maintenance obligations. No discretionary interpretation is permitted. When in doubt, escalation is mandatory.",
+      "scope": {
+        "risk_level": "Critical",
+        "governing_bodies": ["DHS", "SEVP", "University DSO", "Omani MoHE"]
+      },
+      "core_principles": [
+        "Status is activity-based, not time-based",
+        "Authorization must precede action",
+        "Silence is not approval"
+      ],
       "bullets": [
-        "Do not accept employment, training, or internships without explicit authorization from the DSO and sponsor.",
-        "Track visa and document expiry dates; initiate renewal or extension processes early through official channels.",
-        "Escalate any status-impacting issue to the DSO and MoHE immediately."
+        {
+          "rule": "Employment Prohibition Without Authorization",
+          "details": [
+            "Any form of employment, paid or unpaid, on-campus or off-campus, requires prior written authorization.",
+            "This includes internships, research assistantships, fellowships, startups, consulting, freelancing, and remote work.",
+            "Volunteer work is not exempt if it resembles a paid role."
+          ],
+          "authorization_sources": [
+            "University DSO",
+            "USCIS (if applicable)",
+            "Ministry of Higher Education sponsor approval"
+          ],
+          "common_violations": [
+            "Unpaid internships without CPT",
+            "Equity-based startup work",
+            "Online freelance work for non-U.S. entities"
+          ]
+        },
+        {
+          "rule": "Document Validity and Expiry Tracking",
+          "details": [
+            "Passport must remain valid at least six months into the future unless exempt by treaty.",
+            "I-20 or DS-2019 end date must always reflect actual program duration.",
+            "Visa expiry affects re-entry, not lawful presence, but must still be tracked."
+          ],
+          "controls": [
+            "Quarterly document audit",
+            "Calendar-based expiry alerts",
+            "Early renewal initiation (90–180 days)"
+          ]
+        },
+        {
+          "rule": "Status-Impacting Changes",
+          "details": [
+            "Changes in major, funding source, study level, or enrollment status must be approved in advance.",
+            "Unauthorized reduced course loads are a status violation.",
+            "Leave of absence requires coordinated DSO and sponsor approval."
+          ]
+        }
       ],
       "links": [
         "Authority: University Designated School Official (DSO)",
@@ -30,11 +137,32 @@
     },
     {
       "title": "Academic & Living Setup — Official",
-      "summary": "Core onboarding steps linked to university systems and scholarship obligations.",
+      "summary": "Operational setup requirements tied directly to legal status, scholarship continuity, and academic standing.",
       "bullets": [
-        "Complete university onboarding requirements (ID, email, orientation) within published deadlines.",
-        "Verify health insurance enrollment and coverage requirements through the university or sponsor.",
-        "Maintain academic reporting cadence with the university and sponsor as required by scholarship policy."
+        {
+          "rule": "University System Onboarding",
+          "details": [
+            "University ID issuance, email activation, and learning platform access are mandatory.",
+            "Orientation attendance may be legally required for international students.",
+            "Missed onboarding deadlines can delay enrollment verification."
+          ]
+        },
+        {
+          "rule": "Health Insurance Compliance",
+          "details": [
+            "Continuous health insurance coverage meeting university and sponsor standards is mandatory.",
+            "Waivers require formal approval and documented equivalency.",
+            "Coverage gaps may trigger registration holds or sponsor sanctions."
+          ]
+        },
+        {
+          "rule": "Academic Reporting",
+          "details": [
+            "Minimum full-time enrollment must be maintained each term.",
+            "Grades, progress reports, and transcripts may be required by MoHE on a fixed cadence.",
+            "Academic probation must be reported immediately."
+          ]
+        }
       ],
       "links": [
         "Authority: University international office",
@@ -44,11 +172,32 @@
     },
     {
       "title": "Escalation Rules — Official",
-      "summary": "Mandatory escalation for high-stakes or uncertain topics.",
+      "summary": "Non-negotiable escalation hierarchy for uncertainty, emergencies, or compliance ambiguity.",
       "bullets": [
-        "Immigration, legal, and compliance questions must be escalated to the DSO and MoHE; do not guess.",
-        "Medical emergencies require local emergency services; do not provide medical directives.",
-        "If approved knowledge is insufficient, inform the user and provide official escalation guidance only."
+        {
+          "rule": "Immigration and Legal Uncertainty",
+          "details": [
+            "Do not rely on peer advice, online forums, or assumptions.",
+            "Escalate directly to the DSO and MoHE sponsor contact.",
+            "Written confirmation is required before acting."
+          ]
+        },
+        {
+          "rule": "Medical and Safety Emergencies",
+          "details": [
+            "Contact local emergency services (911) immediately.",
+            "Notify university emergency contacts after safety is secured.",
+            "Do not attempt self-diagnosis or peer medical guidance."
+          ]
+        },
+        {
+          "rule": "Insufficient Knowledge",
+          "details": [
+            "If official guidance is unclear or unavailable, explicitly pause action.",
+            "Document the question and request formal clarification.",
+            "Proceed only after receiving authoritative instruction."
+          ]
+        }
       ],
       "links": [
         "Authority: University international office/DSO",
