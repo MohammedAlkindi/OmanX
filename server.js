@@ -1,4 +1,4 @@
-// server.js — OmanX MVP (Advanced, root-based, Express 5-safe)
+// server.js — OmanX Production-Ready
 // Goals:
 // - Production-grade middleware (security, rate limit, logging, compression)
 // - Root-directory static serving (index.html, styles.css, app.js all in root)
@@ -6,6 +6,7 @@
 // - Optional SSE streaming
 // - Knowledge.json hot-reload + caching
 // - Strong error handling + graceful shutdown
+// - Production-ready CORS and CSP headers
 //
 // IMPORTANT:
 // - prompts.js must export:
@@ -14,8 +15,9 @@
 //   - buildKnowledgeText
 //
 // Deployment note:
-// - If frontend and backend are on different domains, set:
-//   ALLOWED_ORIGINS=https://your-frontend-domain,https://www.your-frontend-domain
+// - Set ALLOWED_ORIGINS in production to your actual domain(s)
+// - Set NODE_ENV=production
+// - Set ADMIN_KEY for admin endpoints
 
 import express from "express";
 import path from "path";
@@ -47,9 +49,11 @@ const PORT = Number(process.env.PORT || 3000);
 const NODE_ENV = process.env.NODE_ENV || "development";
 const IS_PROD = NODE_ENV === "production";
 
-const OPENAI_MODEL = process.env.OPENAI_MODEL || "gpt-4.1-mini";
+const OPENAI_MODEL = process.env.OPENAI_MODEL || "gpt-4o-mini";
 const OPENAI_API_KEY = process.env.OPENAI_API_KEY;
 
+// Production: Set this to your actual domain(s)
+// Example: ALLOWED_ORIGINS=https://www.omanx.org,https://omanx.org
 const ALLOWED_ORIGINS = (process.env.ALLOWED_ORIGINS || "")
   .split(",")
   .map((s) => s.trim())
@@ -60,7 +64,7 @@ const CACHE_TTL_MS = Number(process.env.CACHE_TTL_MS || 10 * 60 * 1000); // 10 m
 const CACHE_MAX_ENTRIES = Number(process.env.CACHE_MAX_ENTRIES || 500);
 
 const KNOWLEDGE_PATH = path.join(__dirname, "knowledge.json");
-const ADMIN_KEY = process.env.ADMIN_KEY || ""; // optional; used for admin endpoints in prod
+const ADMIN_KEY = process.env.ADMIN_KEY || ""; // REQUIRED in production for admin endpoints
 
 // -----------------------------
 // Logger (Winston)
@@ -92,6 +96,16 @@ function requireEnv(name) {
   }
 }
 requireEnv("OPENAI_API_KEY");
+
+// Production warnings
+if (IS_PROD) {
+  if (!ALLOWED_ORIGINS.length) {
+    logger.warn("⚠️  ALLOWED_ORIGINS not set in production. CORS will allow all origins.");
+  }
+  if (!ADMIN_KEY) {
+    logger.warn("⚠️  ADMIN_KEY not set. Admin endpoints will be unprotected.");
+  }
+}
 
 // -----------------------------
 // OpenAI client
@@ -179,23 +193,31 @@ class KnowledgeManager {
   }
 
   async load(force = false) {
-    const st = await fs.stat(this.filePath);
-    if (!force && st.mtimeMs <= this.lastMtimeMs && this.knowledgeJson) return false;
+    try {
+      const st = await fs.stat(this.filePath);
+      if (!force && st.mtimeMs <= this.lastMtimeMs && this.knowledgeJson) return false;
 
-    const raw = await fs.readFile(this.filePath, "utf8");
-    const json = JSON.parse(raw);
+      const raw = await fs.readFile(this.filePath, "utf8");
+      const json = JSON.parse(raw);
 
-    this.knowledgeJson = json;
-    this.knowledgeText = buildKnowledgeText(json);
-    this.lastMtimeMs = st.mtimeMs;
+      this.knowledgeJson = json;
+      this.knowledgeText = buildKnowledgeText(json);
+      this.lastMtimeMs = st.mtimeMs;
 
-    logger.info("Knowledge loaded", {
-      entries: typeof json === "object" && json ? Object.keys(json).length : 0,
-      mtimeMs: st.mtimeMs,
-      bytes: raw.length,
-    });
+      logger.info("Knowledge loaded", {
+        entries: json?.items?.length || Object.keys(json || {}).length,
+        mtimeMs: st.mtimeMs,
+        bytes: raw.length,
+      });
 
-    return true;
+      return true;
+    } catch (error) {
+      logger.error("Failed to load knowledge.json", {
+        error: error?.message || String(error),
+        path: this.filePath,
+      });
+      throw error;
+    }
   }
 
   getText() {
@@ -273,26 +295,47 @@ const app = express();
 app.disable("x-powered-by");
 app.set("trust proxy", 1);
 
-// Security headers
+// Security headers (Production-ready CSP)
 app.use(
   helmet({
-    contentSecurityPolicy: false,
+    contentSecurityPolicy: IS_PROD ? {
+      directives: {
+        defaultSrc: ["'self'"],
+        scriptSrc: ["'self'", "'unsafe-inline'"], // Allow inline scripts
+        styleSrc: ["'self'", "'unsafe-inline'"],  // Allow inline styles
+        imgSrc: ["'self'", "data:", "https:"],
+        connectSrc: ["'self'", "https://api.openai.com"], // Allow OpenAI API
+        fontSrc: ["'self'"],
+        objectSrc: ["'none'"],
+        upgradeInsecureRequests: [],
+      },
+    } : false,
     crossOriginEmbedderPolicy: false,
   })
 );
 
-// CORS
+// CORS (Production-ready)
 app.use(
   cors({
     origin: (origin, cb) => {
-      // allow same-origin / curl / server-to-server requests
+      // Allow same-origin / curl / server-to-server requests
       if (!origin) return cb(null, true);
 
-      // if not configured, default open for MVP
-      if (!ALLOWED_ORIGINS.length) return cb(null, true);
+      // Development: allow all
+      if (!IS_PROD) return cb(null, true);
 
-      if (ALLOWED_ORIGINS.includes(origin)) return cb(null, true);
-      return cb(new Error(`CORS blocked: ${origin}`), false);
+      // Production: check whitelist
+      if (!ALLOWED_ORIGINS.length) {
+        logger.warn("CORS: No ALLOWED_ORIGINS set, allowing all origins");
+        return cb(null, true);
+      }
+
+      if (ALLOWED_ORIGINS.includes(origin)) {
+        return cb(null, true);
+      }
+
+      logger.warn("CORS blocked", { origin });
+      return cb(new Error(`CORS policy blocked origin: ${origin}`), false);
     },
     credentials: true,
     methods: ["GET", "POST"],
@@ -321,7 +364,7 @@ app.use(
     stream: {
       write: (msg) => logger.info(msg.trim()),
     },
-    skip: () => IS_PROD === false,
+    skip: (req) => !IS_PROD && req.path === "/health", // Skip health checks in dev
   })
 );
 
@@ -345,7 +388,9 @@ app.use(
     lastModified: true,
     maxAge: IS_PROD ? "1h" : 0,
     setHeaders: (res, filePath) => {
-      if (filePath.endsWith(".html")) res.setHeader("Cache-Control", "no-store");
+      if (filePath.endsWith(".html")) {
+        res.setHeader("Cache-Control", "no-store");
+      }
     },
   })
 );
@@ -359,19 +404,26 @@ app.get("/pitch", (req, res) => {
 // -----------------------------
 try {
   await knowledge.load(true);
+  logger.info("✅ Knowledge base loaded successfully at startup");
 } catch (e) {
-  logger.error("Failed to load knowledge.json at startup", { error: e?.message || String(e) });
-  // Keep server alive so /health can show the issue.
+  logger.error("❌ Failed to load knowledge.json at startup", {
+    error: e?.message || String(e),
+  });
+  // Keep server alive so /health can show the issue
 }
 
 // Periodic hot reload check
+const reloadInterval = Number(process.env.KNOWLEDGE_RELOAD_MS || 30_000);
 setInterval(async () => {
   try {
-    await knowledge.load(false);
+    const updated = await knowledge.load(false);
+    if (updated) {
+      logger.info("♻️  Knowledge base reloaded");
+    }
   } catch (e) {
     logger.error("Knowledge reload failed", { error: e?.message || String(e) });
   }
-}, Number(process.env.KNOWLEDGE_RELOAD_MS || 30_000));
+}, reloadInterval);
 
 // -----------------------------
 // Health & diagnostics
@@ -385,8 +437,10 @@ app.get("/health", async (req, res) => {
       st = null;
     }
 
-    res.json({
-      ok: true,
+    const isHealthy = !!knowledge.getJson() && !!OPENAI_API_KEY;
+
+    res.status(isHealthy ? 200 : 503).json({
+      ok: isHealthy,
       env: NODE_ENV,
       uptime_s: Math.round(process.uptime()),
       requestId: req.requestId,
@@ -397,11 +451,16 @@ app.get("/health", async (req, res) => {
       knowledge: {
         loaded: !!knowledge.getJson(),
         mtimeMs: st?.mtimeMs ?? null,
+        entries: knowledge.getJson()?.items?.length || 0,
       },
       cache: cache.stats(),
     });
   } catch (e) {
-    res.status(500).json({ ok: false, error: e?.message || "health failed", requestId: req.requestId });
+    res.status(500).json({
+      ok: false,
+      error: e?.message || "health check failed",
+      requestId: req.requestId,
+    });
   }
 });
 
@@ -428,24 +487,49 @@ app.get("/metrics", (req, res) => {
 // -----------------------------
 function requireAdmin(req, res, next) {
   if (!IS_PROD) return next();
+
   const key = (req.headers["x-admin-key"] || req.body?.adminKey || "").toString();
-  if (!ADMIN_KEY || key !== ADMIN_KEY) {
+
+  if (!ADMIN_KEY) {
+    logger.warn("Admin endpoint accessed but ADMIN_KEY not set");
+    return res.status(403).json({
+      error: "Admin endpoints are disabled (ADMIN_KEY not configured)",
+      requestId: req.requestId,
+    });
+  }
+
+  if (key !== ADMIN_KEY) {
+    logger.warn("Unauthorized admin access attempt", {
+      requestId: req.requestId,
+      ip: req.ip,
+    });
     return res.status(403).json({ error: "Unauthorized", requestId: req.requestId });
   }
+
   next();
 }
 
 app.post("/admin/cache/clear", requireAdmin, (req, res) => {
   cache.clear();
+  logger.info("Cache cleared by admin", { requestId: req.requestId });
   res.json({ ok: true, requestId: req.requestId });
 });
 
 app.post("/admin/knowledge/reload", requireAdmin, async (req, res) => {
   try {
     const updated = await knowledge.load(true);
+    logger.info("Knowledge reloaded by admin", { requestId: req.requestId, updated });
     res.json({ ok: true, updated, requestId: req.requestId });
   } catch (e) {
-    res.status(500).json({ ok: false, error: e?.message || "reload failed", requestId: req.requestId });
+    logger.error("Admin knowledge reload failed", {
+      requestId: req.requestId,
+      error: e?.message || String(e),
+    });
+    res.status(500).json({
+      ok: false,
+      error: e?.message || "reload failed",
+      requestId: req.requestId,
+    });
   }
 });
 
@@ -454,24 +538,29 @@ app.post("/admin/knowledge/reload", requireAdmin, async (req, res) => {
 // Body: { message: string, stream?: boolean, mode?: "official"|"community" }
 // - "mode" is user-facing; "lane" is internal routing (scholar vs local).
 //
-// Improvements vs previous:
-// - Returns more specific errors (auth/rate-limit/timeouts)
-// - Includes requestId + lane in responses to help frontend debug
-// - Avoids hard-failing when knowledge isn't loaded (still answers in scholar lane, but warns/esc)
- // -----------------------------
+// Improvements:
+// - Returns specific errors (auth/rate-limit/timeouts)
+// - Includes requestId + lane in responses
+// - Handles missing knowledge gracefully
+// -----------------------------
 app.post("/chat", apiLimiter, async (req, res) => {
   const requestId = req.requestId;
 
   try {
     const { message, stream = false, mode = "official" } = req.body || {};
 
+    // Validation
     if (!message || typeof message !== "string") {
       return res.status(400).json({ error: "Missing 'message' string.", requestId });
     }
     if (message.length > 10_000) {
-      return res.status(400).json({ error: "Message too long (max 10,000 chars).", requestId });
+      return res.status(400).json({
+        error: "Message too long (max 10,000 chars).",
+        requestId,
+      });
     }
 
+    // Route to appropriate lane
     const lane = isLocalLifeQuery(message) ? "local" : "scholar";
 
     // Cache only for non-streaming
@@ -484,20 +573,32 @@ app.post("/chat", apiLimiter, async (req, res) => {
       }
     }
 
-    logger.info("Chat request", { requestId, mode, lane, stream, length: message.length });
+    logger.info("Chat request", {
+      requestId,
+      mode,
+      lane,
+      stream,
+      length: message.length,
+    });
 
-    // Scholar lane policy + knowledge injection (if loaded)
-    // Local lane policy without knowledge injection
+    // Build system prompt
     let systemText = "";
 
     if (lane === "local") {
       systemText = SYSTEM_POLICY_LOCAL.trim();
     } else {
       const kb = knowledge.getText();
+
+      if (!kb) {
+        logger.warn("Knowledge base not loaded for scholar query", { requestId });
+      }
+
       systemText =
         SYSTEM_POLICY_SCHOLAR.trim() +
         `\n\nMODE: ${mode}\n` +
-        (kb ? `\nKNOWLEDGE (approved sources):\n${kb}\n` : `\nKNOWLEDGE: (not loaded)\n`);
+        (kb
+          ? `\nKNOWLEDGE (approved sources):\n${kb}\n`
+          : `\nKNOWLEDGE: (not loaded - please check /health endpoint)\n`);
     }
 
     // ---- Streaming (SSE) ----
@@ -528,14 +629,25 @@ app.post("/chat", apiLimiter, async (req, res) => {
         res.write(`data: ${JSON.stringify({ done: true, requestId, lane })}\n\n`);
         res.end();
         cache.set(cacheKey, fullText);
-        logger.info("Stream complete", { requestId, lane, outLen: fullText.length });
+        logger.info("Stream complete", {
+          requestId,
+          lane,
+          outLen: fullText.length,
+        });
       });
 
       streamResp.on("error", (e) => {
         const msg = e?.message || String(e);
         logger.error("Stream error", { requestId, lane, error: msg });
         try {
-          res.write(`data: ${JSON.stringify({ error: "Stream error.", requestId, lane, done: true })}\n\n`);
+          res.write(
+            `data: ${JSON.stringify({
+              error: "Stream error.",
+              requestId,
+              lane,
+              done: true,
+            })}\n\n`
+          );
           res.end();
         } catch {}
       });
@@ -576,13 +688,22 @@ app.post("/chat", apiLimiter, async (req, res) => {
     logger.error("Error in /chat", { requestId, status, error: msg });
 
     if (status === 401) {
-      return res.status(500).json({ error: "OpenAI authentication error.", requestId });
+      return res.status(500).json({
+        error: "OpenAI authentication error.",
+        requestId,
+      });
     }
     if (status === 429) {
-      return res.status(429).json({ error: "OpenAI rate limit exceeded. Try again later.", requestId });
+      return res.status(429).json({
+        error: "OpenAI rate limit exceeded. Try again later.",
+        requestId,
+      });
     }
     if (status === 400) {
-      return res.status(500).json({ error: "OpenAI request was rejected (400). Check model/input formatting.", requestId });
+      return res.status(500).json({
+        error: "OpenAI request was rejected (400). Check model/input formatting.",
+        requestId,
+      });
     }
 
     return res.status(500).json({ error: "Server error.", requestId });
@@ -606,7 +727,7 @@ app.use((err, req, res, _next) => {
     stack: err?.stack,
   });
   res.status(500).json({
-    error: IS_PROD ? "Internal server error" : (err?.message || "Error"),
+    error: IS_PROD ? "Internal server error" : err?.message || "Error",
     requestId: req.requestId,
   });
 });
@@ -615,15 +736,19 @@ app.use((err, req, res, _next) => {
 // Start server + graceful shutdown
 // -----------------------------
 const server = app.listen(PORT, () => {
-  logger.info(`OmanX running`, {
+  logger.info(`🚀 OmanX server running`, {
     url: `http://localhost:${PORT}`,
     env: NODE_ENV,
     model: OPENAI_MODEL,
+    cors: ALLOWED_ORIGINS.length
+      ? ALLOWED_ORIGINS.join(", ")
+      : "all origins (not recommended for production)",
+    adminProtected: IS_PROD && !!ADMIN_KEY,
   });
 });
 
 function shutdown(signal) {
-  logger.info(`${signal} received. Shutting down...`);
+  logger.info(`${signal} received. Shutting down gracefully...`);
   server.close(() => {
     logger.info("HTTP server closed.");
     process.exit(0);
@@ -639,10 +764,15 @@ process.on("SIGINT", () => shutdown("SIGINT"));
 process.on("SIGTERM", () => shutdown("SIGTERM"));
 
 process.on("uncaughtException", (e) => {
-  logger.error("Uncaught exception", { error: e?.message || String(e), stack: e?.stack });
+  logger.error("Uncaught exception", {
+    error: e?.message || String(e),
+    stack: e?.stack,
+  });
   process.exit(1);
 });
 
 process.on("unhandledRejection", (reason) => {
-  logger.error("Unhandled rejection", { reason: reason?.message || String(reason) });
+  logger.error("Unhandled rejection", {
+    reason: reason?.message || String(reason),
+  });
 });
