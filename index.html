@@ -4,86 +4,90 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>OmanX</title>
+
     <meta
       name="description"
-      content="Minimal, source-constrained onboarding guidance for Omani scholars in the United States."
+      content="Minimal AI guidance for Omani scholars and everyday questions."
     />
+
     <link rel="stylesheet" href="/styles.css" />
     <link rel="icon" href="data:," />
   </head>
 
   <body>
     <main class="shell">
+      <!-- Top Bar -->
       <header class="topbar">
         <div class="brand">
           <div class="logo" aria-hidden="true">OX</div>
           <div class="brand-text">
             <h1>OmanX</h1>
-            <p>Minimal AI governance for Omani scholarship guidance and everyday questions.</p>
+            <p>Minimal AI guidance for Omani scholars and everyday questions.</p>
           </div>
         </div>
 
-        <div class="top-actions">
-          <div class="mode" role="tablist" aria-label="Response policy mode">
-            <button class="mode-btn on" id="modeOfficial" type="button" role="tab" aria-selected="true">
-              Official
-            </button>
-            <button class="mode-btn" id="modeCommunity" type="button" role="tab" aria-selected="false">
-              Community
-            </button>
-          </div>
-
-          <span class="pill" id="statusPill" title="Service status">
-            <span class="pill-dot"></span>
-            <span class="pill-text">Online</span>
-          </span>
-        </div>
+        <span class="status-pill" aria-label="Service status">
+          <span class="dot"></span>
+          Online
+        </span>
       </header>
 
-      <section class="layout">
-        <section class="assistant-panel">
-          <div class="chat-head">
-            <div>
-              <h2>Chat</h2>
-            </div>
-            <button class="ghost" id="clearBtn" type="button">Clear</button>
-          </div>
+      <!-- Chat Panel -->
+      <section class="assistant-panel">
+        <div class="chat-head">
+          <h2>Chat</h2>
+          <button class="ghost" id="clearBtn" type="button">Clear</button>
+        </div>
 
-          <div id="statusBanner" class="status-banner" hidden>
-            <span class="status-banner-text">
-              Service unavailable. We will not guess—please contact the relevant office.
+        <div class="model-row">
+          <span class="model-pill">OmanX</span>
+          <span class="model-meta">Source-aware. No guessing.</span>
+        </div>
+
+        <div
+          id="chat"
+          class="chat-scroll"
+          role="log"
+          aria-live="polite"
+          aria-relevant="additions"
+        >
+          <div class="messages" id="messages"></div>
+        </div>
+
+        <form id="form" class="composer">
+          <textarea
+            id="input"
+            rows="1"
+            placeholder="Ask a question…"
+            aria-label="Message input"
+          ></textarea>
+
+          <div class="composer-actions">
+            <span class="hint">
+              <kbd>Enter</kbd> send · <kbd>Shift</kbd>+<kbd>Enter</kbd> newline
             </span>
+
+            <button id="send" class="primary" type="submit">
+              Send
+            </button>
           </div>
+        </form>
 
-          <div id="chat" class="chat-scroll" role="log" aria-live="polite"></div>
-
-          <form id="form" class="composer">
-            <label class="input-label" for="input">Ask anything, from scholarship compliance to everyday topics</label>
-            <textarea id="input" rows="3" placeholder="Ask a question…"></textarea>
-            <div class="composer-actions">
-              <p class="hint"><kbd>Enter</kbd> send · <kbd>Shift</kbd>+<kbd>Enter</kbd> newline</p>
-              <button id="send" class="primary" type="submit">
-                <span class="send-text">Send</span>
-              </button>
-            </div>
-          </form>
-
-          <p class="disclaimer">
-            Informational guidance only. For immigration/legal/medical matters, follow official instructions.
-          </p>
-        </section>
+        <p class="disclaimer">
+          Informational guidance only. Always verify with official institutions for
+          legal, immigration, or medical matters.
+        </p>
       </section>
     </main>
 
     <footer class="footer">
-      <div>© <span id="year"></span> OmanX</div>
-      <div class="footer-links">
-        <span>Verify official guidance with MoHE, embassy, and university offices.</span>
-        <span class="dot">•</span>
-        <a href="/pitch">Brief</a>
-      </div>
+      <span>© <span id="year"></span> OmanX</span>
+      <span>Verify with MoHE, embassy, and university offices.</span>
     </footer>
 
     <script src="/app.js"></script>
+    <script>
+      document.getElementById("year").textContent = new Date().getFullYear();
+    </script>
   </body>
 </html>
