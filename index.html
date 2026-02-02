@@ -25,14 +25,19 @@
           </div>
         </div>
 
-        <span class="status-pill" aria-label="Service status">
-          <span class="dot"></span>
-          Online
+        <span class="status-pill" id="statusPill" aria-label="Service status">
+          <span class="dot" aria-hidden="true"></span>
+          <span class="pill-text">Online</span>
         </span>
       </header>
 
       <!-- Chat Panel -->
       <section class="assistant-panel">
+        <div class="status-banner" id="statusBanner" role="status" hidden>
+          <span class="status-banner-text">
+            Service unavailable. We will not guess—please contact the relevant office.
+          </span>
+        </div>
         <div class="chat-head">
           <h2>Chat</h2>
           <button class="ghost" id="clearBtn" type="button">Clear</button>
