@@ -11,6 +11,7 @@ const clearBtn = document.getElementById("clearBtn");
 const statusPill = document.getElementById("statusPill");
 const statusBanner = document.getElementById("statusBanner");
 const statusBannerText = statusBanner?.querySelector(".status-banner-text");
+const messagesEl = document.getElementById("messages");
 const yearEl = document.getElementById("year");
 
 // Optional mode toggles (if present in your HTML)
@@ -65,8 +66,9 @@ const createMessage = (role, text) => {
 };
 
 const addMessage = (role, text) => {
-  if (!chatEl) return;
-  chatEl.appendChild(createMessage(role, text));
+  const target = messagesEl || chatEl;
+  if (!target) return;
+  target.appendChild(createMessage(role, text));
   scrollToBottom();
 };
 
@@ -218,7 +220,11 @@ if (formEl && inputEl) {
 
 if (clearBtn && chatEl) {
   clearBtn.addEventListener("click", () => {
-    chatEl.innerHTML = "";
+    if (messagesEl) {
+      messagesEl.innerHTML = "";
+    } else {
+      chatEl.innerHTML = "";
+    }
   });
 }
 
