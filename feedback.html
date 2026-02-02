@@ -1,0 +1,65 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>OmanX Feedback</title>
+
+    <meta
+      name="description"
+      content="Share feedback to help improve OmanX."
+    />
+
+    <link rel="stylesheet" href="/styles.css" />
+    <link rel="icon" href="data:," />
+  </head>
+
+  <body>
+    <main class="shell">
+      <header class="topbar">
+        <div class="brand">
+          <div class="logo" aria-hidden="true">OX</div>
+          <div class="brand-text">
+            <p>Help improve OmanX with a short survey.</p>
+          </div>
+        </div>
+
+        <a class="ghost" href="/" aria-label="Back to chat">Back to chat</a>
+      </header>
+
+      <section class="assistant-panel feedback-panel">
+        <div class="chat-head">
+          <h2>Feedback survey</h2>
+          <span class="model-meta">3–5 minutes</span>
+        </div>
+
+        <p class="feedback-note">
+          This optional survey helps improve OmanX. No sensitive data is collected.
+        </p>
+
+        <div class="survey-shell">
+          <iframe
+            title="OmanX feedback survey"
+            src="https://docs.google.com/forms/d/e/1FAIpQLScGd3yQPe79m8TXsKa4M8Gnelwr8_s6DSHo745CejbEj_QOuA/viewform?embedded=true"
+            width="640"
+            height="1200"
+            frameborder="0"
+            marginheight="0"
+            marginwidth="0"
+          >
+            Loading…
+          </iframe>
+        </div>
+      </section>
+    </main>
+
+    <footer class="footer">
+      <span>© <span id="year"></span> OmanX</span>
+      <span>Verify with MoHE, embassy, and university offices.</span>
+    </footer>
+
+    <script>
+      document.getElementById("year").textContent = new Date().getFullYear();
+    </script>
+  </body>
+</html>
