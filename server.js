@@ -500,6 +500,22 @@ app.post("/chat", apiLimiter, async (req, res) => {
         (kb ? `\nKNOWLEDGE (approved sources):\n${kb}\n` : `\nKNOWLEDGE: (not loaded)\n`);
     }
 
+    const buildFallbackText = () => {
+      if (lane === "local") {
+        return [
+          "I’m unable to reach the OmanX AI service right now.",
+          "Please try again shortly.",
+        ].join(" ");
+      }
+
+      return [
+        "I’m unable to reach the OmanX AI service right now.",
+        "For visa or immigration questions (like F-1 internships, CPT/OPT, or work authorization),",
+        "please contact your Designated School Official (DSO) or your university’s international student office.",
+        "This is informational only—verify with your school before taking action.",
+      ].join(" ");
+    };
+
     // ---- Streaming (SSE) ----
     if (stream) {
       res.setHeader("Content-Type", "text/event-stream; charset=utf-8");
@@ -509,13 +525,24 @@ app.post("/chat", apiLimiter, async (req, res) => {
 
       let fullText = "";
 
-      const streamResp = await client.responses.stream({
-        model: OPENAI_MODEL,
-        input: [
-          { role: "system", content: [{ type: "input_text", text: systemText }] },
-          { role: "user", content: [{ type: "input_text", text: message }] },
-        ],
-      });
+      let streamResp;
+      try {
+        streamResp = await client.responses.stream({
+          model: OPENAI_MODEL,
+          input: [
+            { role: "system", content: [{ type: "input_text", text: systemText }] },
+            { role: "user", content: [{ type: "input_text", text: message }] },
+          ],
+        });
+      } catch (e) {
+        const msg = e?.message || String(e);
+        logger.error("Stream init error", { requestId, lane, error: msg });
+        res.write(
+          `data: ${JSON.stringify({ error: buildFallbackText(), requestId, lane, done: true })}\n\n`
+        );
+        res.end();
+        return;
+      }
 
       streamResp.on("response.output_text.delta", (event) => {
         const delta = event.delta || "";
@@ -550,13 +577,27 @@ app.post("/chat", apiLimiter, async (req, res) => {
     }
 
     // ---- Non-streaming ----
-    const response = await client.responses.create({
-      model: OPENAI_MODEL,
-      input: [
-        { role: "system", content: [{ type: "input_text", text: systemText }] },
-        { role: "user", content: [{ type: "input_text", text: message }] },
-      ],
-    });
+    let response;
+    try {
+      response = await client.responses.create({
+        model: OPENAI_MODEL,
+        input: [
+          { role: "system", content: [{ type: "input_text", text: systemText }] },
+          { role: "user", content: [{ type: "input_text", text: message }] },
+        ],
+      });
+    } catch (e) {
+      const msg = e?.message || String(e);
+      const status = e?.status || e?.response?.status;
+      logger.error("OpenAI request failed", { requestId, lane, status, error: msg });
+      return res.json({
+        text: buildFallbackText(),
+        cached: false,
+        degraded: true,
+        requestId,
+        lane,
+      });
+    }
 
     const text = response.output_text || "I couldn't generate a response right now.";
 
