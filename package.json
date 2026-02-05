@@ -7,7 +7,7 @@
   "scripts": {
     "start": "node server.js",
     "dev": "NODE_ENV=development node server.js",
-    "test": "node router.test.js"
+    "test": "node --test router.test.js localResponder.test.js"
   },
   "engines": {
     "node": ">=18.0.0"

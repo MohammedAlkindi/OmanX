@@ -30,6 +30,7 @@ import {
 } from "./prompts.js";
 
 import { routeQuery, searchKnowledge } from './router.js';
+import { generateLocalResponse } from './localResponder.js';
 
 dotenv.config();
 
@@ -488,20 +489,13 @@ app.post("/chat", apiLimiter, async (req, res) => {
       ].join('\n');
     }
 
-    const buildFallbackText = () => {
-      if (lane === 'normal') {
-        return "I'm unable to reach the OmanX AI service right now. Please try again shortly.";
-      }
-      return [
-        "I'm unable to reach the OmanX AI service right now.",
-        "For visa or immigration questions, please contact your Designated School Official (DSO)",
-        "or your university's international student office. This is informational only—verify with your school before taking action.",
-      ].join(" ");
-    };
+    const buildFallbackText = (kbResults = []) =>
+      generateLocalResponse({ lane, message, kbResults });
 
     if (!client) {
+      const kbResults = lane === 'strict' ? searchKnowledge(knowledge.getJson(), message) : [];
       return res.json({
-        text: buildFallbackText(),
+        text: buildFallbackText(kbResults),
         cached: false,
         degraded: true,
         requestId,
@@ -583,8 +577,9 @@ app.post("/chat", apiLimiter, async (req, res) => {
       const msg = e?.message || String(e);
       const status = e?.status || e?.response?.status;
       logger.error("OpenAI request failed", { requestId, lane, status, error: msg });
+      const kbResults = lane === 'strict' ? searchKnowledge(knowledge.getJson(), message) : [];
       return res.json({
-        text: buildFallbackText(),
+        text: buildFallbackText(kbResults),
         cached: false,
         degraded: true,
         requestId,
