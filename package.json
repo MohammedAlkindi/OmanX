@@ -1,13 +1,13 @@
 {
   "name": "omanx",
-  "version": "2.0.0",
+  "version": "2.1.0",
   "type": "module",
-  "description": "OmanX - AI assistant for Omani students in the US",
+  "description": "OmanX - verified AI guidance for Omani students in the US",
   "main": "server.js",
   "scripts": {
     "start": "node server.js",
     "dev": "NODE_ENV=development node server.js",
-    "test": "node --test router.test.js localResponder.test.js"
+    "test": "node --check server.js && node --check router.js && node --check localResponder.js && node --check app.js"
   },
   "engines": {
     "node": ">=18.0.0"
@@ -22,8 +22,5 @@
     "morgan": "^1.10.0",
     "openai": "^4.80.0",
     "winston": "^3.13.0"
-  },
-  "devDependencies": {
-    "node-fetch": "^3.3.2"
   }
 }

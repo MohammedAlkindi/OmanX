@@ -1,9 +1,3 @@
-// app.js — OmanX MVP (frontend)
-// Goals:
-// - Minimal assistant UI with structured responses
-// - Health check + graceful offline banner
-// - UNIFIED MODE: No mode selection UI
-
 const chatEl = document.getElementById("chat");
 const formEl = document.getElementById("form");
 const inputEl = document.getElementById("input");
@@ -14,6 +8,7 @@ const statusBanner = document.getElementById("statusBanner");
 const statusBannerText = statusBanner?.querySelector(".status-banner-text");
 const messagesEl = document.getElementById("messages");
 const yearEl = document.getElementById("year");
+const starterButtons = document.querySelectorAll(".starter");
 
 const DEMO_ERROR = "Sorry, I couldn't reach the OmanX service. Please try again.";
 const DEFAULT_OFFLINE_MESSAGE =
@@ -28,23 +23,18 @@ const setStatus = (state, text) => {
   const el = statusPill.querySelector(".pill-text");
   if (el) el.textContent = text;
   statusPill.dataset.state = state;
-
-  if (statusBanner) {
-    statusBanner.hidden = state !== "offline";
-  }
+  if (statusBanner) statusBanner.hidden = state !== "offline";
 };
 
 const setStatusBanner = (text) => {
-  if (!statusBannerText) return;
-  statusBannerText.textContent = text;
+  if (statusBannerText) statusBannerText.textContent = text;
 };
 
 const scrollToBottom = () => {
-  if (!chatEl) return;
-  chatEl.scrollTop = chatEl.scrollHeight;
+  if (chatEl) chatEl.scrollTop = chatEl.scrollHeight;
 };
 
-const createMessage = (role, text) => {
+const createMessage = (role, text, meta = "") => {
   const wrapper = document.createElement("div");
   wrapper.className = `msg ${role}`;
 
@@ -54,35 +44,36 @@ const createMessage = (role, text) => {
 
   const bubble = document.createElement("div");
   bubble.className = "bubble";
-  bubble.textContent = text;
+
+  const body = document.createElement("div");
+  body.textContent = text;
+  bubble.appendChild(body);
+
+  if (meta) {
+    const metaEl = document.createElement("div");
+    metaEl.className = "message-meta";
+    metaEl.textContent = meta;
+    bubble.appendChild(metaEl);
+  }
 
   wrapper.appendChild(avatar);
   wrapper.appendChild(bubble);
-
   return wrapper;
 };
 
-const addMessage = (role, text) => {
+const addMessage = (role, text, meta = "") => {
   const target = messagesEl || chatEl;
   if (!target) return;
-  target.appendChild(createMessage(role, text));
+  target.appendChild(createMessage(role, text, meta));
   scrollToBottom();
 };
 
 const setLoading = (isLoading) => {
   if (!sendBtn) return;
   sendBtn.disabled = isLoading;
-  const t = sendBtn.querySelector(".send-text");
-  if (t) {
-    t.textContent = isLoading ? "Sending…" : "Send";
-  } else {
-    sendBtn.textContent = isLoading ? "Sending…" : "Send";
-  }
+  sendBtn.textContent = isLoading ? "Sending…" : "Send";
 };
 
-// -----------------------------
-// API base resolution
-// -----------------------------
 function getApiBase() {
   try {
     const url = new URL(window.location.href);
@@ -103,9 +94,6 @@ function getApiBase() {
 const API_BASE = getApiBase();
 const apiUrl = (p) => `${API_BASE}${p.startsWith("/") ? p : `/${p}`}`;
 
-// -----------------------------
-// Connectivity check
-// -----------------------------
 async function checkHealth() {
   try {
     const r = await fetch(apiUrl("/health"), { method: "GET" });
@@ -122,9 +110,6 @@ async function checkHealth() {
   }
 }
 
-// -----------------------------
-// Send message
-// -----------------------------
 const sendMessage = async (message) => {
   addMessage("me", message);
   setLoading(true);
@@ -137,26 +122,16 @@ const sendMessage = async (message) => {
       body: JSON.stringify({ message }),
     });
 
-    let payload = null;
-    try {
-      payload = await response.json();
-    } catch {
-      payload = null;
-    }
+    const payload = await response.json().catch(() => null);
 
     if (!response.ok) {
-      if (response.status === 404) {
-        setStatusBanner(API_BASE_ERROR_MESSAGE);
-      } else {
-        setStatusBanner(DEFAULT_OFFLINE_MESSAGE);
-      }
-      const errMsg = payload?.error
-        ? `${payload.error} (HTTP ${response.status})`
-        : `Request failed: HTTP ${response.status}`;
-      throw new Error(errMsg);
+      setStatusBanner(response.status === 404 ? API_BASE_ERROR_MESSAGE : DEFAULT_OFFLINE_MESSAGE);
+      throw new Error(payload?.error ? `${payload.error} (HTTP ${response.status})` : `Request failed: HTTP ${response.status}`);
     }
 
-    addMessage("bot", payload?.text || "I couldn't generate a response right now.");
+    const laneMeta = payload?.lane === "strict" ? "Compliance mode • Verified KB only" : "Community mode";
+    const refs = Array.isArray(payload?.kbRefs) && payload.kbRefs.length ? ` • Refs: ${payload.kbRefs.join(", ")}` : "";
+    addMessage("bot", payload?.text || "I couldn't generate a response right now.", `${laneMeta}${refs}`);
     setStatus("online", "Online");
   } catch (error) {
     console.error(error);
@@ -164,7 +139,7 @@ const sendMessage = async (message) => {
       ? `Sorry — the service returned an error. ${error.message}`
       : DEMO_ERROR;
 
-    addMessage("bot", msg);
+    addMessage("bot", msg, "Connection issue");
     setStatusBanner(DEFAULT_OFFLINE_MESSAGE);
     setStatus("offline", "Offline");
   } finally {
@@ -172,15 +147,11 @@ const sendMessage = async (message) => {
   }
 };
 
-// -----------------------------
-// Event handlers
-// -----------------------------
 if (formEl && inputEl) {
   formEl.addEventListener("submit", (event) => {
     event.preventDefault();
     const message = inputEl.value.trim();
     if (!message) return;
-
     inputEl.value = "";
     sendMessage(message);
   });
@@ -193,21 +164,26 @@ if (formEl && inputEl) {
   });
 }
 
+starterButtons.forEach((btn) => {
+  btn.addEventListener("click", () => {
+    const q = btn.dataset.query;
+    if (!q) return;
+    inputEl.value = q;
+    formEl.requestSubmit();
+  });
+});
+
 if (clearBtn && chatEl) {
   clearBtn.addEventListener("click", () => {
-    if (messagesEl) {
-      messagesEl.innerHTML = "";
-    } else {
-      chatEl.innerHTML = "";
-    }
+    if (messagesEl) messagesEl.innerHTML = "";
   });
 }
 
-// -----------------------------
-// Boot
-// -----------------------------
-checkHealth();
+addMessage(
+  "bot",
+  "Marhaban! I can help with student compliance questions (visa, CPT/OPT, legal/safety) and daily student life in the US.",
+  "Built for Omani students"
+);
 
-if (API_BASE) {
-  console.log("[OmanX] Using API base:", API_BASE);
-}
+checkHealth();
+if (API_BASE) console.log("[OmanX] Using API base:", API_BASE);

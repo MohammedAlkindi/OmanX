@@ -3,25 +3,23 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>OmanX</title>
-
+    <title>OmanX | Omani Students in the US</title>
     <meta
       name="description"
-      content="Minimal AI guidance for Omani scholars and everyday questions."
+      content="Verified AI guidance for Omani students in the US, with compliance-first responses powered by approved knowledge."
     />
-
     <link rel="stylesheet" href="./styles.css" />
     <link rel="icon" href="data:," />
   </head>
 
   <body>
     <main class="shell">
-      <!-- Top Bar -->
       <header class="topbar">
         <div class="brand">
           <div class="logo" aria-hidden="true">OX</div>
           <div class="brand-text">
-            <p>AI guidance for Omani scholars and everyday questions.</p>
+            <h1>OmanX</h1>
+            <p>AI guidance for Omani students in the United States.</p>
           </div>
         </div>
 
@@ -31,65 +29,57 @@
         </span>
       </header>
 
-      <!-- Chat Panel -->
       <section class="assistant-panel">
+        <div class="trust-strip">
+          <strong>Verified-first policy:</strong>
+          Compliance answers use only approved entries from <code>knowledge.json</code> and escalate when data is missing.
+        </div>
+
         <div class="status-banner" id="statusBanner" role="status" hidden>
           <span class="status-banner-text">
             Service unavailable. We will not guess—please contact the relevant office.
           </span>
         </div>
+
         <div class="chat-head">
-          <h2>Chat</h2>
+          <h2>Ask OmanX</h2>
           <button class="ghost" id="clearBtn" type="button">Clear</button>
         </div>
 
-        <div
-          id="chat"
-          class="chat-scroll"
-          role="log"
-          aria-live="polite"
-          aria-relevant="additions"
-        >
+        <div class="starters" aria-label="Suggested prompts">
+          <button class="starter" data-query="I need to understand what can violate my F-1 visa status.">Visa status risks</button>
+          <button class="starter" data-query="How does CPT authorization usually work for Omani scholarship students?">CPT guidance</button>
+          <button class="starter" data-query="What documents should I gather before talking to my DSO about OPT?">OPT prep checklist</button>
+          <button class="starter" data-query="What should I do in an emergency if I am unsure about legal consequences?">Emergency escalation</button>
+        </div>
+
+        <div id="chat" class="chat-scroll" role="log" aria-live="polite" aria-relevant="additions">
           <div class="messages" id="messages"></div>
         </div>
 
         <form id="form" class="composer">
-          <textarea
-            id="input"
-            rows="1"
-            placeholder="Ask a question…"
-            aria-label="Message input"
-          ></textarea>
+          <textarea id="input" rows="1" placeholder="Ask a question…" aria-label="Message input"></textarea>
 
           <div class="composer-actions">
             <span class="hint">
               <kbd>Enter</kbd> send · <kbd>Shift</kbd>+<kbd>Enter</kbd> newline
             </span>
-
-            <button id="send" class="primary" type="submit">
-              Send
-            </button>
+            <button id="send" class="primary" type="submit">Send</button>
           </div>
         </form>
 
         <p class="disclaimer">
-          Informational guidance only. Always verify with official institutions for
-          legal, immigration, or medical matters.
+          Informational guidance only. Always verify with MoHE, embassy, DSO, and university offices for legal, immigration, or medical matters.
         </p>
       </section>
     </main>
 
     <footer class="footer">
       <span>© <span id="year"></span> OmanX</span>
-      <span>
-        <a class="footer-link" href="./feedback.html">Help improve OmanX (3–5 min survey)</a>
-      </span>
-      <span>Verify with MoHE, embassy, and university offices.</span>
+      <span><a class="footer-link" href="./feedback.html">Help improve OmanX (3–5 min survey)</a></span>
+      <span>Built for Oman pilot (MoHE-aligned workflow).</span>
     </footer>
 
     <script src="./app.js"></script>
-    <script>
-      document.getElementById("year").textContent = new Date().getFullYear();
-    </script>
   </body>
 </html>

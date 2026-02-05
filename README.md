@@ -1,23 +1,57 @@
-# OmanX.org
+# OmanX MVP
 
-**OmanX** is a government-ready AI onboarding platform built to guide Omani scholars through studying and living in the United States with clarity, safety, and official alignment.
+OmanX is a **compliance-first AI assistant** for Omani students studying in the United States.
 
-## What it is
-A structured digital assistant that combines approved knowledge, step-by-step checklists, and constrained AI guidance to support students from pre-departure through their first semester in the U.S.
+This MVP is designed for early launch, pilot usage, and Ministry-facing demos:
+- Minimal UI for fast onboarding.
+- Safety routing (normal vs strict compliance mode).
+- Strict mode grounded in `knowledge.json` only.
+- Automatic escalation language when no verified guidance exists.
 
-## Focus
-- Pre-departure and arrival checklists  
-- First-week and first-semester onboarding  
-- U.S. systems (banking, housing, connectivity, campus setup)  
-- High-stakes escalation (immigration, health, compliance)  
-- Clear references to official and institutional sources  
+## Product promise (MVP)
+- **Audience:** Omani students in the US.
+- **Core pain solved:** avoid visa/compliance mistakes and provide clear escalation paths.
+- **Trust model:** verified content only for high-stakes topics.
 
-## Philosophy
-No guessing. No noise.  
-Guidance is constrained to approved sources, designed for auditability, and built to escalate—not improvise—when stakes are high.
+## Quick start
+```bash
+npm start
+```
+Open `http://localhost:3000`.
 
-## Status
-Pilot MVP in active development.
+## Required environment
+Create `.env` (or set host environment variables):
+
+```env
+OPENAI_API_KEY=your_key_here
+OPENAI_MODEL=gpt-4o-mini
+NODE_ENV=production
+RATE_LIMIT_MAX=120
+ADMIN_KEY=optional_admin_key
+```
+
+## Deployment (Vercel)
+This repository is configured for Vercel (`vercel.json`).
+
+1. Import repository into Vercel.
+2. Set environment variables (`OPENAI_API_KEY`, `OPENAI_MODEL`, `ADMIN_KEY`).
+3. Deploy.
+4. Smoke-check:
+   - `GET /health`
+   - `POST /chat` with a compliance question (e.g. visa/CPT/OPT)
+
+## Key API endpoints
+- `GET /health` – service + knowledge status
+- `GET /ready` – readiness probe
+- `POST /chat` – main assistant endpoint
+- `POST /admin/cache/clear` – clear cache (admin in prod)
+- `POST /admin/knowledge/reload` – reload `knowledge.json` (admin in prod)
+
+## MVP scope decisions
+To keep the project lean for launch/pitching:
+- Removed non-essential test files from runtime package.
+- Kept deterministic router + local fallback behavior.
+- Focused UI on fast compliance-oriented usage.
 
 ---
-OmanX.org • Structured guidance for Omani scholars abroad
+OmanX MVP — built for Oman pilot adoption and iterative growth.

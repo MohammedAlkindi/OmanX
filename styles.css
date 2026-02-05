@@ -302,6 +302,41 @@ textarea:focus-visible{
   align-items:center;
 }
 
+.trust-strip{
+  margin-bottom:12px;
+  padding:10px 12px;
+  border:1px solid var(--border-subtle);
+  border-radius: var(--radius-md);
+  background: var(--surface-2);
+  font-size:13px;
+  color: var(--text-muted);
+}
+
+.starters{
+  display:flex;
+  flex-wrap:wrap;
+  gap:8px;
+  margin:10px 0 14px;
+}
+
+.starter{
+  border:1px solid var(--border-subtle);
+  border-radius:999px;
+  background:var(--surface-2);
+  color:var(--text);
+  font-size:12px;
+  padding:6px 10px;
+  cursor:pointer;
+}
+
+.starter:hover{ border-color: var(--accent); }
+
+.message-meta{
+  margin-top:8px;
+  font-size:12px;
+  color: var(--text-subtle);
+}
+
 .footer{
   margin-top:28px;
   padding:14px;
