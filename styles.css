@@ -296,6 +296,10 @@ textarea:focus-visible{
   padding:8px 12px;
   border-radius: var(--radius-sm);
   cursor:pointer;
+  color: var(--text);
+  text-decoration:none;
+  display:inline-flex;
+  align-items:center;
 }
 
 .footer{
