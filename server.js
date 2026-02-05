@@ -283,10 +283,6 @@ app.use(
   })
 );
 
-app.get("/pitch", (req, res) => {
-  res.sendFile(path.join(__dirname, "pitch.html"));
-});
-
 // -----------------------------
 // Startup load knowledge (do NOT crash prod if knowledge is missing)
 // -----------------------------
@@ -419,7 +415,7 @@ app.post("/chat", apiLimiter, async (req, res) => {
       const cached = cache.get(cacheKey);
       if (cached) {
         logger.info("Cache hit", { requestId, lane });
-        return res.json({ text: cached, cached: true, requestId, lane });
+        return res.json({ text: cached, cached: true, requestId, lane, kbRefs: [] });
       }
     }
 
@@ -448,11 +444,13 @@ app.post("/chat", apiLimiter, async (req, res) => {
           degraded: true,
           requestId,
           lane,
+          kbRefs: [],
         });
       }
       
       // Search KB for relevant entries
       const kbResults = searchKnowledge(kb, message);
+      const kbRefs = kbResults.slice(0, 3).map((r) => r.id);
       
       if (kbResults.length === 0) {
         // No relevant KB entries → refuse + escalate
@@ -470,6 +468,7 @@ app.post("/chat", apiLimiter, async (req, res) => {
           noKbMatch: true,
           requestId,
           lane,
+          kbRefs,
         });
       }
       
@@ -494,12 +493,14 @@ app.post("/chat", apiLimiter, async (req, res) => {
 
     if (!client) {
       const kbResults = lane === 'strict' ? searchKnowledge(knowledge.getJson(), message) : [];
+      const kbRefs = kbResults.slice(0, 3).map((r) => r.id);
       return res.json({
         text: buildFallbackText(kbResults),
         cached: false,
         degraded: true,
         requestId,
         lane,
+        kbRefs,
       });
     }
 
@@ -578,23 +579,27 @@ app.post("/chat", apiLimiter, async (req, res) => {
       const status = e?.status || e?.response?.status;
       logger.error("OpenAI request failed", { requestId, lane, status, error: msg });
       const kbResults = lane === 'strict' ? searchKnowledge(knowledge.getJson(), message) : [];
+      const kbRefs = kbResults.slice(0, 3).map((r) => r.id);
       return res.json({
         text: buildFallbackText(kbResults),
         cached: false,
         degraded: true,
         requestId,
         lane,
+        kbRefs,
       });
     }
 
     const text = response.output_text || "I couldn't generate a response right now.";
     cache.set(cacheKey, text);
 
+    const kbRefs = lane === 'strict' ? searchKnowledge(knowledge.getJson(), message).slice(0, 3).map((r) => r.id) : [];
     return res.json({
       text,
       cached: false,
       requestId,
       lane,
+      kbRefs,
       usage: response.usage,
     });
   } catch (err) {
