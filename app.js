@@ -73,7 +73,11 @@ const setLoading = (isLoading) => {
   if (!sendBtn) return;
   sendBtn.disabled = isLoading;
   const t = sendBtn.querySelector(".send-text");
-  if (t) t.textContent = isLoading ? "Sending…" : "Send";
+  if (t) {
+    t.textContent = isLoading ? "Sending…" : "Send";
+  } else {
+    sendBtn.textContent = isLoading ? "Sending…" : "Send";
+  }
 };
 
 // -----------------------------
