@@ -2,6 +2,7 @@
 // Goals:
 // - Minimal assistant UI with structured responses
 // - Health check + graceful offline banner
+// - UNIFIED MODE: No mode selection UI
 
 const chatEl = document.getElementById("chat");
 const formEl = document.getElementById("form");
@@ -13,10 +14,6 @@ const statusBanner = document.getElementById("statusBanner");
 const statusBannerText = statusBanner?.querySelector(".status-banner-text");
 const messagesEl = document.getElementById("messages");
 const yearEl = document.getElementById("year");
-
-// Optional mode toggles (if present in your HTML)
-const modeOfficialBtn = document.getElementById("modeOfficial");
-const modeCommunityBtn = document.getElementById("modeCommunity");
 
 const DEMO_ERROR = "Sorry, I couldn't reach the OmanX service. Please try again.";
 const DEFAULT_OFFLINE_MESSAGE =
@@ -103,32 +100,6 @@ const API_BASE = getApiBase();
 const apiUrl = (p) => `${API_BASE}${p.startsWith("/") ? p : `/${p}`}`;
 
 // -----------------------------
-// Mode selection (official/community)
-// -----------------------------
-let mode = "official";
-
-function setMode(next) {
-  mode = next;
-
-  if (modeOfficialBtn && modeCommunityBtn) {
-    if (mode === "official") {
-      modeOfficialBtn.classList.add("on");
-      modeCommunityBtn.classList.remove("on");
-      modeOfficialBtn.setAttribute("aria-selected", "true");
-      modeCommunityBtn.setAttribute("aria-selected", "false");
-    } else {
-      modeCommunityBtn.classList.add("on");
-      modeOfficialBtn.classList.remove("on");
-      modeCommunityBtn.setAttribute("aria-selected", "true");
-      modeOfficialBtn.setAttribute("aria-selected", "false");
-    }
-  }
-}
-
-modeOfficialBtn?.addEventListener("click", () => setMode("official"));
-modeCommunityBtn?.addEventListener("click", () => setMode("community"));
-
-// -----------------------------
 // Connectivity check
 // -----------------------------
 async function checkHealth() {
@@ -159,7 +130,7 @@ const sendMessage = async (message) => {
     const response = await fetch(apiUrl("/chat"), {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ message, mode }),
+      body: JSON.stringify({ message }),
     });
 
     let payload = null;
@@ -231,7 +202,6 @@ if (clearBtn && chatEl) {
 // -----------------------------
 // Boot
 // -----------------------------
-setMode("official");
 checkHealth();
 
 if (API_BASE) {

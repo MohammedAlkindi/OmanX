@@ -6,16 +6,7 @@
 // - Optional SSE streaming
 // - Knowledge.json hot-reload + caching
 // - Strong error handling + graceful shutdown
-//
-// IMPORTANT:
-// - prompts.js must export:
-//   - SYSTEM_POLICY_SCHOLAR
-//   - SYSTEM_POLICY_LOCAL
-//   - buildKnowledgeText
-//
-// Deployment note:
-// - If frontend and backend are on different domains, set:
-//   ALLOWED_ORIGINS=https://your-frontend-domain,https://www.your-frontend-domain
+// - UNIFIED MODE: Auto-routing between strict and normal lanes
 
 import express from "express";
 import path from "path";
@@ -38,6 +29,8 @@ import {
   buildKnowledgeText,
 } from "./prompts.js";
 
+import { routeQuery, searchKnowledge } from './router.js';
+
 dotenv.config();
 
 const __filename = fileURLToPath(import.meta.url);
@@ -47,7 +40,7 @@ const PORT = Number(process.env.PORT || 3000);
 const NODE_ENV = process.env.NODE_ENV || "development";
 const IS_PROD = NODE_ENV === "production";
 
-const OPENAI_MODEL = process.env.OPENAI_MODEL || "gpt-4.1-mini";
+const OPENAI_MODEL = process.env.OPENAI_MODEL || "gpt-4o-mini";
 const OPENAI_API_KEY = process.env.OPENAI_API_KEY;
 
 const ALLOWED_ORIGINS = (process.env.ALLOWED_ORIGINS || "")
@@ -103,71 +96,6 @@ const client = new OpenAI({
 });
 
 // -----------------------------
-// Intent routing (simple MVP)
-// -----------------------------
-function isLocalLifeQuery(text = "") {
-  const t = String(text).toLowerCase();
-
-  const localHits = [
-    "restaurant",
-    "restaurants",
-    "food",
-    "eat",
-    "nearby",
-    "near me",
-    "cafe",
-    "coffee",
-    "pizza",
-    "bar",
-    "brunch",
-    "gym",
-    "grocery",
-    "supermarket",
-    "laundry",
-    "philly",
-    "philadelphia",
-    "spring garden",
-    "center city",
-    "rittenhouse",
-    "fishtown",
-    "old city",
-    "university city",
-    "things to do",
-    "recommend",
-    "recommendation",
-  ];
-
-  const governedHits = [
-    "i-20",
-    "ds-2019",
-    "sevis",
-    "dso",
-    "visa",
-    "immigration",
-    "status",
-    "work authorization",
-    "opt",
-    "cpt",
-    "legal",
-    "police",
-    "emergency",
-    "911",
-    "insurance",
-    "medical",
-    "hospital",
-    "scholarship",
-    "ministry",
-    "funding",
-    "reimbursement",
-    "housing contract",
-    "lease",
-  ];
-
-  if (governedHits.some((k) => t.includes(k))) return false;
-  return localHits.some((k) => t.includes(k));
-}
-
-// -----------------------------
 // Knowledge base manager (hot reload + safe fallback)
 // -----------------------------
 class KnowledgeManager {
@@ -179,23 +107,29 @@ class KnowledgeManager {
   }
 
   async load(force = false) {
-    const st = await fs.stat(this.filePath);
-    if (!force && st.mtimeMs <= this.lastMtimeMs && this.knowledgeJson) return false;
+    try {
+      const st = await fs.stat(this.filePath);
+      if (!force && st.mtimeMs <= this.lastMtimeMs && this.knowledgeJson) return false;
 
-    const raw = await fs.readFile(this.filePath, "utf8");
-    const json = JSON.parse(raw);
+      const raw = await fs.readFile(this.filePath, "utf8");
+      const json = JSON.parse(raw);
 
-    this.knowledgeJson = json;
-    this.knowledgeText = buildKnowledgeText(json);
-    this.lastMtimeMs = st.mtimeMs;
+      this.knowledgeJson = json;
+      this.knowledgeText = buildKnowledgeText(json);
+      this.lastMtimeMs = st.mtimeMs;
 
-    logger.info("Knowledge loaded", {
-      entries: typeof json === "object" && json ? Object.keys(json).length : 0,
-      mtimeMs: st.mtimeMs,
-      bytes: raw.length,
-    });
+      logger.info("Knowledge loaded", {
+        entries: typeof json === "object" && json ? Object.keys(json).length : 0,
+        mtimeMs: st.mtimeMs,
+        bytes: raw.length,
+      });
 
-    return true;
+      return true;
+    } catch (e) {
+      logger.error("Knowledge load failed", { error: e?.message || String(e) });
+      // Don't crash - allow server to run without KB
+      return false;
+    }
   }
 
   getText() {
@@ -219,10 +153,10 @@ class ResponseCache {
     this.map = new Map(); // key -> { ts, value }
   }
 
-  keyFor({ model, message, mode, lane }) {
+  keyFor({ model, message, lane }) {
     return crypto
       .createHash("sha256")
-      .update(`${model}::${mode || ""}::${lane || ""}::${message}`)
+      .update(`${model}::${lane || ""}::${message}`)
       .digest("hex");
   }
 
@@ -450,32 +384,38 @@ app.post("/admin/knowledge/reload", requireAdmin, async (req, res) => {
 });
 
 // -----------------------------
-// Chat endpoint
-// Body: { message: string, stream?: boolean, mode?: "official"|"community" }
-// - "mode" is user-facing; "lane" is internal routing (scholar vs local).
-//
-// Improvements vs previous:
-// - Returns more specific errors (auth/rate-limit/timeouts)
-// - Includes requestId + lane in responses to help frontend debug
-// - Avoids hard-failing when knowledge isn't loaded (still answers in scholar lane, but warns/esc)
- // -----------------------------
+// Chat endpoint - UNIFIED MODE
+// Body: { message: string, stream?: boolean }
+// Auto-routes internally to strict or normal lane
+// -----------------------------
 app.post("/chat", apiLimiter, async (req, res) => {
   const requestId = req.requestId;
 
   try {
-    const { message, stream = false, mode = "official" } = req.body || {};
+    const { message, stream = false } = req.body || {};
 
-    if (!message || typeof message !== "string") {
+    if (!message || typeof message !== 'string') {
       return res.status(400).json({ error: "Missing 'message' string.", requestId });
     }
     if (message.length > 10_000) {
       return res.status(400).json({ error: "Message too long (max 10,000 chars).", requestId });
     }
 
-    const lane = isLocalLifeQuery(message) ? "local" : "scholar";
+    // UNIFIED ROUTING: Auto-detect lane
+    const routing = routeQuery(message);
+    const lane = routing.lane; // 'strict' or 'normal'
 
-    // Cache only for non-streaming
-    const cacheKey = cache.keyFor({ model: OPENAI_MODEL, message, mode, lane });
+    logger.info("Chat request (unified)", { 
+      requestId, 
+      lane, 
+      stream, 
+      length: message.length,
+      triggers: routing.matches.slice(0, 3), // Log first 3 matches
+      confidence: routing.confidence 
+    });
+
+    // Cache key includes routing decision
+    const cacheKey = cache.keyFor({ model: OPENAI_MODEL, message, lane });
     if (!stream) {
       const cached = cache.get(cacheKey);
       if (cached) {
@@ -484,35 +424,80 @@ app.post("/chat", apiLimiter, async (req, res) => {
       }
     }
 
-    logger.info("Chat request", { requestId, mode, lane, stream, length: message.length });
-
-    // Scholar lane policy + knowledge injection (if loaded)
-    // Local lane policy without knowledge injection
+    // Build system prompt based on lane
     let systemText = "";
 
-    if (lane === "local") {
+    if (lane === 'normal') {
+      // Normal lane: conversational, no KB needed
       systemText = SYSTEM_POLICY_LOCAL.trim();
     } else {
-      const kb = knowledge.getText();
-      systemText =
-        SYSTEM_POLICY_SCHOLAR.trim() +
-        `\n\nMODE: ${mode}\n` +
-        (kb ? `\nKNOWLEDGE (approved sources):\n${kb}\n` : `\nKNOWLEDGE: (not loaded)\n`);
+      // Strict lane: Load KB and search for relevant entries
+      const kb = knowledge.getJson();
+      
+      if (!kb) {
+        // KB not loaded → refuse + escalate
+        const fallback = [
+          "⚠️ I cannot access the official knowledge base right now.",
+          "For visa, immigration, work authorization, or compliance questions,",
+          "please contact your Designated School Official (DSO) immediately.",
+          "Do not rely on external sources for these matters.",
+        ].join(" ");
+        
+        return res.json({
+          text: fallback,
+          cached: false,
+          degraded: true,
+          requestId,
+          lane,
+        });
+      }
+      
+      // Search KB for relevant entries
+      const kbResults = searchKnowledge(kb, message);
+      
+      if (kbResults.length === 0) {
+        // No relevant KB entries → refuse + escalate
+        const noMatch = [
+          "🔒 I couldn't find relevant official guidance for your question in my knowledge base.",
+          "This may require case-specific advice.",
+          "Please contact your Designated School Official (DSO) or your university's",
+          "international student office for accurate information.",
+          "Do not proceed without official confirmation.",
+        ].join(" ");
+        
+        return res.json({
+          text: noMatch,
+          cached: false,
+          noKbMatch: true,
+          requestId,
+          lane,
+        });
+      }
+      
+      // Build KB context from top 3 results
+      const kbContext = kbResults.slice(0, 3).map((r, i) => {
+        return `\n--- KB Entry ${i + 1}: ${r.id} (relevance: ${r.score}) ---\n` +
+               JSON.stringify(r.doc, null, 2);
+      }).join('\n');
+      
+      systemText = [
+        SYSTEM_POLICY_SCHOLAR.trim(),
+        "\n\n## RETRIEVED KNOWLEDGE BASE ENTRIES",
+        "Use ONLY these entries to answer. Do not speculate beyond them.",
+        "Paraphrase the guidance in user-friendly language.",
+        "Cite which KB entry ID(s) you used.",
+        kbContext,
+      ].join('\n');
     }
 
     const buildFallbackText = () => {
-      if (lane === "local") {
-        return [
-          "I’m unable to reach the OmanX AI service right now.",
-          "Please try again shortly.",
-        ].join(" ");
+      if (lane === 'normal') {
+        return "I'm unable to reach the OmanX AI service right now. Please try again shortly.";
       }
-
       return [
-        "I’m unable to reach the OmanX AI service right now.",
-        "For visa or immigration questions (like F-1 internships, CPT/OPT, or work authorization),",
-        "please contact your Designated School Official (DSO) or your university’s international student office.",
-        "This is informational only—verify with your school before taking action.",
+        "I'm unable to reach the OmanX AI service right now.",
+        "For visa or immigration questions, please contact your Designated School Official (DSO)",
+        "or your university's international student office. This is informational only—verify with your school before taking action.",
       ].join(" ");
     };
 
@@ -600,7 +585,6 @@ app.post("/chat", apiLimiter, async (req, res) => {
     }
 
     const text = response.output_text || "I couldn't generate a response right now.";
-
     cache.set(cacheKey, text);
 
     return res.json({
@@ -614,19 +598,20 @@ app.post("/chat", apiLimiter, async (req, res) => {
     const status = err?.status || err?.response?.status;
     const msg = err?.message || String(err);
 
-    logger.error("Error in /chat", { requestId, status, error: msg });
+    logger.error("Error in /chat", { requestId, status, error: msg, stack: err?.stack });
 
+    // Return user-safe error message, log full details server-side
     if (status === 401) {
-      return res.status(500).json({ error: "OpenAI authentication error.", requestId });
+      return res.status(500).json({ error: "Authentication error. Contact support.", requestId });
     }
     if (status === 429) {
-      return res.status(429).json({ error: "OpenAI rate limit exceeded. Try again later.", requestId });
+      return res.status(429).json({ error: "Rate limit exceeded. Try again later.", requestId });
     }
     if (status === 400) {
-      return res.status(500).json({ error: "OpenAI request was rejected (400). Check model/input formatting.", requestId });
+      return res.status(500).json({ error: "Invalid request format. Contact support.", requestId });
     }
 
-    return res.status(500).json({ error: "Server error.", requestId });
+    return res.status(500).json({ error: "Server error. Please try again.", requestId });
   }
 });
 
