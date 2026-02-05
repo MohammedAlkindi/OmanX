@@ -78,22 +78,20 @@ const logger = winston.createLogger({
 // -----------------------------
 // Config validation
 // -----------------------------
-function requireEnv(name) {
-  if (!process.env[name]) {
-    logger.error(`Missing required environment variable: ${name}`);
-    process.exit(1);
-  }
+if (!OPENAI_API_KEY) {
+  logger.warn("OPENAI_API_KEY is missing. Chat responses will use safe fallback guidance only.");
 }
-requireEnv("OPENAI_API_KEY");
 
 // -----------------------------
 // OpenAI client
 // -----------------------------
-const client = new OpenAI({
-  apiKey: OPENAI_API_KEY,
-  timeout: 60_000,
-  maxRetries: 2,
-});
+const client = OPENAI_API_KEY
+  ? new OpenAI({
+      apiKey: OPENAI_API_KEY,
+      timeout: 60_000,
+      maxRetries: 2,
+    })
+  : null;
 
 // -----------------------------
 // Knowledge base manager (hot reload + safe fallback)
@@ -500,6 +498,16 @@ app.post("/chat", apiLimiter, async (req, res) => {
         "or your university's international student office. This is informational only—verify with your school before taking action.",
       ].join(" ");
     };
+
+    if (!client) {
+      return res.json({
+        text: buildFallbackText(),
+        cached: false,
+        degraded: true,
+        requestId,
+        lane,
+      });
+    }
 
     // ---- Streaming (SSE) ----
     if (stream) {
