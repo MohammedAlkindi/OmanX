@@ -1,9 +1,4 @@
 {
-  "functions": {
-    "api/*.js": {
-      "runtime": "nodejs20.x"
-    }
-  },
   "rewrites": [
     { "source": "/chat", "destination": "/api/chat" },
     { "source": "/health", "destination": "/api/health" },
