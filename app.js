@@ -1,7 +1,4 @@
 // app.js — OmanX MVP (frontend)
-// Goals:
-// - Minimal assistant UI with structured responses
-// - Health check + graceful offline banner
 
 const chatEl = document.getElementById("chat");
 const formEl = document.getElementById("form");

@@ -1,5 +1,4 @@
 // prompts.js — Enhanced OmanX dual-mode assistant with adaptive strictness
-// Version 2.0: Sophisticated risk assessment, context-aware mode switching, and compliance safeguards
 
 export const SYSTEM_POLICY_SCHOLAR = `
 # OmanX Dual-Mode Scholar Assistant - Enhanced Edition

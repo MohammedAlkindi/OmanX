@@ -6,16 +6,7 @@
 // - Optional SSE streaming
 // - Knowledge.json hot-reload + caching
 // - Strong error handling + graceful shutdown
-//
-// IMPORTANT:
-// - prompts.js must export:
-//   - SYSTEM_POLICY_SCHOLAR
-//   - SYSTEM_POLICY_LOCAL
-//   - buildKnowledgeText
-//
-// Deployment note:
-// - If frontend and backend are on different domains, set:
-//   ALLOWED_ORIGINS=https://your-frontend-domain,https://www.your-frontend-domain
+// - UNIFIED MODE: Auto-routing between strict and normal lanes
 
 import express from "express";
 import path from "path";
@@ -38,6 +29,9 @@ import {
   buildKnowledgeText,
 } from "./prompts.js";
 
+import { routeQuery, searchKnowledge } from './router.js';
+import { generateLocalResponse } from './localResponder.js';
+
 dotenv.config();
 
 const __filename = fileURLToPath(import.meta.url);
@@ -47,7 +41,7 @@ const PORT = Number(process.env.PORT || 3000);
 const NODE_ENV = process.env.NODE_ENV || "development";
 const IS_PROD = NODE_ENV === "production";
 
-const OPENAI_MODEL = process.env.OPENAI_MODEL || "gpt-4.1-mini";
+const OPENAI_MODEL = process.env.OPENAI_MODEL || "gpt-4o-mini";
 const OPENAI_API_KEY = process.env.OPENAI_API_KEY;
 
 const ALLOWED_ORIGINS = (process.env.ALLOWED_ORIGINS || "")
@@ -85,87 +79,34 @@ const logger = winston.createLogger({
 // -----------------------------
 // Config validation
 // -----------------------------
-function requireEnv(name) {
-  if (!process.env[name]) {
-    logger.error(`Missing required environment variable: ${name}`);
+if (!OPENAI_API_KEY) {
+  logger.warn("OPENAI_API_KEY is missing. Chat responses will use safe fallback guidance only.");
+}
+
+// In production, require ADMIN_KEY and ALLOWED_ORIGINS to be explicitly configured
+if (IS_PROD) {
+  if (!ADMIN_KEY) {
+    logger.error("ADMIN_KEY is required in production. Set ADMIN_KEY in environment.");
+    // Fail fast in production to avoid accidentally exposing admin endpoints.
+    process.exit(1);
+  }
+
+  if (!ALLOWED_ORIGINS.length) {
+    logger.error("ALLOWED_ORIGINS must be set in production to restrict CORS.");
     process.exit(1);
   }
 }
-requireEnv("OPENAI_API_KEY");
 
 // -----------------------------
 // OpenAI client
 // -----------------------------
-const client = new OpenAI({
-  apiKey: OPENAI_API_KEY,
-  timeout: 60_000,
-  maxRetries: 2,
-});
-
-// -----------------------------
-// Intent routing (simple MVP)
-// -----------------------------
-function isLocalLifeQuery(text = "") {
-  const t = String(text).toLowerCase();
-
-  const localHits = [
-    "restaurant",
-    "restaurants",
-    "food",
-    "eat",
-    "nearby",
-    "near me",
-    "cafe",
-    "coffee",
-    "pizza",
-    "bar",
-    "brunch",
-    "gym",
-    "grocery",
-    "supermarket",
-    "laundry",
-    "philly",
-    "philadelphia",
-    "spring garden",
-    "center city",
-    "rittenhouse",
-    "fishtown",
-    "old city",
-    "university city",
-    "things to do",
-    "recommend",
-    "recommendation",
-  ];
-
-  const governedHits = [
-    "i-20",
-    "ds-2019",
-    "sevis",
-    "dso",
-    "visa",
-    "immigration",
-    "status",
-    "work authorization",
-    "opt",
-    "cpt",
-    "legal",
-    "police",
-    "emergency",
-    "911",
-    "insurance",
-    "medical",
-    "hospital",
-    "scholarship",
-    "ministry",
-    "funding",
-    "reimbursement",
-    "housing contract",
-    "lease",
-  ];
-
-  if (governedHits.some((k) => t.includes(k))) return false;
-  return localHits.some((k) => t.includes(k));
-}
+const client = OPENAI_API_KEY
+  ? new OpenAI({
+      apiKey: OPENAI_API_KEY,
+      timeout: 60_000,
+      maxRetries: 2,
+    })
+  : null;
 
 // -----------------------------
 // Knowledge base manager (hot reload + safe fallback)
@@ -179,23 +120,29 @@ class KnowledgeManager {
   }
 
   async load(force = false) {
-    const st = await fs.stat(this.filePath);
-    if (!force && st.mtimeMs <= this.lastMtimeMs && this.knowledgeJson) return false;
+    try {
+      const st = await fs.stat(this.filePath);
+      if (!force && st.mtimeMs <= this.lastMtimeMs && this.knowledgeJson) return false;
 
-    const raw = await fs.readFile(this.filePath, "utf8");
-    const json = JSON.parse(raw);
+      const raw = await fs.readFile(this.filePath, "utf8");
+      const json = JSON.parse(raw);
 
-    this.knowledgeJson = json;
-    this.knowledgeText = buildKnowledgeText(json);
-    this.lastMtimeMs = st.mtimeMs;
+      this.knowledgeJson = json;
+      this.knowledgeText = buildKnowledgeText(json);
+      this.lastMtimeMs = st.mtimeMs;
 
-    logger.info("Knowledge loaded", {
-      entries: typeof json === "object" && json ? Object.keys(json).length : 0,
-      mtimeMs: st.mtimeMs,
-      bytes: raw.length,
-    });
+      logger.info("Knowledge loaded", {
+        entries: typeof json === "object" && json ? Object.keys(json).length : 0,
+        mtimeMs: st.mtimeMs,
+        bytes: raw.length,
+      });
 
-    return true;
+      return true;
+    } catch (e) {
+      logger.error("Knowledge load failed", { error: e?.message || String(e) });
+      // Don't crash - allow server to run without KB
+      return false;
+    }
   }
 
   getText() {
@@ -219,10 +166,10 @@ class ResponseCache {
     this.map = new Map(); // key -> { ts, value }
   }
 
-  keyFor({ model, message, mode, lane }) {
+  keyFor({ model, message, lane }) {
     return crypto
       .createHash("sha256")
-      .update(`${model}::${mode || ""}::${lane || ""}::${message}`)
+      .update(`${model}::${lane || ""}::${message}`)
       .digest("hex");
   }
 
@@ -276,7 +223,19 @@ app.set("trust proxy", 1);
 // Security headers
 app.use(
   helmet({
-    contentSecurityPolicy: false,
+    // In production enable a reasonable CSP; disable only when developing locally.
+    contentSecurityPolicy: IS_PROD
+      ? {
+          directives: {
+            defaultSrc: ["'self'"],
+            scriptSrc: ["'self'"],
+            styleSrc: ["'self'", "https:"] ,
+            imgSrc: ["'self'", 'data:'],
+            connectSrc: ["'self'"],
+            frameAncestors: ["'self'"],
+          },
+        }
+      : false,
     crossOriginEmbedderPolicy: false,
   })
 );
@@ -288,9 +247,7 @@ app.use(
       // allow same-origin / curl / server-to-server requests
       if (!origin) return cb(null, true);
 
-      // if not configured, default open for MVP
-      if (!ALLOWED_ORIGINS.length) return cb(null, true);
-
+      // In production ALLOWED_ORIGINS is required (validated at startup).
       if (ALLOWED_ORIGINS.includes(origin)) return cb(null, true);
       return cb(new Error(`CORS blocked: ${origin}`), false);
     },
@@ -321,7 +278,8 @@ app.use(
     stream: {
       write: (msg) => logger.info(msg.trim()),
     },
-    skip: () => IS_PROD === false,
+    // In development we want request logs visible. Only skip morgan in production.
+    skip: () => IS_PROD === true,
   })
 );
 
@@ -349,10 +307,6 @@ app.use(
     },
   })
 );
-
-app.get("/pitch", (req, res) => {
-  res.sendFile(path.join(__dirname, "pitch.html"));
-});
 
 // -----------------------------
 // Startup load knowledge (do NOT crash prod if knowledge is missing)
@@ -422,6 +376,29 @@ app.get("/metrics", (req, res) => {
   });
 });
 
+// Serve knowledge base entry (simple JSON) for frontend citations
+app.get('/kb/:id', (req, res) => {
+  try {
+    const kb = knowledge.getJson();
+    if (!kb) return res.status(503).json({ error: 'Knowledge base not available' });
+
+    const id = req.params.id;
+    let entry = null;
+
+    if (Array.isArray(kb.documents)) {
+      entry = kb.documents.find((d) => d.id === id);
+    } else if (kb[id]) {
+      entry = kb[id];
+    }
+
+    if (!entry) return res.status(404).json({ error: 'KB entry not found' });
+    return res.json({ id, entry });
+  } catch (e) {
+    logger.error('KB fetch error', { error: e?.message || String(e) });
+    return res.status(500).json({ error: 'KB lookup failed' });
+  }
+});
+
 // -----------------------------
 // Admin endpoints
 // - In production: requires ADMIN_KEY via x-admin-key header OR {adminKey} body
@@ -449,55 +426,154 @@ app.post("/admin/knowledge/reload", requireAdmin, async (req, res) => {
   }
 });
 
+// Admin: upload new knowledge JSON (protected in production)
+app.post('/admin/knowledge/upload', requireAdmin, express.json({ limit: '1mb' }), async (req, res) => {
+  try {
+    const payload = req.body;
+    if (!payload || (typeof payload !== 'object')) {
+      return res.status(400).json({ ok: false, error: 'Invalid JSON payload', requestId: req.requestId });
+    }
+
+    // Basic validation: must contain metadata and documents OR be object-based
+    const hasDocs = Array.isArray(payload.documents) && payload.documents.length > 0;
+    const hasObj = Object.keys(payload).length > 0 && (payload.metadata || hasDocs);
+    if (!hasDocs && !hasObj) {
+      return res.status(400).json({ ok: false, error: 'Knowledge JSON missing required fields', requestId: req.requestId });
+    }
+
+    await fs.writeFile(KNOWLEDGE_PATH, JSON.stringify(payload, null, 2), 'utf8');
+    await knowledge.load(true);
+    return res.json({ ok: true, updated: true, requestId: req.requestId });
+  } catch (e) {
+    logger.error('KB upload failed', { error: e?.message || String(e) });
+    return res.status(500).json({ ok: false, error: 'KB upload failed', requestId: req.requestId });
+  }
+});
+
 // -----------------------------
-// Chat endpoint
-// Body: { message: string, stream?: boolean, mode?: "official"|"community" }
-// - "mode" is user-facing; "lane" is internal routing (scholar vs local).
-//
-// Improvements vs previous:
-// - Returns more specific errors (auth/rate-limit/timeouts)
-// - Includes requestId + lane in responses to help frontend debug
-// - Avoids hard-failing when knowledge isn't loaded (still answers in scholar lane, but warns/esc)
- // -----------------------------
+// Chat endpoint - UNIFIED MODE
+// Body: { message: string, stream?: boolean }
+// Auto-routes internally to strict or normal lane
+// -----------------------------
 app.post("/chat", apiLimiter, async (req, res) => {
   const requestId = req.requestId;
 
   try {
-    const { message, stream = false, mode = "official" } = req.body || {};
+    const { message, stream = false } = req.body || {};
 
-    if (!message || typeof message !== "string") {
+    if (!message || typeof message !== 'string') {
       return res.status(400).json({ error: "Missing 'message' string.", requestId });
     }
     if (message.length > 10_000) {
       return res.status(400).json({ error: "Message too long (max 10,000 chars).", requestId });
     }
 
-    const lane = isLocalLifeQuery(message) ? "local" : "scholar";
+    // UNIFIED ROUTING: Auto-detect lane
+    const routing = routeQuery(message);
+    const lane = routing.lane; // 'strict' or 'normal'
 
-    // Cache only for non-streaming
-    const cacheKey = cache.keyFor({ model: OPENAI_MODEL, message, mode, lane });
+    logger.info("Chat request (unified)", { 
+      requestId, 
+      lane, 
+      stream, 
+      length: message.length,
+      triggers: routing.matches.slice(0, 3), // Log first 3 matches
+      confidence: routing.confidence 
+    });
+
+    // Cache key includes routing decision
+    const cacheKey = cache.keyFor({ model: OPENAI_MODEL, message, lane });
     if (!stream) {
       const cached = cache.get(cacheKey);
       if (cached) {
         logger.info("Cache hit", { requestId, lane });
-        return res.json({ text: cached, cached: true, requestId, lane });
+        return res.json({ text: cached, cached: true, requestId, lane, kbRefs: [] });
       }
     }
 
-    logger.info("Chat request", { requestId, mode, lane, stream, length: message.length });
-
-    // Scholar lane policy + knowledge injection (if loaded)
-    // Local lane policy without knowledge injection
+    // Build system prompt based on lane
     let systemText = "";
 
-    if (lane === "local") {
+    if (lane === 'normal') {
+      // Normal lane: conversational, no KB needed
       systemText = SYSTEM_POLICY_LOCAL.trim();
     } else {
-      const kb = knowledge.getText();
-      systemText =
-        SYSTEM_POLICY_SCHOLAR.trim() +
-        `\n\nMODE: ${mode}\n` +
-        (kb ? `\nKNOWLEDGE (approved sources):\n${kb}\n` : `\nKNOWLEDGE: (not loaded)\n`);
+      // Strict lane: Load KB and search for relevant entries
+      const kb = knowledge.getJson();
+      
+      if (!kb) {
+        // KB not loaded → refuse + escalate
+        const fallback = [
+          "I cannot access the official knowledge base right now.",
+          "For visa, immigration, work authorization, or compliance questions,",
+          "please contact your Designated School Official (DSO) immediately.",
+          "Do not rely on external sources for these matters.",
+        ].join(" ");
+        
+        return res.json({
+          text: fallback,
+          cached: false,
+          degraded: true,
+          requestId,
+          lane,
+          kbRefs: [],
+        });
+      }
+      
+      // Search KB for relevant entries
+      const kbResults = searchKnowledge(kb, message);
+      const kbRefs = kbResults.slice(0, 3).map((r) => r.id);
+      
+      if (kbResults.length === 0) {
+        // No relevant KB entries → refuse + escalate
+        const noMatch = [
+          "🔒 I couldn't find relevant official guidance for your question in my knowledge base.",
+          "This may require case-specific advice.",
+          "Please contact your Designated School Official (DSO) or your university's",
+          "international student office for accurate information.",
+          "Do not proceed without official confirmation.",
+        ].join(" ");
+        
+        return res.json({
+          text: noMatch,
+          cached: false,
+          noKbMatch: true,
+          requestId,
+          lane,
+          kbRefs,
+        });
+      }
+      
+      // Build KB context from top 3 results
+      const kbContext = kbResults.slice(0, 3).map((r, i) => {
+        return `\n--- KB Entry ${i + 1}: ${r.id} (relevance: ${r.score}) ---\n` +
+               JSON.stringify(r.doc, null, 2);
+      }).join('\n');
+      
+      systemText = [
+        SYSTEM_POLICY_SCHOLAR.trim(),
+        "\n\n## RETRIEVED KNOWLEDGE BASE ENTRIES",
+        "Use ONLY these entries to answer. Do not speculate beyond them.",
+        "Paraphrase the guidance in user-friendly language.",
+        "Cite which KB entry ID(s) you used.",
+        kbContext,
+      ].join('\n');
+    }
+
+    const buildFallbackText = (kbResults = []) =>
+      generateLocalResponse({ lane, message, kbResults });
+
+    if (!client) {
+      const kbResults = lane === 'strict' ? searchKnowledge(knowledge.getJson(), message) : [];
+      const kbRefs = kbResults.slice(0, 3).map((r) => r.id);
+      return res.json({
+        text: buildFallbackText(kbResults),
+        cached: false,
+        degraded: true,
+        requestId,
+        lane,
+        kbRefs,
+      });
     }
 
     // ---- Streaming (SSE) ----
@@ -509,13 +585,24 @@ app.post("/chat", apiLimiter, async (req, res) => {
 
       let fullText = "";
 
-      const streamResp = await client.responses.stream({
-        model: OPENAI_MODEL,
-        input: [
-          { role: "system", content: [{ type: "input_text", text: systemText }] },
-          { role: "user", content: [{ type: "input_text", text: message }] },
-        ],
-      });
+      let streamResp;
+      try {
+        streamResp = await client.responses.stream({
+          model: OPENAI_MODEL,
+          input: [
+            { role: "system", content: [{ type: "input_text", text: systemText }] },
+            { role: "user", content: [{ type: "input_text", text: message }] },
+          ],
+        });
+      } catch (e) {
+        const msg = e?.message || String(e);
+        logger.error("Stream init error", { requestId, lane, error: msg });
+        res.write(
+          `data: ${JSON.stringify({ error: buildFallbackText(), requestId, lane, done: true })}\n\n`
+        );
+        res.end();
+        return;
+      }
 
       streamResp.on("response.output_text.delta", (event) => {
         const delta = event.delta || "";
@@ -550,42 +637,61 @@ app.post("/chat", apiLimiter, async (req, res) => {
     }
 
     // ---- Non-streaming ----
-    const response = await client.responses.create({
-      model: OPENAI_MODEL,
-      input: [
-        { role: "system", content: [{ type: "input_text", text: systemText }] },
-        { role: "user", content: [{ type: "input_text", text: message }] },
-      ],
-    });
+    let response;
+    try {
+      response = await client.responses.create({
+        model: OPENAI_MODEL,
+        input: [
+          { role: "system", content: [{ type: "input_text", text: systemText }] },
+          { role: "user", content: [{ type: "input_text", text: message }] },
+        ],
+      });
+    } catch (e) {
+      const msg = e?.message || String(e);
+      const status = e?.status || e?.response?.status;
+      logger.error("OpenAI request failed", { requestId, lane, status, error: msg });
+      const kbResults = lane === 'strict' ? searchKnowledge(knowledge.getJson(), message) : [];
+      const kbRefs = kbResults.slice(0, 3).map((r) => r.id);
+      return res.json({
+        text: buildFallbackText(kbResults),
+        cached: false,
+        degraded: true,
+        requestId,
+        lane,
+        kbRefs,
+      });
+    }
 
     const text = response.output_text || "I couldn't generate a response right now.";
-
     cache.set(cacheKey, text);
 
+    const kbRefs = lane === 'strict' ? searchKnowledge(knowledge.getJson(), message).slice(0, 3).map((r) => r.id) : [];
     return res.json({
       text,
       cached: false,
       requestId,
       lane,
+      kbRefs,
       usage: response.usage,
     });
   } catch (err) {
     const status = err?.status || err?.response?.status;
     const msg = err?.message || String(err);
 
-    logger.error("Error in /chat", { requestId, status, error: msg });
+    logger.error("Error in /chat", { requestId, status, error: msg, stack: err?.stack });
 
+    // Return user-safe error message, log full details server-side
     if (status === 401) {
-      return res.status(500).json({ error: "OpenAI authentication error.", requestId });
+      return res.status(500).json({ error: "Authentication error. Contact support.", requestId });
     }
     if (status === 429) {
-      return res.status(429).json({ error: "OpenAI rate limit exceeded. Try again later.", requestId });
+      return res.status(429).json({ error: "Rate limit exceeded. Try again later.", requestId });
     }
     if (status === 400) {
-      return res.status(500).json({ error: "OpenAI request was rejected (400). Check model/input formatting.", requestId });
+      return res.status(500).json({ error: "Invalid request format. Contact support.", requestId });
     }
 
-    return res.status(500).json({ error: "Server error.", requestId });
+    return res.status(500).json({ error: "Server error. Please try again.", requestId });
   }
 });
 
@@ -605,8 +711,13 @@ app.use((err, req, res, _next) => {
     error: err?.message || String(err),
     stack: err?.stack,
   });
+  const userMessage = IS_PROD
+    ? "Server error. Please try again later or contact support."
+    : (err?.message || "Error") + (err?.stack ? `\n${err.stack}` : "");
+
   res.status(500).json({
     error: IS_PROD ? "Internal server error" : (err?.message || "Error"),
+    text: userMessage,
     requestId: req.requestId,
   });
 });
