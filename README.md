@@ -36,9 +36,15 @@ This repository is configured for Vercel (`vercel.json`).
 1. Import repository into Vercel.
 2. Set environment variables (`OPENAI_API_KEY`, `OPENAI_MODEL`, `ADMIN_KEY`).
 3. Deploy.
-4. Smoke-check:
+4. Add custom domain `omanx.org` in **Vercel Project → Settings → Domains**.
+5. Configure DNS at your registrar:
+   - Apex (`omanx.org`) → A record to `76.76.21.21`
+   - `www` → CNAME to `cname.vercel-dns.com`
+6. Wait for SSL provisioning to complete in Vercel.
+7. Smoke-check:
    - `GET /health`
    - `POST /chat` with a compliance question (e.g. visa/CPT/OPT)
+   - `https://omanx.org` and `https://www.omanx.org`
 
 ## Key API endpoints
 - `GET /health` – service + knowledge status
