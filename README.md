@@ -30,6 +30,13 @@ RATE_LIMIT_MAX=120
 ADMIN_KEY=optional_admin_key
 ```
 
+You can use the provided example environment file as a starting point:
+
+```bash
+cp .env.example .env
+# then edit .env to add your OPENAI_API_KEY and other values
+```
+
 ## Deployment (Vercel)
 This repository is configured for Vercel (`vercel.json`).
 

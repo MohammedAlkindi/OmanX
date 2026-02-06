@@ -52,7 +52,28 @@ const createMessage = (role, text, meta = "") => {
   if (meta) {
     const metaEl = document.createElement("div");
     metaEl.className = "message-meta";
-    metaEl.textContent = meta;
+
+    // Render KB refs as clickable links when present: "... • Refs: ID1, ID2"
+    const refsMatch = /Refs:\s*(.+)$/i.exec(meta);
+    if (refsMatch) {
+      const before = meta.slice(0, refsMatch.index).trim();
+      if (before) metaEl.appendChild(document.createTextNode(before + " "));
+
+      const ids = refsMatch[1].split(/\s*,\s*/).filter(Boolean);
+      ids.forEach((id, idx) => {
+        const a = document.createElement('a');
+        a.href = apiUrl(`/kb/${encodeURIComponent(id)}`);
+        a.target = '_blank';
+        a.rel = 'noopener noreferrer';
+        a.className = 'kb-ref';
+        a.textContent = id;
+        metaEl.appendChild(a);
+        if (idx < ids.length - 1) metaEl.appendChild(document.createTextNode(', '));
+      });
+    } else {
+      metaEl.textContent = meta;
+    }
+
     bubble.appendChild(metaEl);
   }
 
@@ -125,6 +146,16 @@ const sendMessage = async (message) => {
     const payload = await response.json().catch(() => null);
 
     if (!response.ok) {
+      // If the server returned a helpful `text` field, show it to the user instead
+      const serverText = payload?.text || payload?.error;
+      if (serverText) {
+        const laneMeta = payload?.lane === "strict" ? "Compliance mode • Verified KB only" : "Community mode";
+        const refs = Array.isArray(payload?.kbRefs) && payload.kbRefs.length ? ` • Refs: ${payload.kbRefs.join(", ")}` : "";
+        addMessage("bot", serverText, `${laneMeta}${refs}`);
+        setStatus("online", "Online");
+        return;
+      }
+
       setStatusBanner(response.status === 404 ? API_BASE_ERROR_MESSAGE : DEFAULT_OFFLINE_MESSAGE);
       throw new Error(payload?.error ? `${payload.error} (HTTP ${response.status})` : `Request failed: HTTP ${response.status}`);
     }

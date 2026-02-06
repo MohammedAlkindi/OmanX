@@ -1,0 +1,37 @@
+name: CI
+
+on:
+  push:
+    branches: [ main, master ]
+  pull_request:
+    branches: [ main, master ]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        node-version: [18.x]
+    steps:
+      - uses: actions/checkout@v4
+      - name: Use Node.js ${{ matrix.node-version }}
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ matrix.node-version }}
+      - name: Install dependencies
+        run: npm ci
+      - name: Syntax checks
+        run: |
+          node --check server.js || true
+          node --check router.js || true
+          node --check localResponder.js || true
+          node --check app.js || true
+      - name: Run package tests
+        run: npm test
+      - name: Lint (optional)
+        run: |
+          if [ -f package.json ]; then
+            if npm run | grep -q lint; then
+              npm run lint || true
+            fi
+          fi

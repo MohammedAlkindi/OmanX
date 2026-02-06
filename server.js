@@ -83,6 +83,20 @@ if (!OPENAI_API_KEY) {
   logger.warn("OPENAI_API_KEY is missing. Chat responses will use safe fallback guidance only.");
 }
 
+// In production, require ADMIN_KEY and ALLOWED_ORIGINS to be explicitly configured
+if (IS_PROD) {
+  if (!ADMIN_KEY) {
+    logger.error("ADMIN_KEY is required in production. Set ADMIN_KEY in environment.");
+    // Fail fast in production to avoid accidentally exposing admin endpoints.
+    process.exit(1);
+  }
+
+  if (!ALLOWED_ORIGINS.length) {
+    logger.error("ALLOWED_ORIGINS must be set in production to restrict CORS.");
+    process.exit(1);
+  }
+}
+
 // -----------------------------
 // OpenAI client
 // -----------------------------
@@ -209,7 +223,19 @@ app.set("trust proxy", 1);
 // Security headers
 app.use(
   helmet({
-    contentSecurityPolicy: false,
+    // In production enable a reasonable CSP; disable only when developing locally.
+    contentSecurityPolicy: IS_PROD
+      ? {
+          directives: {
+            defaultSrc: ["'self'"],
+            scriptSrc: ["'self'"],
+            styleSrc: ["'self'", "https:"] ,
+            imgSrc: ["'self'", 'data:'],
+            connectSrc: ["'self'"],
+            frameAncestors: ["'self'"],
+          },
+        }
+      : false,
     crossOriginEmbedderPolicy: false,
   })
 );
@@ -221,9 +247,7 @@ app.use(
       // allow same-origin / curl / server-to-server requests
       if (!origin) return cb(null, true);
 
-      // if not configured, default open for MVP
-      if (!ALLOWED_ORIGINS.length) return cb(null, true);
-
+      // In production ALLOWED_ORIGINS is required (validated at startup).
       if (ALLOWED_ORIGINS.includes(origin)) return cb(null, true);
       return cb(new Error(`CORS blocked: ${origin}`), false);
     },
@@ -254,7 +278,8 @@ app.use(
     stream: {
       write: (msg) => logger.info(msg.trim()),
     },
-    skip: () => IS_PROD === false,
+    // In development we want request logs visible. Only skip morgan in production.
+    skip: () => IS_PROD === true,
   })
 );
 
@@ -351,6 +376,29 @@ app.get("/metrics", (req, res) => {
   });
 });
 
+// Serve knowledge base entry (simple JSON) for frontend citations
+app.get('/kb/:id', (req, res) => {
+  try {
+    const kb = knowledge.getJson();
+    if (!kb) return res.status(503).json({ error: 'Knowledge base not available' });
+
+    const id = req.params.id;
+    let entry = null;
+
+    if (Array.isArray(kb.documents)) {
+      entry = kb.documents.find((d) => d.id === id);
+    } else if (kb[id]) {
+      entry = kb[id];
+    }
+
+    if (!entry) return res.status(404).json({ error: 'KB entry not found' });
+    return res.json({ id, entry });
+  } catch (e) {
+    logger.error('KB fetch error', { error: e?.message || String(e) });
+    return res.status(500).json({ error: 'KB lookup failed' });
+  }
+});
+
 // -----------------------------
 // Admin endpoints
 // - In production: requires ADMIN_KEY via x-admin-key header OR {adminKey} body
@@ -375,6 +423,30 @@ app.post("/admin/knowledge/reload", requireAdmin, async (req, res) => {
     res.json({ ok: true, updated, requestId: req.requestId });
   } catch (e) {
     res.status(500).json({ ok: false, error: e?.message || "reload failed", requestId: req.requestId });
+  }
+});
+
+// Admin: upload new knowledge JSON (protected in production)
+app.post('/admin/knowledge/upload', requireAdmin, express.json({ limit: '1mb' }), async (req, res) => {
+  try {
+    const payload = req.body;
+    if (!payload || (typeof payload !== 'object')) {
+      return res.status(400).json({ ok: false, error: 'Invalid JSON payload', requestId: req.requestId });
+    }
+
+    // Basic validation: must contain metadata and documents OR be object-based
+    const hasDocs = Array.isArray(payload.documents) && payload.documents.length > 0;
+    const hasObj = Object.keys(payload).length > 0 && (payload.metadata || hasDocs);
+    if (!hasDocs && !hasObj) {
+      return res.status(400).json({ ok: false, error: 'Knowledge JSON missing required fields', requestId: req.requestId });
+    }
+
+    await fs.writeFile(KNOWLEDGE_PATH, JSON.stringify(payload, null, 2), 'utf8');
+    await knowledge.load(true);
+    return res.json({ ok: true, updated: true, requestId: req.requestId });
+  } catch (e) {
+    logger.error('KB upload failed', { error: e?.message || String(e) });
+    return res.status(500).json({ ok: false, error: 'KB upload failed', requestId: req.requestId });
   }
 });
 
@@ -639,8 +711,13 @@ app.use((err, req, res, _next) => {
     error: err?.message || String(err),
     stack: err?.stack,
   });
+  const userMessage = IS_PROD
+    ? "Server error. Please try again later or contact support."
+    : (err?.message || "Error") + (err?.stack ? `\n${err.stack}` : "");
+
   res.status(500).json({
     error: IS_PROD ? "Internal server error" : (err?.message || "Error"),
+    text: userMessage,
     requestId: req.requestId,
   });
 });

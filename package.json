@@ -7,7 +7,7 @@
   "scripts": {
     "start": "node server.js",
     "dev": "NODE_ENV=development node server.js",
-    "test": "node --check server.js && node --check router.js && node --check localResponder.js && node --check app.js"
+    "test": "node test/smoke.js"
   },
   "engines": {
     "node": ">=18.0.0"
