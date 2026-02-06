@@ -130,7 +130,7 @@ modeCommunityBtn?.addEventListener("click", () => setMode("community"));
 // -----------------------------
 async function checkHealth() {
   try {
-    const r = await fetch(apiUrl("/health"), { method: "GET" });
+    const r = await fetch(apiUrl("/api/health"), { method: "GET" });
     if (!r.ok) {
       setStatusBanner(r.status === 404 ? API_BASE_ERROR_MESSAGE : DEFAULT_OFFLINE_MESSAGE);
       throw new Error(`health ${r.status}`);
@@ -153,7 +153,7 @@ const sendMessage = async (message) => {
   setStatus("busy", "Thinking");
 
   try {
-    const response = await fetch(apiUrl("/chat"), {
+    const response = await fetch(apiUrl("/api/chat"), {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ message, mode }),
