@@ -1,0 +1,5 @@
+[
+  { "id": "uscis", "name": "USCIS", "url": "https://www.uscis.gov" },
+  { "id": "studyinthestates", "name": "Study in the States", "url": "https://studyinthestates.dhs.gov" },
+  { "id": "oman-mission", "name": "Oman Cultural Mission", "url": "https://omanculturalmission.org" }
+]
