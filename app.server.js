@@ -242,9 +242,44 @@ app.use(
       // allow same-origin / curl / server-to-server requests
       if (!origin) return cb(null, true);
 
+      // If no explicit allowed origins configured, allow all (useful for local dev)
       if (!ALLOWED_ORIGINS.length) return cb(null, true);
-      if (ALLOWED_ORIGINS.includes(origin)) return cb(null, true);
-      return cb(new Error(`CORS blocked: ${origin}`), false);
+
+      try {
+        const u = new URL(origin);
+        const originFull = origin; // e.g. 'http://127.0.0.1:3000'
+        const originHost = `${u.hostname}${u.port ? `:${u.port}` : ""}`; // '127.0.0.1:3000' or 'localhost'
+
+        for (const allowedRaw of ALLOWED_ORIGINS) {
+          const allowed = (allowedRaw || "").trim();
+          if (!allowed) continue;
+
+          // Exact match (including protocol/port)
+          if (allowed === originFull) return cb(null, true);
+
+          // If allowed is a full URL, compare hostname[:port]
+          try {
+            const a = new URL(allowed);
+            const allowedHost = `${a.hostname}${a.port ? `:${a.port}` : ""}`;
+            if (allowedHost === originHost) return cb(null, true);
+            // Accept if hostname matches (handles http://localhost:3000 vs http://127.0.0.1:3000)
+            if (a.hostname === u.hostname) return cb(null, true);
+            if ((a.hostname === "localhost" && u.hostname === "127.0.0.1") || (a.hostname === "127.0.0.1" && u.hostname === "localhost")) {
+              return cb(null, true);
+            }
+          } catch {
+            // allowed may be just hostname or hostname:port
+            if (allowed === originHost || allowed === u.hostname) return cb(null, true);
+            if ((allowed === "localhost" && u.hostname === "127.0.0.1") || (allowed === "127.0.0.1" && u.hostname === "localhost")) {
+              return cb(null, true);
+            }
+          }
+        }
+
+        return cb(new Error(`CORS blocked: ${origin}`), false);
+      } catch (e) {
+        return cb(new Error(`CORS blocked: ${origin}`), false);
+      }
     },
     credentials: true,
     methods: ["GET", "POST"],
