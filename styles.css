@@ -85,6 +85,10 @@ body{
   font-weight:700;
   background: rgba(16,163,127,0.12);
   color: var(--accent);
+  background-image: url('/icon.svg');
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: 60% 60%;
 }
 
 .brand-text h1{
