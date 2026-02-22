@@ -35,7 +35,7 @@ const RATE_LIMIT_MAX = Number(process.env.RATE_LIMIT_MAX || 120);
 const CACHE_TTL_MS = Number(process.env.CACHE_TTL_MS || 10 * 60 * 1000);
 const CACHE_MAX_ENTRIES = Number(process.env.CACHE_MAX_ENTRIES || 500);
 
-const KNOWLEDGE_PATH = path.join(__dirname, "knowledge.json");
+const KNOWLEDGE_PATH = path.join(__dirname, "data", "knowledge.json");
 const ADMIN_KEY = process.env.ADMIN_KEY || "";
 
 // ============================================================================
