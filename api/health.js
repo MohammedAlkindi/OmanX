@@ -1,7 +1,10 @@
-import app from "../app.server.js";
+// api/health.js - OmanX health check endpoint
 
-export default async function handler(req, res) {
-  const query = req.url.includes("?") ? req.url.slice(req.url.indexOf("?")) : "";
-  req.url = `/health${query}`;
-  return app(req, res);
+export default function healthHandler(req, res) {
+  return res.status(200).json({
+    ok: true,
+    service: "omanx",
+    route: "health",
+    timestamp: new Date().toISOString()
+  });
 }

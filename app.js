@@ -1,3 +1,5 @@
+// app.js - OmanX frontend application
+
 const form = document.getElementById('form');
 const input = document.getElementById('input');
 const messages = document.getElementById('messages');
@@ -77,6 +79,7 @@ function loadMessages() {
       return;
     }
 
+    messages.innerHTML = ''; // Clear default welcome message
     parsed.forEach((m) => {
       if (!m || typeof m.text !== 'string') return;
       addMessage(m.role === 'user' ? 'user' : 'assistant', m.text);
@@ -88,11 +91,18 @@ function loadMessages() {
 
 async function checkHealth() {
   try {
-    const res = await fetch('/ready', { method: 'GET' });
-    if (res.ok) {
-      setServiceState('online', 'Online');
+    // Try both endpoints for maximum compatibility
+    const res = await fetch('/api/ready', { method: 'GET' }).catch(() => null);
+    if (!res || !res.ok) {
+      // Fallback to non-api route
+      const fallbackRes = await fetch('/ready', { method: 'GET' });
+      if (fallbackRes.ok) {
+        setServiceState('online', 'Online');
+      } else {
+        setServiceState('offline', 'Offline');
+      }
     } else {
-      setServiceState('offline', 'Offline');
+      setServiceState('online', 'Online');
     }
   } catch {
     setServiceState('offline', 'Offline');
@@ -108,11 +118,21 @@ async function sendMessage(message) {
   scrollToBottom();
 
   try {
-    const res = await fetch('/chat', {
+    // Try /api/chat first, fallback to /chat
+    let res = await fetch('/api/chat', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ message }),
-    });
+    }).catch(() => null);
+
+    // If /api/chat fails, try /chat
+    if (!res || !res.ok) {
+      res = await fetch('/chat', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ message }),
+      });
+    }
 
     const payload = await res.json();
     if (!res.ok) {
@@ -122,6 +142,7 @@ async function sendMessage(message) {
     bubble.textContent = payload.text || 'No response generated.';
     setServiceState('online', 'Online');
   } catch (err) {
+    console.error('Chat error:', err);
     bubble.textContent = `I couldn't complete this request. ${err.message || 'Please try again.'}`;
     setServiceState('offline', 'Offline');
   }
@@ -161,6 +182,7 @@ clearBtn.addEventListener('click', () => {
   input.focus();
 });
 
+// Initial setup
 checkHealth();
 setInterval(checkHealth, 30000);
 loadMessages();

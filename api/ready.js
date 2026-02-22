@@ -1,7 +1,9 @@
-import app from "../app.server.js";
+// api/ready.js - OmanX readiness check endpoint
 
 export default async function handler(req, res) {
-  const query = req.url.includes("?") ? req.url.slice(req.url.indexOf("?")) : "";
-  req.url = `/ready${query}`;
-  return app(req, res);
+  return res.status(200).json({
+    ready: true,
+    service: "omanx",
+    timestamp: new Date().toISOString()
+  });
 }

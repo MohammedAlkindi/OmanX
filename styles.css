@@ -1,322 +1,623 @@
-:root{
-  color-scheme: light;
+/* =========================================================
+   OmanX — Styled to AlkindiX Design System
+   Dark, minimal, sophisticated
+========================================================= */
 
-  --bg: #f7f7f8;
-  --surface: #ffffff;
-  --surface-2: #f2f2f3;
-
-  --border-subtle: rgba(0,0,0,0.08);
-  --border: rgba(0,0,0,0.12);
-
-  --text: #0f172a;
-  --text-muted: rgba(15,23,42,0.65);
-  --text-subtle: rgba(15,23,42,0.45);
-
-  --accent: #10a37f;
-  --accent-strong: #0e8c6f;
-  --focus-ring: rgba(16,163,127,0.28);
-
-  --radius-lg: 18px;
-  --radius-md: 14px;
-  --radius-sm: 10px;
-
-  --font: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, Arial, sans-serif;
-  --mono: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+/* RESET */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
 }
 
-@media (prefers-color-scheme: dark){
-  :root{
-    color-scheme: dark;
+html {
+  font-size: 16px;
+  scroll-behavior: smooth;
+}
 
-    --bg: #0b0f14;
-    --surface: #0f141b;
-    --surface-2: #0b0f14;
+/* THEME — mirrors AlkindiX exactly */
+:root {
+  --bg: #0b0b0b;
+  --text: #e7e7e7;
+  --muted: #9a9a9a;
+  --accent: #ffffff;
+  --line: rgba(255, 255, 255, 0.1);
+  --card: #111111;
+  --radius: 10px;
+  --radius-lg: 14px;
 
-    --border-subtle: rgba(255,255,255,0.08);
-    --border: rgba(255,255,255,0.14);
+  /* OmanX accent green (retains brand identity) */
+  --ox-green: #10a37f;
+  --ox-green-dim: rgba(16, 163, 127, 0.15);
+  --ox-green-border: rgba(16, 163, 127, 0.3);
+}
 
-    --text: rgba(255,255,255,0.92);
-    --text-muted: rgba(255,255,255,0.62);
-    --text-subtle: rgba(255,255,255,0.45);
+/* BASE */
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: "Inter", ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, Arial, sans-serif;
+  line-height: 1.65;
+  opacity: 0;
+  transition: opacity 0.6s ease;
+}
+
+body.loaded {
+  opacity: 1;
+}
+
+/* Subtle grid background — identical to AlkindiX */
+body::before {
+  content: '';
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-image:
+    linear-gradient(rgba(255, 255, 255, 0.02) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255, 255, 255, 0.02) 1px, transparent 1px);
+  background-size: 60px 60px;
+  pointer-events: none;
+  z-index: -1;
+  opacity: 0.5;
+}
+
+/* Load Inter from Google Fonts */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&display=swap');
+
+/* =========================================================
+   TYPOGRAPHY
+========================================================= */
+
+h1, h2, h3 {
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  color: var(--accent);
+}
+
+h1 { font-size: clamp(1.4rem, 3vw, 1.8rem); margin-bottom: 0.25rem; }
+h2 { font-size: 1.15rem; margin-bottom: 0; }
+h3 { font-size: 1.1rem; margin-bottom: 0.5rem; }
+
+p {
+  font-size: 0.95rem;
+  opacity: 0.85;
+  margin-bottom: 0;
+}
+
+.muted {
+  color: var(--muted);
+}
+
+a {
+  color: var(--accent);
+  text-decoration: none;
+  transition: opacity 0.2s ease;
+}
+
+a:hover {
+  opacity: 0.8;
+}
+
+/* =========================================================
+   SCROLL PROGRESS — AlkindiX style
+========================================================= */
+.scroll-progress {
+  position: fixed;
+  top: 0;
+  left: 0;
+  height: 2px;
+  background: linear-gradient(90deg, var(--accent) 0%, rgba(255, 255, 255, 0.4) 100%);
+  z-index: 10001;
+  transition: width 0.1s ease;
+  box-shadow: 0 0 10px rgba(255, 255, 255, 0.4);
+}
+
+/* =========================================================
+   SHELL / LAYOUT
+========================================================= */
+.shell {
+  width: min(1100px, 92%);
+  margin: 0 auto;
+  padding: 32px 0 60px;
+}
+
+/* =========================================================
+   TOPBAR — AlkindiX nav aesthetic
+========================================================= */
+.topbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 16px;
+  height: 64px;
+  padding: 0 1.75rem;
+  background: rgba(15, 15, 15, 0.85);
+  backdrop-filter: blur(12px);
+  border: 1px solid var(--line);
+  border-radius: var(--radius-lg);
+  transition: border-color 0.3s ease, box-shadow 0.3s ease;
+  position: sticky;
+  top: 16px;
+  z-index: 999;
+}
+
+.topbar:hover {
+  border-color: rgba(255, 255, 255, 0.18);
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.4);
+}
+
+.brand {
+  display: flex;
+  gap: 14px;
+  align-items: center;
+}
+
+.logo {
+  width: 38px;
+  height: 38px;
+  display: grid;
+  place-items: center;
+  border-radius: 8px;
+  font-weight: 700;
+  font-size: 13px;
+  background: var(--ox-green-dim);
+  color: var(--ox-green);
+  border: 1px solid var(--ox-green-border);
+  letter-spacing: -0.02em;
+  flex-shrink: 0;
+}
+
+.brand-text h1 {
+  font-size: 1.1rem;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  color: var(--accent);
+}
+
+.brand-text p {
+  font-size: 0.8rem;
+  color: var(--muted);
+  margin: 0;
+  opacity: 1;
+}
+
+/* =========================================================
+   STATUS PILL
+========================================================= */
+.status-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  font-size: 0.82rem;
+  color: var(--muted);
+  padding: 5px 11px;
+  border-radius: 30px;
+  background: var(--card);
+  border: 1px solid var(--line);
+  white-space: nowrap;
+  transition: border-color 0.3s ease;
+}
+
+.status-pill .dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: #22c55e;
+  flex-shrink: 0;
+  box-shadow: 0 0 6px rgba(34, 197, 94, 0.5);
+}
+
+.status-pill[data-state="busy"] .dot {
+  background: #f59e0b;
+  box-shadow: 0 0 6px rgba(245, 158, 11, 0.5);
+}
+
+.status-pill[data-state="offline"] .dot {
+  background: #ef4444;
+  box-shadow: 0 0 6px rgba(239, 68, 68, 0.5);
+}
+
+/* =========================================================
+   STATUS BANNER
+========================================================= */
+.status-banner {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  padding: 12px 16px;
+  border-radius: var(--radius);
+  background: rgba(239, 68, 68, 0.08);
+  border: 1px solid rgba(239, 68, 68, 0.2);
+  color: #fca5a5;
+  font-size: 0.875rem;
+  margin-bottom: 16px;
+}
+
+.status-banner-text { flex: 1; }
+
+/* =========================================================
+   ASSISTANT PANEL — AlkindiX card style
+========================================================= */
+.assistant-panel {
+  margin-top: 20px;
+  background: var(--card);
+  border: 1px solid var(--line);
+  border-radius: var(--radius-lg);
+  padding: 1.75rem;
+  display: flex;
+  flex-direction: column;
+  min-height: 72vh;
+  transition: border-color 0.3s ease, box-shadow 0.3s ease;
+  position: relative;
+  overflow: hidden;
+}
+
+/* Subtle gradient overlay — AlkindiX project-card style */
+.assistant-panel::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.02) 0%, transparent 60%);
+  pointer-events: none;
+}
+
+.assistant-panel:hover {
+  border-color: rgba(255, 255, 255, 0.18);
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.4);
+}
+
+/* =========================================================
+   CHAT HEAD
+========================================================= */
+.chat-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding-bottom: 1rem;
+  border-bottom: 1px solid var(--line);
+  margin-bottom: 1rem;
+}
+
+.chat-head h2 {
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--accent);
+  letter-spacing: -0.01em;
+}
+
+/* =========================================================
+   CHAT SCROLL & MESSAGES
+========================================================= */
+.chat-scroll {
+  flex: 1;
+  overflow-y: auto;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(255,255,255,0.1) transparent;
+}
+
+.chat-scroll::-webkit-scrollbar {
+  width: 4px;
+}
+
+.chat-scroll::-webkit-scrollbar-thumb {
+  background: rgba(255,255,255,0.1);
+  border-radius: 2px;
+}
+
+.messages {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  padding: 8px 0;
+}
+
+.msg {
+  display: flex;
+  gap: 12px;
+  align-items: flex-start;
+  animation: msgReveal 0.4s cubic-bezier(0.4, 0, 0.2, 1) both;
+}
+
+@keyframes msgReveal {
+  from {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
   }
 }
 
-*{ box-sizing:border-box; }
-html,body{ height:100%; }
+.avatar {
+  width: 34px;
+  height: 34px;
+  display: grid;
+  place-items: center;
+  border-radius: 8px;
+  border: 1px solid var(--line);
+  font-weight: 600;
+  font-size: 11px;
+  color: var(--muted);
+  background: var(--bg);
+  flex-shrink: 0;
+  letter-spacing: -0.02em;
+}
 
-body{
-  margin:0;
-  font-family: var(--font);
+.msg.me .avatar {
+  background: var(--ox-green-dim);
+  color: var(--ox-green);
+  border-color: var(--ox-green-border);
+}
+
+.bubble {
+  max-width: 680px;
+  padding: 12px 16px;
+  border-radius: var(--radius);
+  border: 1px solid var(--line);
+  background: var(--bg);
+  font-size: 0.9rem;
+  white-space: pre-wrap;
+  line-height: 1.65;
+  color: var(--text);
+  transition: border-color 0.3s ease;
+}
+
+.msg.me .bubble {
+  background: var(--ox-green-dim);
+  border-color: var(--ox-green-border);
+  color: var(--text);
+}
+
+/* =========================================================
+   COMPOSER — AlkindiX btn style
+========================================================= */
+.composer {
+  margin-top: 1.25rem;
+  border-top: 1px solid var(--line);
+  padding-top: 1.25rem;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+textarea {
+  width: 100%;
+  resize: none;
+  border-radius: var(--radius);
+  border: 1px solid var(--line);
+  padding: 12px 16px;
+  font-family: inherit;
   background: var(--bg);
   color: var(--text);
-  line-height:1.55;
+  font-size: 0.9rem;
+  line-height: 1.6;
+  transition: border-color 0.3s ease, box-shadow 0.3s ease;
 }
 
-.shell{
-  max-width: 920px;
-  margin: 20px auto 36px;
-  padding: 0 16px;
+textarea::placeholder {
+  color: var(--muted);
 }
 
-/* Top bar */
-.topbar{
-  display:flex;
-  justify-content:space-between;
-  align-items:center;
-  gap:16px;
-  padding:16px 18px;
-  border-radius: var(--radius-lg);
-  border:1px solid var(--border-subtle);
-  background: var(--surface);
+textarea:focus {
+  outline: none;
+  border-color: rgba(255, 255, 255, 0.25);
+  box-shadow: 0 0 0 3px rgba(255, 255, 255, 0.04);
 }
 
-.brand{
-  display:flex;
-  gap:12px;
-  align-items:center;
+.composer-actions {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
 }
 
-.logo{
-  width:40px;
-  height:40px;
-  display:grid;
-  place-items:center;
-  border-radius:10px;
-  font-weight:700;
-  background: rgba(16,163,127,0.12);
-  color: var(--accent);
-  background-image: url('/icon.svg');
-  background-repeat: no-repeat;
-  background-position: center;
-  background-size: 60% 60%;
+.hint {
+  font-size: 0.78rem;
+  color: var(--muted);
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  flex-wrap: wrap;
 }
 
-.brand-text h1{
-  margin:0;
-  font-size:18px;
-  font-weight:600;
+kbd {
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  font-size: 0.72rem;
+  padding: 2px 6px;
+  border-radius: 5px;
+  border: 1px solid var(--line);
+  background: var(--bg);
+  color: var(--muted);
 }
 
-.brand-text p{
-  margin:4px 0 0;
-  font-size:13px;
-  color: var(--text-muted);
-}
-
-.status-pill{
-  display:inline-flex;
-  align-items:center;
-  gap:8px;
-  font-size:13px;
-  color: var(--text-muted);
-  padding:6px 10px;
-  border-radius:999px;
-  background: var(--surface-2);
-  border:1px solid var(--border-subtle);
-}
-
-.status-pill .dot{
-  width:8px;
-  height:8px;
-  border-radius:999px;
-  background: #22c55e;
-}
-
-.status-pill[data-state="busy"] .dot{
-  background: #f59e0b;
-}
-
-.status-pill[data-state="offline"] .dot{
-  background: #ef4444;
-}
-
-.status-banner{
-  display:flex;
-  align-items:flex-start;
-  gap:10px;
-  padding:12px 14px;
-  border-radius: var(--radius-md);
-  background: rgba(239,68,68,0.12);
-  border:1px solid rgba(239,68,68,0.24);
-  color: #b91c1c;
-  font-size:13px;
-  margin-bottom:12px;
-}
-
-.status-banner-text{
-  flex:1;
-}
-
-/* Panel */
-.assistant-panel{
-  margin-top:20px;
-  border-radius: var(--radius-lg);
-  border:1px solid var(--border-subtle);
-  background: var(--surface);
-  padding:18px;
-  display:flex;
-  flex-direction:column;
-  min-height: 70vh;
-}
-
-.chat-head{
-  display:flex;
-  justify-content:space-between;
-  align-items:center;
-}
-
-.chat-head h2{
-  margin:0;
-  font-size:17px;
-  font-weight:600;
-}
-
-.model-row{
-  display:flex;
-  gap:10px;
-  align-items:center;
-  margin-top:6px;
-  margin-bottom:10px;
-}
-
-.model-pill{
-  font-size:12px;
-  padding:4px 10px;
-  border-radius:999px;
-  border:1px solid var(--border-subtle);
-  background: var(--surface-2);
-}
-
-.model-meta{
-  font-size:13px;
-  color: var(--text-muted);
-}
-
-/* Chat */
-.chat-scroll{
-  flex:1;
-  overflow-y:auto;
-}
-
-.messages{
-  display:flex;
-  flex-direction:column;
-  gap:14px;
-  padding:10px 2px;
-}
-
-.msg{
-  display:flex;
-  gap:10px;
-  align-items:flex-start;
-}
-
-.avatar{
-  width:34px;
-  height:34px;
-  display:grid;
-  place-items:center;
-  border-radius:10px;
-  border:1px solid var(--border-subtle);
-  font-weight:600;
-  font-size:12px;
-  color: var(--text-muted);
-}
-
-.msg.me .avatar{
-  background: rgba(16,163,127,0.12);
-  color: var(--accent);
-}
-
-.bubble{
-  max-width: 720px;
-  padding:12px 14px;
-  border-radius: var(--radius-md);
-  border:1px solid var(--border-subtle);
-  background: var(--surface);
-  font-size:14.5px;
-  white-space: pre-wrap;
-}
-
-.msg.me .bubble{
-  background: rgba(16,163,127,0.10);
-  border-color: rgba(16,163,127,0.2);
-}
-
-/* Composer */
-.composer{
-  margin-top:12px;
-  border-top:1px solid var(--border-subtle);
-  padding-top:12px;
-  display:flex;
-  flex-direction:column;
-  gap:10px;
-}
-
-textarea{
-  width:100%;
-  resize:none;
-  border-radius: var(--radius-lg);
-  border:1px solid var(--border-subtle);
-  padding:14px;
-  font-family: var(--font);
-  background: var(--surface-2);
-  font-size:14px;
-}
-
-textarea:focus-visible{
-  outline:none;
-  box-shadow: 0 0 0 3px var(--focus-ring);
-}
-
-.composer-actions{
-  display:flex;
-  justify-content:space-between;
-  align-items:center;
-  gap:12px;
-}
-
-.hint{
-  font-size:12px;
-  color: var(--text-muted);
-}
-
-.primary{
-  border-radius:999px;
-  padding:10px 18px;
-  border:none;
+/* =========================================================
+   BUTTONS — AlkindiX btn system
+========================================================= */
+.primary {
+  display: inline-block;
+  padding: 0.55rem 1.4rem;
+  border-radius: 30px;
+  font-size: 0.9rem;
+  font-weight: 500;
   background: var(--accent);
-  color:#fff;
-  cursor:pointer;
+  color: #000;
+  border: 1px solid transparent;
+  cursor: pointer;
+  transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+  position: relative;
+  overflow: hidden;
 }
 
-.primary:hover{
-  background: var(--accent-strong);
+.primary::before {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 0;
+  height: 0;
+  background: rgba(0, 0, 0, 0.1);
+  border-radius: 50%;
+  transform: translate(-50%, -50%);
+  transition: width 0.5s ease, height 0.5s ease;
 }
 
-.ghost{
-  background:none;
-  border:1px solid var(--border-subtle);
-  padding:8px 12px;
-  border-radius: var(--radius-sm);
-  cursor:pointer;
+.primary:hover::before {
+  width: 250px;
+  height: 250px;
 }
 
-.footer{
-  margin-top:28px;
-  padding:14px;
-  font-size:12px;
-  color: var(--text-muted);
-  display:flex;
-  justify-content:space-between;
-  border-top:1px solid var(--border-subtle);
+.primary:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 10px 25px rgba(255, 255, 255, 0.15);
 }
 
-kbd{
-  font-family: var(--mono);
-  font-size:11px;
-  padding:2px 6px;
-  border-radius:6px;
-  border:1px solid var(--border-subtle);
-  background: var(--surface);
+.primary:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+  transform: none;
+  box-shadow: none;
+}
+
+.ghost {
+  display: inline-block;
+  padding: 0.45rem 1rem;
+  border-radius: 6px;
+  font-size: 0.85rem;
+  font-weight: 500;
+  background: transparent;
+  color: var(--accent);
+  border: 1px solid var(--line);
+  cursor: pointer;
+  transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.ghost:hover {
+  background: rgba(255, 255, 255, 0.05);
+  border-color: rgba(255, 255, 255, 0.25);
+  transform: translateY(-1px);
+}
+
+/* =========================================================
+   DISCLAIMER
+========================================================= */
+.disclaimer {
+  margin-top: 1rem;
+  padding-top: 0.75rem;
+  border-top: 1px solid var(--line);
+  font-size: 0.78rem;
+  color: var(--muted);
+  opacity: 1;
+  line-height: 1.5;
+  max-width: 100%;
+}
+
+/* =========================================================
+   FOOTER — AlkindiX footer style
+========================================================= */
+.footer {
+  margin-top: 3rem;
+  padding: 1.5rem 0;
+  border-top: 1px solid var(--line);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 0.85rem;
+  color: var(--muted);
+}
+
+.footer span {
+  opacity: 0.8;
+}
+
+/* =========================================================
+   ACCESSIBILITY — AlkindiX keyboard nav
+========================================================= */
+.keyboard-nav *:focus {
+  outline: 2px solid var(--accent);
+  outline-offset: 4px;
+}
+
+body:not(.keyboard-nav) *:focus {
+  outline: none;
+}
+
+/* =========================================================
+   RESPONSIVE
+========================================================= */
+@media (max-width: 768px) {
+  .shell {
+    width: 92%;
+    padding: 16px 0 48px;
+  }
+
+  .topbar {
+    top: 8px;
+    padding: 0 1.25rem;
+    height: 58px;
+  }
+
+  .brand-text p {
+    display: none;
+  }
+
+  .assistant-panel {
+    padding: 1.25rem;
+    min-height: 65vh;
+  }
+
+  .footer {
+    flex-direction: column;
+    gap: 0.5rem;
+    text-align: center;
+  }
+
+  .composer-actions {
+    flex-direction: column-reverse;
+    align-items: flex-end;
+  }
+
+  .hint {
+    align-self: flex-start;
+  }
+}
+
+@media (max-width: 480px) {
+  .shell {
+    width: 94%;
+  }
+
+  .topbar {
+    border-radius: 10px;
+  }
+
+  .assistant-panel {
+    border-radius: 10px;
+  }
+
+  .bubble {
+    font-size: 0.875rem;
+  }
+}
+
+/* =========================================================
+   REDUCED MOTION
+========================================================= */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+
+  html {
+    scroll-behavior: auto;
+  }
 }

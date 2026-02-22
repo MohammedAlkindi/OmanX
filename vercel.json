@@ -1,8 +1,22 @@
 {
-  "rewrites": [
-    { "source": "/chat", "destination": "/api/chat" },
-    { "source": "/health", "destination": "/api/health" },
-    { "source": "/ready", "destination": "/api/ready" },
-    { "source": "/metrics", "destination": "/api/metrics" }
+  "version": 2,
+  "functions": {
+    "api/*.js": {
+      "maxDuration": 10
+    }
+  },
+  "routes": [
+    {
+      "src": "/api/(.*)",
+      "dest": "/api/$1"
+    },
+    {
+      "src": "/(chat|health|ready|metrics)",
+      "dest": "/api/$1"
+    },
+    {
+      "src": "/(.*)",
+      "dest": "/index.html"
+    }
   ]
 }
