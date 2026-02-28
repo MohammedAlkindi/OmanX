@@ -79,7 +79,7 @@ function loadMessages() {
       return;
     }
 
-    messages.innerHTML = ''; // Clear default welcome message
+    messages.innerHTML = '';
     parsed.forEach((m) => {
       if (!m || typeof m.text !== 'string') return;
       addMessage(m.role === 'user' ? 'user' : 'assistant', m.text);
@@ -91,50 +91,41 @@ function loadMessages() {
 
 async function checkHealth() {
   try {
-    // Try both endpoints for maximum compatibility
-    const res = await fetch('/api/ready', { method: 'GET' }).catch(() => null);
-    if (!res || !res.ok) {
-      // Fallback to non-api route
-      const fallbackRes = await fetch('/ready', { method: 'GET' });
-      if (fallbackRes.ok) {
-        setServiceState('online', 'Online');
-      } else {
-        setServiceState('offline', 'Offline');
-      }
-    } else {
+    const res = await fetch('/api/ready', { method: 'GET' });
+    if (res.ok) {
       setServiceState('online', 'Online');
+      return;
     }
+    setServiceState('offline', 'Offline');
   } catch {
     setServiceState('offline', 'Offline');
   }
 }
 
+async function parsePayload(res) {
+  const contentType = res.headers.get('content-type') || '';
+  if (contentType.includes('application/json')) {
+    return res.json();
+  }
+  const text = await res.text();
+  return { error: text || 'Unexpected non-JSON response' };
+}
+
 async function sendMessage(message) {
   setServiceState('busy', 'Thinking…');
 
-  const { wrapper, bubble } = createMessage('assistant', '');
-  bubble.textContent = '…';
+  const { wrapper, bubble } = createMessage('assistant', '…');
   messages.appendChild(wrapper);
   scrollToBottom();
 
   try {
-    // Try /api/chat first, fallback to /chat
-    let res = await fetch('/api/chat', {
+    const res = await fetch('/api/chat', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ message }),
-    }).catch(() => null);
+    });
 
-    // If /api/chat fails, try /chat
-    if (!res || !res.ok) {
-      res = await fetch('/chat', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ message }),
-      });
-    }
-
-    const payload = await res.json();
+    const payload = await parsePayload(res);
     if (!res.ok) {
       throw new Error(payload?.error || 'Request failed');
     }
@@ -182,7 +173,6 @@ clearBtn.addEventListener('click', () => {
   input.focus();
 });
 
-// Initial setup
 checkHealth();
 setInterval(checkHealth, 30000);
 loadMessages();
