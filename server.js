@@ -1,5 +1,3 @@
-// server.js 
-
 import express from "express";
 import path from "path";
 import { fileURLToPath } from "url";
@@ -36,9 +34,21 @@ app.get("/ready", readyHandler);
 app.get("/metrics", metricsHandler);
 
 // SPA fallback - serve index.html for all other routes
-// FIX: Use a function instead of "*" to avoid path-to-regexp error
+// FIX: Use a more specific pattern or use app.use for catch-all
 app.use((req, res) => {
+  // Skip API routes that weren't found
+  if (req.path.startsWith('/api/') || req.path.startsWith('/chat') || 
+      req.path.startsWith('/health') || req.path.startsWith('/ready') || 
+      req.path.startsWith('/metrics')) {
+    return res.status(404).json({ error: 'API endpoint not found' });
+  }
   res.sendFile(path.join(__dirname, "index.html"));
+});
+
+// Error handling middleware
+app.use((err, req, res, next) => {
+  console.error('Server error:', err);
+  res.status(500).json({ error: 'Internal server error' });
 });
 
 app.listen(PORT, "0.0.0.0", () => {

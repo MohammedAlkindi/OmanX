@@ -1,4 +1,4 @@
-// api/chat.js — OmanX Complete Chat Handler (self-contained)
+// chat.js - API route for OmanX chatbot
 
 import OpenAI from "openai";
 import fs from "fs/promises";
@@ -7,21 +7,52 @@ import { fileURLToPath } from "url";
 import crypto from "crypto";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
-const KNOWLEDGE_PATH = path.join(__dirname, "../data/knowledge.json");
+// FIX: Better path resolution - try multiple possible locations
+const KNOWLEDGE_PATHS = [
+  path.join(__dirname, "../data/knowledge.json"),
+  path.join(process.cwd(), "data/knowledge.json"),
+  path.join(__dirname, "../../data/knowledge.json")
+];
+
 const MODEL = process.env.OPENAI_MODEL || "gpt-4o-mini";
 
 // ── Knowledge base (file-cached, reloads if modified) ────────────────────────
 let _kb = null;
 let _kbMtime = 0;
+let _kbPath = null;
+
+async function findKnowledgePath() {
+  for (const testPath of KNOWLEDGE_PATHS) {
+    try {
+      await fs.access(testPath);
+      return testPath;
+    } catch {
+      continue;
+    }
+  }
+  return null;
+}
 
 async function getKB() {
   try {
-    const st = await fs.stat(KNOWLEDGE_PATH);
+    if (!_kbPath) {
+      _kbPath = await findKnowledgePath();
+    }
+    
+    if (!_kbPath) {
+      console.warn("[OmanX] No knowledge base found at any expected paths");
+      return null;
+    }
+
+    const st = await fs.stat(_kbPath);
     if (_kb && st.mtimeMs <= _kbMtime) return _kb;
-    const raw = await fs.readFile(KNOWLEDGE_PATH, "utf8");
+    
+    const raw = await fs.readFile(_kbPath, "utf8");
     _kb = JSON.parse(raw);
     _kbMtime = st.mtimeMs;
-  } catch {
+    console.log(`[OmanX] Knowledge base loaded from ${_kbPath}`);
+  } catch (error) {
+    console.error("[OmanX] Error loading knowledge base:", error.message);
     _kb = null;
   }
   return _kb;
@@ -48,6 +79,7 @@ const COMPLIANCE_TRIGGERS = [
 ];
 
 function isCompliance(message) {
+  if (!message) return false;
   const q = message.toLowerCase();
   return COMPLIANCE_TRIGGERS.some((t) => q.includes(t));
 }
@@ -141,7 +173,10 @@ function cacheSet(key, value) {
 let _client = null;
 function getClient() {
   if (_client) return _client;
-  if (!process.env.OPENAI_API_KEY) return null;
+  if (!process.env.OPENAI_API_KEY) {
+    console.error("[OmanX] Missing OPENAI_API_KEY environment variable");
+    return null;
+  }
   _client = new OpenAI({
     apiKey: process.env.OPENAI_API_KEY,
     timeout: 60_000,
@@ -150,8 +185,23 @@ function getClient() {
   return _client;
 }
 
+// ── Sanitize input ───────────────────────────────────────────────────────────
+function sanitizeMessage(message) {
+  // Basic sanitization - remove control characters and trim
+  return message.replace(/[\x00-\x1F\x7F-\x9F]/g, '').trim();
+}
+
 // ── Handler ───────────────────────────────────────────────────────────────────
 export default async function handler(req, res) {
+  // Add CORS headers if needed
+  res.setHeader('Access-Control-Allow-Origin', '*');
+  res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS');
+  res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
+
+  if (req.method === "OPTIONS") {
+    return res.status(200).end();
+  }
+
   if (req.method !== "POST") {
     return res.status(405).json({ error: "Method not allowed" });
   }
@@ -161,7 +211,14 @@ export default async function handler(req, res) {
   if (!message || typeof message !== "string") {
     return res.status(400).json({ error: "Missing 'message' string." });
   }
-  if (message.length > 10_000) {
+
+  const sanitizedMessage = sanitizeMessage(message);
+  
+  if (sanitizedMessage.length === 0) {
+    return res.status(400).json({ error: "Message is empty after sanitization." });
+  }
+  
+  if (sanitizedMessage.length > 10_000) {
     return res.status(400).json({ error: "Message too long (max 10,000 chars)." });
   }
 
@@ -169,13 +226,14 @@ export default async function handler(req, res) {
   if (!client) {
     return res.status(500).json({
       text: "OmanX is not configured. Please contact the administrator.",
+      error: "OpenAI client not configured"
     });
   }
 
   // Cache lookup
   const cacheKey = crypto
     .createHash("sha256")
-    .update(`${MODEL}::${message}`)
+    .update(`${MODEL}::${sanitizedMessage}`)
     .digest("hex");
 
   const cached = cacheGet(cacheKey);
@@ -184,13 +242,13 @@ export default async function handler(req, res) {
   }
 
   // Detect topic and load KB if compliance-related
-  const compliance = isCompliance(message);
+  const compliance = isCompliance(sanitizedMessage);
   let kbResults = [];
 
   if (compliance) {
     const kb = await getKB();
     if (kb) {
-      kbResults = searchKB(kb, message);
+      kbResults = searchKB(kb, sanitizedMessage);
     }
   }
 
@@ -201,7 +259,7 @@ export default async function handler(req, res) {
       model: MODEL,
       messages: [
         { role: "system", content: systemPrompt },
-        { role: "user", content: message },
+        { role: "user", content: sanitizedMessage },
       ],
       max_tokens: 1024,
       temperature: 0.4,
@@ -214,16 +272,18 @@ export default async function handler(req, res) {
     cacheSet(cacheKey, text);
     return res.json({ text, cached: false, compliance });
   } catch (err) {
-    console.error("[OmanX] OpenAI error:", err?.message);
+    console.error("[OmanX] OpenAI error:", err?.message, err?.stack);
 
     if (err?.status === 429) {
       return res.status(429).json({
         error: "Rate limit reached. Please wait a moment and try again.",
+        text: "I'm experiencing high demand. Please try again in a moment."
       });
     }
     if (err?.status === 401) {
       return res.status(500).json({
         error: "Authentication error. Please contact the administrator.",
+        text: "I'm having trouble connecting. Please try again later."
       });
     }
 
@@ -231,6 +291,7 @@ export default async function handler(req, res) {
       text: compliance
         ? "I couldn't process your request. For compliance matters, contact your DSO directly."
         : "I couldn't process your request. Please try again.",
+      error: err?.message || "Unknown error"
     });
   }
 }
