@@ -1,4 +1,4 @@
-// chat.js - API route for OmanX chatbot
+// api/chat.js - API route for OmanX chatbot
 
 import OpenAI from "openai";
 import fs from "fs/promises";
@@ -7,11 +7,12 @@ import { fileURLToPath } from "url";
 import crypto from "crypto";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
-// FIX: Better path resolution - try multiple possible locations
+
+// process.cwd() first — most reliable in Vercel and local environments
 const KNOWLEDGE_PATHS = [
-  path.join(__dirname, "../data/knowledge.json"),
   path.join(process.cwd(), "data/knowledge.json"),
-  path.join(__dirname, "../../data/knowledge.json")
+  path.join(__dirname, "../data/knowledge.json"),
+  path.join(__dirname, "../../data/knowledge.json"),
 ];
 
 const MODEL = process.env.OPENAI_MODEL || "gpt-4o-mini";
@@ -38,7 +39,7 @@ async function getKB() {
     if (!_kbPath) {
       _kbPath = await findKnowledgePath();
     }
-    
+
     if (!_kbPath) {
       console.warn("[OmanX] No knowledge base found at any expected paths");
       return null;
@@ -46,7 +47,7 @@ async function getKB() {
 
     const st = await fs.stat(_kbPath);
     if (_kb && st.mtimeMs <= _kbMtime) return _kb;
-    
+
     const raw = await fs.readFile(_kbPath, "utf8");
     _kb = JSON.parse(raw);
     _kbMtime = st.mtimeMs;
@@ -148,6 +149,8 @@ ${kbSection}`;
 }
 
 // ── Response cache (in-memory, TTL 10 min) ────────────────────────────────────
+// Note: This cache is per-instance. In serverless environments (Vercel),
+// it will reset on cold starts. It still helps for warm invocations.
 const _cache = new Map();
 const CACHE_TTL = 10 * 60 * 1000;
 
@@ -185,18 +188,16 @@ function getClient() {
   return _client;
 }
 
-// ── Sanitize input ───────────────────────────────────────────────────────────
+// ── Sanitize input ────────────────────────────────────────────────────────────
 function sanitizeMessage(message) {
-  // Basic sanitization - remove control characters and trim
-  return message.replace(/[\x00-\x1F\x7F-\x9F]/g, '').trim();
+  return message.replace(/[\x00-\x1F\x7F-\x9F]/g, "").trim();
 }
 
 // ── Handler ───────────────────────────────────────────────────────────────────
 export default async function handler(req, res) {
-  // Add CORS headers if needed
-  res.setHeader('Access-Control-Allow-Origin', '*');
-  res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS');
-  res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
+  res.setHeader("Access-Control-Allow-Origin", "*");
+  res.setHeader("Access-Control-Allow-Methods", "POST, OPTIONS");
+  res.setHeader("Access-Control-Allow-Headers", "Content-Type");
 
   if (req.method === "OPTIONS") {
     return res.status(200).end();
@@ -213,11 +214,11 @@ export default async function handler(req, res) {
   }
 
   const sanitizedMessage = sanitizeMessage(message);
-  
+
   if (sanitizedMessage.length === 0) {
     return res.status(400).json({ error: "Message is empty after sanitization." });
   }
-  
+
   if (sanitizedMessage.length > 10_000) {
     return res.status(400).json({ error: "Message too long (max 10,000 chars)." });
   }
@@ -226,7 +227,7 @@ export default async function handler(req, res) {
   if (!client) {
     return res.status(500).json({
       text: "OmanX is not configured. Please contact the administrator.",
-      error: "OpenAI client not configured"
+      error: "OpenAI client not configured",
     });
   }
 
@@ -277,13 +278,13 @@ export default async function handler(req, res) {
     if (err?.status === 429) {
       return res.status(429).json({
         error: "Rate limit reached. Please wait a moment and try again.",
-        text: "I'm experiencing high demand. Please try again in a moment."
+        text: "I'm experiencing high demand. Please try again in a moment.",
       });
     }
     if (err?.status === 401) {
       return res.status(500).json({
         error: "Authentication error. Please contact the administrator.",
-        text: "I'm having trouble connecting. Please try again later."
+        text: "I'm having trouble connecting. Please try again later.",
       });
     }
 
@@ -291,7 +292,7 @@ export default async function handler(req, res) {
       text: compliance
         ? "I couldn't process your request. For compliance matters, contact your DSO directly."
         : "I couldn't process your request. Please try again.",
-      error: err?.message || "Unknown error"
+      error: err?.message || "Unknown error",
     });
   }
 }

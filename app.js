@@ -1,5 +1,32 @@
 // app.js - OmanX frontend application
 
+// Add loaded class to body to fix opacity issue
+document.addEventListener('DOMContentLoaded', function() {
+  document.body.classList.add('loaded');
+});
+
+// Keyboard navigation detection
+document.addEventListener('keydown', function(e) {
+  if (e.key === 'Tab') {
+    document.body.classList.add('keyboard-nav');
+  }
+});
+
+document.addEventListener('mousedown', function() {
+  document.body.classList.remove('keyboard-nav');
+});
+
+// Scroll progress indicator
+window.addEventListener('scroll', function() {
+  const winScroll = document.body.scrollTop || document.documentElement.scrollTop;
+  const height = document.documentElement.scrollHeight - document.documentElement.clientHeight;
+  const scrolled = (winScroll / height) * 100;
+  const progressBar = document.querySelector('.scroll-progress');
+  if (progressBar) {
+    progressBar.style.width = scrolled + '%';
+  }
+});
+
 const form = document.getElementById('form');
 const input = document.getElementById('input');
 const messages = document.getElementById('messages');

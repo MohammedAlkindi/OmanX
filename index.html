@@ -16,10 +16,12 @@
     <link rel="icon" type="image/png" sizes="16x16" href="/public/favicon-16x16.png">
     <link rel="icon" type="image/png" sizes="32x32" href="/public/favicon-32x32.png">
     <link rel="icon" href="/public/favicon.ico" sizes="any" />
-
   </head>
 
   <body>
+    <!-- Scroll progress indicator -->
+    <div class="scroll-progress"></div>
+
     <main class="shell">
       <!-- Top Bar -->
       <header class="topbar">
@@ -91,8 +93,5 @@
     </footer>
 
     <script src="/app.js"></script>
-    <script>
-      document.getElementById("year").textContent = new Date().getFullYear();
-    </script>
   </body>
 </html>

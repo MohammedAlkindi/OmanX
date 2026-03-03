@@ -27,28 +27,18 @@ app.get("/api/health", healthHandler);
 app.get("/api/ready", readyHandler);
 app.get("/api/metrics", metricsHandler);
 
-// Also support non-/api routes for backward compatibility
-app.post("/chat", chatHandler);
-app.get("/health", healthHandler);
-app.get("/ready", readyHandler);
-app.get("/metrics", metricsHandler);
-
-// SPA fallback - serve index.html for all other routes
-// FIX: Use a more specific pattern or use app.use for catch-all
+// SPA fallback — only serve index.html for non-API paths
 app.use((req, res) => {
-  // Skip API routes that weren't found
-  if (req.path.startsWith('/api/') || req.path.startsWith('/chat') || 
-      req.path.startsWith('/health') || req.path.startsWith('/ready') || 
-      req.path.startsWith('/metrics')) {
-    return res.status(404).json({ error: 'API endpoint not found' });
+  if (req.path.startsWith("/api/")) {
+    return res.status(404).json({ error: "API endpoint not found" });
   }
   res.sendFile(path.join(__dirname, "index.html"));
 });
 
 // Error handling middleware
 app.use((err, req, res, next) => {
-  console.error('Server error:', err);
-  res.status(500).json({ error: 'Internal server error' });
+  console.error("Server error:", err);
+  res.status(500).json({ error: "Internal server error" });
 });
 
 app.listen(PORT, "0.0.0.0", () => {

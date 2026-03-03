@@ -11,10 +11,6 @@
       "dest": "/api/$1"
     },
     {
-      "src": "/(chat|health|ready|metrics)",
-      "dest": "/api/$1"
-    },
-    {
       "src": "/(.*)",
       "dest": "/index.html"
     }
