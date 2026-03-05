@@ -35,6 +35,13 @@ const sendBtn = document.getElementById('send');
 const clearBtn = document.getElementById('clearBtn');
 const statusPill = document.getElementById('statusPill');
 const statusBanner = document.getElementById('statusBanner');
+const authForm = document.getElementById('authForm');
+const emailInput = document.getElementById('emailInput');
+const loginBtn = document.getElementById('loginBtn');
+const logoutBtn = document.getElementById('logoutBtn');
+const authStatus = document.getElementById('authStatus');
+
+let currentUser = null;
 
 const STORAGE_KEY = 'omanx.chat.messages.v1';
 
@@ -136,6 +143,68 @@ async function checkHealth() {
   }
 }
 
+
+function setAuthState({ authenticated, user, message }) {
+  currentUser = authenticated ? user : null;
+  logoutBtn.hidden = !authenticated;
+  loginBtn.disabled = authenticated;
+  emailInput.disabled = authenticated;
+  sendBtn.disabled = !authenticated;
+  input.disabled = !authenticated;
+
+  if (authenticated) {
+    authStatus.textContent = `Signed in as ${user.email || user.id}.`;
+    if (message) authStatus.textContent = message;
+    input.placeholder = 'Ask a question…';
+  } else {
+    authStatus.textContent = message || 'Sign in to access personalized compliance guidance.';
+    input.placeholder = 'Sign in to start chatting…';
+  }
+}
+
+async function refreshSession() {
+  try {
+    const res = await fetch('/api/auth/session');
+    if (!res.ok) {
+      setAuthState({ authenticated: false });
+      return;
+    }
+    const payload = await res.json();
+    setAuthState({ authenticated: true, user: payload.user });
+  } catch {
+    setAuthState({ authenticated: false, message: 'Unable to reach auth service.' });
+  }
+}
+
+async function completeMagicLinkIfPresent() {
+  const params = new URLSearchParams(window.location.search);
+  const tokenHash = params.get('token_hash');
+  const type = params.get('type');
+
+  if (!tokenHash || !type) return;
+
+  authStatus.textContent = 'Completing sign-in…';
+
+  try {
+    const res = await fetch('/api/auth/verify', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ token_hash: tokenHash, type }),
+    });
+
+    const payload = await res.json();
+    if (!res.ok) {
+      throw new Error(payload?.error || 'Sign-in failed.');
+    }
+
+    const cleanUrl = `${window.location.origin}${window.location.pathname}`;
+    window.history.replaceState({}, document.title, cleanUrl);
+    setAuthState({ authenticated: true, user: payload.user, message: 'Sign-in complete.' });
+  } catch (err) {
+    setAuthState({ authenticated: false, message: err.message || 'Sign-in failed.' });
+  }
+}
+
 async function sendMessage(message) {
   setServiceState('busy', 'Thinking…');
 
@@ -145,21 +214,11 @@ async function sendMessage(message) {
   scrollToBottom();
 
   try {
-    // Try /api/chat first, fallback to /chat
-    let res = await fetch('/api/chat', {
+    const res = await fetch('/api/chat', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ message }),
-    }).catch(() => null);
-
-    // If /api/chat fails, try /chat
-    if (!res || !res.ok) {
-      res = await fetch('/chat', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ message }),
-      });
-    }
+    });
 
     const payload = await res.json();
     if (!res.ok) {
@@ -190,7 +249,7 @@ form.addEventListener('submit', async (event) => {
 
   sendBtn.disabled = true;
   await sendMessage(message);
-  sendBtn.disabled = false;
+  sendBtn.disabled = !currentUser;
   input.focus();
 });
 
@@ -199,6 +258,43 @@ input.addEventListener('keydown', (event) => {
   if (event.key === 'Enter' && !event.shiftKey) {
     event.preventDefault();
     form.requestSubmit();
+  }
+});
+
+
+authForm.addEventListener('submit', async (event) => {
+  event.preventDefault();
+  const email = emailInput.value.trim();
+  if (!email) return;
+
+  loginBtn.disabled = true;
+  authStatus.textContent = 'Sending magic link…';
+
+  try {
+    const res = await fetch('/api/auth/start', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email }),
+    });
+
+    const payload = await res.json();
+    if (!res.ok) {
+      throw new Error(payload?.error || 'Unable to send magic link.');
+    }
+
+    authStatus.textContent = 'Check your email for the sign-in link.';
+  } catch (err) {
+    authStatus.textContent = err.message || 'Unable to send magic link.';
+  } finally {
+    loginBtn.disabled = false;
+  }
+});
+
+logoutBtn.addEventListener('click', async () => {
+  try {
+    await fetch('/api/auth/logout', { method: 'POST' });
+  } finally {
+    setAuthState({ authenticated: false, message: 'Signed out.' });
   }
 });
 
@@ -214,3 +310,7 @@ checkHealth();
 setInterval(checkHealth, 30000);
 loadMessages();
 autoResize();
+(async () => {
+  await completeMagicLinkIfPresent();
+  await refreshSession();
+})();

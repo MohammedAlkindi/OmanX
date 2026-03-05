@@ -612,3 +612,38 @@ body:not(.keyboard-nav) *:focus {
     scroll-behavior: auto;
   }
 }
+.auth-panel {
+  margin: 0 0 16px;
+  padding: 12px;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  background: var(--card);
+}
+
+.auth-form {
+  display: grid;
+  gap: 8px;
+}
+
+.auth-actions {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.auth-actions input {
+  flex: 1;
+  min-width: 220px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  padding: 10px;
+  font: inherit;
+  background: var(--bg);
+  color: var(--text);
+}
+
+.auth-status {
+  margin: 8px 0 0;
+  color: var(--muted);
+  font-size: 0.92rem;
+}

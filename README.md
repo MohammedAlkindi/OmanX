@@ -21,3 +21,15 @@ Pilot MVP in active development.
 
 ---
 OmanX.org • Structured guidance for Omani scholars abroad
+
+
+## Authentication
+OmanX now supports passwordless authentication (magic link) for protected API access.
+
+- Start sign-in: `POST /api/auth/start`
+- Verify callback token: `POST /api/auth/verify`
+- Check session: `GET /api/auth/session`
+- Logout: `POST /api/auth/logout`
+- Protected endpoint example: `POST /api/chat`
+
+See `docs/authentication.md` for architecture and setup details.

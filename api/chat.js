@@ -5,6 +5,7 @@ import fs from "fs/promises";
 import path from "path";
 import { fileURLToPath } from "url";
 import crypto from "crypto";
+import { requireAuth } from "./_auth.js";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
@@ -197,7 +198,7 @@ function sanitizeMessage(message) {
 export default async function handler(req, res) {
   res.setHeader("Access-Control-Allow-Origin", "*");
   res.setHeader("Access-Control-Allow-Methods", "POST, OPTIONS");
-  res.setHeader("Access-Control-Allow-Headers", "Content-Type");
+  res.setHeader("Access-Control-Allow-Headers", "Content-Type, Authorization");
 
   if (req.method === "OPTIONS") {
     return res.status(200).end();
@@ -205,6 +206,11 @@ export default async function handler(req, res) {
 
   if (req.method !== "POST") {
     return res.status(405).json({ error: "Method not allowed" });
+  }
+
+  const auth = await requireAuth(req);
+  if (!auth.ok) {
+    return res.status(auth.status).json({ error: auth.error });
   }
 
   const { message } = req.body || {};
@@ -256,6 +262,13 @@ export default async function handler(req, res) {
   const systemPrompt = buildSystemPrompt(kbResults);
 
   try {
+    console.log("[OmanX] /api/chat request", {
+      userId: auth.user.id,
+      email: auth.user.email,
+      compliance,
+      chars: sanitizedMessage.length,
+    });
+
     const response = await client.chat.completions.create({
       model: MODEL,
       messages: [
