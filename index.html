@@ -39,6 +39,18 @@
         </span>
       </header>
 
+      <section class="auth-panel" id="authPanel">
+        <form id="authForm" class="auth-form">
+          <label for="emailInput">Sign in with your university or personal email</label>
+          <div class="auth-actions">
+            <input id="emailInput" type="email" placeholder="name@example.com" required />
+            <button id="loginBtn" class="primary" type="submit">Send Magic Link</button>
+            <button id="logoutBtn" class="ghost" type="button" hidden>Log out</button>
+          </div>
+        </form>
+        <p id="authStatus" class="auth-status">Sign in to access personalized compliance guidance.</p>
+      </section>
+
       <!-- Chat Panel -->
       <section class="assistant-panel">
         <div class="status-banner" id="statusBanner" role="status" hidden>

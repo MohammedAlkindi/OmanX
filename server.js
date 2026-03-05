@@ -7,6 +7,10 @@ import chatHandler from "./api/chat.js";
 import healthHandler from "./api/health.js";
 import readyHandler from "./api/ready.js";
 import metricsHandler from "./api/metrics.js";
+import authStartHandler from "./api/auth/start.js";
+import authVerifyHandler from "./api/auth/verify.js";
+import authSessionHandler from "./api/auth/session.js";
+import authLogoutHandler from "./api/auth/logout.js";
 
 dotenv.config();
 
@@ -26,6 +30,10 @@ app.post("/api/chat", chatHandler);
 app.get("/api/health", healthHandler);
 app.get("/api/ready", readyHandler);
 app.get("/api/metrics", metricsHandler);
+app.post("/api/auth/start", authStartHandler);
+app.post("/api/auth/verify", authVerifyHandler);
+app.get("/api/auth/session", authSessionHandler);
+app.post("/api/auth/logout", authLogoutHandler);
 
 // SPA fallback — only serve index.html for non-API paths
 app.use((req, res) => {
