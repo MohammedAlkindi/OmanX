@@ -1,3 +1,5 @@
+// api/auth/start.js
+
 import { requireAuthEnv } from "../_auth.js";
 
 function validEmail(email) {

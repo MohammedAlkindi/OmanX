@@ -1,3 +1,5 @@
+// server.js - Main entry point for OmanX Express server
+
 import express from "express";
 import path from "path";
 import { fileURLToPath } from "url";
@@ -22,8 +24,8 @@ const app = express();
 // Middleware
 app.use(express.json({ limit: "1mb" }));
 
-// Serve static files from root directory
-app.use(express.static(__dirname));
+// Serve static files from public directory
+app.use(express.static(path.join(__dirname, "public")));
 
 // API Routes
 app.post("/api/chat", chatHandler);
@@ -40,7 +42,7 @@ app.use((req, res) => {
   if (req.path.startsWith("/api/")) {
     return res.status(404).json({ error: "API endpoint not found" });
   }
-  res.sendFile(path.join(__dirname, "index.html"));
+  res.sendFile(path.join(__dirname, "public", "index.html"));
 });
 
 // Error handling middleware

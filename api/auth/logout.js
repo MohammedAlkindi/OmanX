@@ -1,3 +1,5 @@
+// api/auth/logout.js
+
 import { clearSessionCookie } from "../_auth.js";
 
 export default async function handler(req, res) {

@@ -1,3 +1,5 @@
+// api/_auth.js - Authentication utilities for OmanX API routes
+
 const COOKIE_NAME = "omanx_session";
 
 function getSupabaseUrl() {

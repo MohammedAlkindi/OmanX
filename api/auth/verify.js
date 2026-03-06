@@ -1,3 +1,5 @@
+// api/auth/verify.js
+
 import { requireAuthEnv, setSessionCookie } from "../_auth.js";
 
 export default async function handler(req, res) {

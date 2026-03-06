@@ -1,3 +1,6 @@
+// api/auth/session.js
+
+
 import { requireAuth } from "../_auth.js";
 
 export default async function handler(req, res) {

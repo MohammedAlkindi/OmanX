@@ -1,3 +1,5 @@
+// 
+
 # OmanX.org
 
 **OmanX** is a government-ready AI onboarding platform built to guide Omani scholars through studying and living in the United States with clarity, safety, and official alignment.

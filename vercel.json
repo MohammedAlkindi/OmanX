@@ -1,3 +1,5 @@
+// vercel.json - Configuration for Vercel deployment of OmanX 
+
 {
   "version": 2,
   "functions": {
