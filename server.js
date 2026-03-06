@@ -1,9 +1,9 @@
 // server.js - Main entry point for OmanX Express server
 
+import './env.js';
 import express from "express";
 import path from "path";
 import { fileURLToPath } from "url";
-import dotenv from "dotenv";
 
 import chatHandler from "./api/chat.js";
 import healthHandler from "./api/health.js";
@@ -13,8 +13,6 @@ import authStartHandler from "./api/auth/start.js";
 import authVerifyHandler from "./api/auth/verify.js";
 import authSessionHandler from "./api/auth/session.js";
 import authLogoutHandler from "./api/auth/logout.js";
-
-dotenv.config();
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const PORT = Number(process.env.PORT || 3000);
