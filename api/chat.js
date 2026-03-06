@@ -5,11 +5,10 @@ import fs from "fs/promises";
 import path from "path";
 import { fileURLToPath } from "url";
 import crypto from "crypto";
-import { requireAuth } from "./_auth.js";
+// import { requireAuth } from "./_auth.js"; // temporarily disabled
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
-// process.cwd() first — most reliable in Vercel and local environments
 const KNOWLEDGE_PATHS = [
   path.join(process.cwd(), "data/knowledge.json"),
   path.join(__dirname, "../data/knowledge.json"),
@@ -18,7 +17,6 @@ const KNOWLEDGE_PATHS = [
 
 const MODEL = process.env.OPENAI_MODEL || "gpt-4o-mini";
 
-// ── Knowledge base (file-cached, reloads if modified) ────────────────────────
 let _kb = null;
 let _kbMtime = 0;
 let _kbPath = null;
@@ -37,18 +35,10 @@ async function findKnowledgePath() {
 
 async function getKB() {
   try {
-    if (!_kbPath) {
-      _kbPath = await findKnowledgePath();
-    }
-
-    if (!_kbPath) {
-      console.warn("[OmanX] No knowledge base found at any expected paths");
-      return null;
-    }
-
+    if (!_kbPath) _kbPath = await findKnowledgePath();
+    if (!_kbPath) { console.warn("[OmanX] No knowledge base found"); return null; }
     const st = await fs.stat(_kbPath);
     if (_kb && st.mtimeMs <= _kbMtime) return _kb;
-
     const raw = await fs.readFile(_kbPath, "utf8");
     _kb = JSON.parse(raw);
     _kbMtime = st.mtimeMs;
@@ -60,7 +50,6 @@ async function getKB() {
   return _kb;
 }
 
-// ── Compliance topic detection ────────────────────────────────────────────────
 const COMPLIANCE_TRIGGERS = [
   "visa", "f-1", "f1", "j-1", "j1", "i-20", "i20", "ds-2019", "ds2019",
   "sevis", "immigration", "uscis", "cbp", "customs",
@@ -86,12 +75,10 @@ function isCompliance(message) {
   return COMPLIANCE_TRIGGERS.some((t) => q.includes(t));
 }
 
-// ── KB search ─────────────────────────────────────────────────────────────────
 function searchKB(knowledgeJson, query) {
   if (!knowledgeJson) return [];
   const q = query.toLowerCase();
   const results = [];
-
   const docs = Array.isArray(knowledgeJson.documents)
     ? knowledgeJson.documents
     : Object.entries(knowledgeJson)
@@ -100,7 +87,6 @@ function searchKB(knowledgeJson, query) {
           id: k,
           ...(typeof v === "object" && v !== null ? v : { content: v }),
         }));
-
   for (const doc of docs) {
     if (!doc) continue;
     const text = JSON.stringify(doc).toLowerCase();
@@ -109,11 +95,9 @@ function searchKB(knowledgeJson, query) {
     ).length;
     if (score > 0) results.push({ doc, score, id: doc.id || "unknown" });
   }
-
   return results.sort((a, b) => b.score - a.score).slice(0, 3);
 }
 
-// ── System prompt ─────────────────────────────────────────────────────────────
 const BASE_SYSTEM = `You are OmanX, a warm and knowledgeable AI assistant built for Omani scholars studying in the United States.
 
 You handle two kinds of questions in one seamless conversation:
@@ -131,49 +115,27 @@ Always:
 
 function buildSystemPrompt(kbResults) {
   if (!kbResults || kbResults.length === 0) return BASE_SYSTEM;
-
   const kbSection = kbResults
-    .map(
-      (r, i) =>
-        `### KB Entry ${i + 1} — ID: ${r.id}\n${JSON.stringify(r.doc, null, 2)}`
-    )
+    .map((r, i) => `### KB Entry ${i + 1} — ID: ${r.id}\n${JSON.stringify(r.doc, null, 2)}`)
     .join("\n\n");
-
-  return `${BASE_SYSTEM}
-
----
-
-## Relevant Knowledge Base Entries
-Use ONLY these entries for compliance guidance. Cite the entry ID when referencing them.
-
-${kbSection}`;
+  return `${BASE_SYSTEM}\n\n---\n\n## Relevant Knowledge Base Entries\nUse ONLY these entries for compliance guidance. Cite the entry ID when referencing them.\n\n${kbSection}`;
 }
 
-// ── Response cache (in-memory, TTL 10 min) ────────────────────────────────────
-// Note: This cache is per-instance. In serverless environments (Vercel),
-// it will reset on cold starts. It still helps for warm invocations.
 const _cache = new Map();
 const CACHE_TTL = 10 * 60 * 1000;
 
 function cacheGet(key) {
   const entry = _cache.get(key);
   if (!entry) return null;
-  if (Date.now() - entry.ts > CACHE_TTL) {
-    _cache.delete(key);
-    return null;
-  }
+  if (Date.now() - entry.ts > CACHE_TTL) { _cache.delete(key); return null; }
   return entry.value;
 }
 
 function cacheSet(key, value) {
-  if (_cache.size > 500) {
-    const oldest = _cache.keys().next().value;
-    _cache.delete(oldest);
-  }
+  if (_cache.size > 500) _cache.delete(_cache.keys().next().value);
   _cache.set(key, { ts: Date.now(), value });
 }
 
-// ── OpenAI client (lazy singleton) ───────────────────────────────────────────
 let _client = null;
 function getClient() {
   if (_client) return _client;
@@ -181,37 +143,27 @@ function getClient() {
     console.error("[OmanX] Missing OPENAI_API_KEY environment variable");
     return null;
   }
-  _client = new OpenAI({
-    apiKey: process.env.OPENAI_API_KEY,
-    timeout: 60_000,
-    maxRetries: 2,
-  });
+  _client = new OpenAI({ apiKey: process.env.OPENAI_API_KEY, timeout: 60_000, maxRetries: 2 });
   return _client;
 }
 
-// ── Sanitize input ────────────────────────────────────────────────────────────
 function sanitizeMessage(message) {
   return message.replace(/[\x00-\x1F\x7F-\x9F]/g, "").trim();
 }
 
-// ── Handler ───────────────────────────────────────────────────────────────────
 export default async function handler(req, res) {
   res.setHeader("Access-Control-Allow-Origin", "*");
   res.setHeader("Access-Control-Allow-Methods", "POST, OPTIONS");
   res.setHeader("Access-Control-Allow-Headers", "Content-Type, Authorization");
 
-  if (req.method === "OPTIONS") {
-    return res.status(200).end();
-  }
+  if (req.method === "OPTIONS") return res.status(200).end();
+  if (req.method !== "POST") return res.status(405).json({ error: "Method not allowed" });
 
-  if (req.method !== "POST") {
-    return res.status(405).json({ error: "Method not allowed" });
-  }
-
-  const auth = await requireAuth(req);
-  if (!auth.ok) {
-    return res.status(auth.status).json({ error: auth.error });
-  }
+  // ── Auth temporarily disabled ─────────────────────────────────────────────
+  // const auth = await requireAuth(req);
+  // if (!auth.ok) return res.status(auth.status).json({ error: auth.error });
+  const auth = { ok: true, user: { id: "dev", email: "dev@omanx.com" } };
+  // ─────────────────────────────────────────────────────────────────────────
 
   const { message } = req.body || {};
 
@@ -237,26 +189,19 @@ export default async function handler(req, res) {
     });
   }
 
-  // Cache lookup
   const cacheKey = crypto
     .createHash("sha256")
     .update(`${MODEL}::${sanitizedMessage}`)
     .digest("hex");
 
   const cached = cacheGet(cacheKey);
-  if (cached) {
-    return res.json({ text: cached, cached: true });
-  }
+  if (cached) return res.json({ text: cached, cached: true });
 
-  // Detect topic and load KB if compliance-related
   const compliance = isCompliance(sanitizedMessage);
   let kbResults = [];
-
   if (compliance) {
     const kb = await getKB();
-    if (kb) {
-      kbResults = searchKB(kb, sanitizedMessage);
-    }
+    if (kb) kbResults = searchKB(kb, sanitizedMessage);
   }
 
   const systemPrompt = buildSystemPrompt(kbResults);
@@ -279,15 +224,11 @@ export default async function handler(req, res) {
       temperature: 0.4,
     });
 
-    const text =
-      response.choices?.[0]?.message?.content?.trim() ||
-      "No response generated.";
-
+    const text = response.choices?.[0]?.message?.content?.trim() || "No response generated.";
     cacheSet(cacheKey, text);
     return res.json({ text, cached: false, compliance });
   } catch (err) {
     console.error("[OmanX] OpenAI error:", err?.message, err?.stack);
-
     if (err?.status === 429) {
       return res.status(429).json({
         error: "Rate limit reached. Please wait a moment and try again.",
@@ -300,7 +241,6 @@ export default async function handler(req, res) {
         text: "I'm having trouble connecting. Please try again later.",
       });
     }
-
     return res.status(500).json({
       text: compliance
         ? "I couldn't process your request. For compliance matters, contact your DSO directly."

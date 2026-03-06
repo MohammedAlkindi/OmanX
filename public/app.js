@@ -1,57 +1,47 @@
 // app.js - OmanX frontend application
 
-// Add loaded class to body to fix opacity issue
 document.addEventListener('DOMContentLoaded', function() {
   document.body.classList.add('loaded');
 });
 
-// Keyboard navigation detection
 document.addEventListener('keydown', function(e) {
-  if (e.key === 'Tab') {
-    document.body.classList.add('keyboard-nav');
-  }
+  if (e.key === 'Tab') document.body.classList.add('keyboard-nav');
 });
 
 document.addEventListener('mousedown', function() {
   document.body.classList.remove('keyboard-nav');
 });
 
-// Scroll progress indicator
 window.addEventListener('scroll', function() {
   const winScroll = document.body.scrollTop || document.documentElement.scrollTop;
   const height = document.documentElement.scrollHeight - document.documentElement.clientHeight;
   const scrolled = (winScroll / height) * 100;
   const progressBar = document.querySelector('.scroll-progress');
-  if (progressBar) {
-    progressBar.style.width = scrolled + '%';
-  }
+  if (progressBar) progressBar.style.width = scrolled + '%';
 });
 
-const form = document.getElementById('form');
-const input = document.getElementById('input');
-const messages = document.getElementById('messages');
-const chat = document.getElementById('chat');
-const sendBtn = document.getElementById('send');
-const clearBtn = document.getElementById('clearBtn');
+const form       = document.getElementById('form');
+const input      = document.getElementById('input');
+const messages   = document.getElementById('messages');
+const chat       = document.getElementById('chat');
+const sendBtn    = document.getElementById('send');
+const clearBtn   = document.getElementById('clearBtn');
 const statusPill = document.getElementById('statusPill');
 const statusBanner = document.getElementById('statusBanner');
-const authForm = document.getElementById('authForm');
+const authForm   = document.getElementById('authForm');
 const emailInput = document.getElementById('emailInput');
-const loginBtn = document.getElementById('loginBtn');
-const logoutBtn = document.getElementById('logoutBtn');
+const loginBtn   = document.getElementById('loginBtn');
+const logoutBtn  = document.getElementById('logoutBtn');
 const authStatus = document.getElementById('authStatus');
 
 let currentUser = null;
-
 const STORAGE_KEY = 'omanx.chat.messages.v1';
 
 function setServiceState(state, text) {
   statusPill.dataset.state = state;
   const textEl = statusPill.querySelector('.pill-text');
   if (textEl) textEl.textContent = text;
-
-  const offline = state === 'offline';
-  statusBanner.hidden = !offline;
+  statusBanner.hidden = state !== 'offline';
 }
 
 function autoResize() {
@@ -60,9 +50,7 @@ function autoResize() {
 }
 
 function scrollToBottom() {
-  requestAnimationFrame(() => {
-    chat.scrollTop = chat.scrollHeight;
-  });
+  requestAnimationFrame(() => { chat.scrollTop = chat.scrollHeight; });
 }
 
 function createMessage(role, text) {
@@ -105,15 +93,13 @@ function loadMessages() {
     addMessage('assistant', 'Welcome to OmanX. Ask a question to begin.');
     return;
   }
-
   try {
     const parsed = JSON.parse(raw);
     if (!Array.isArray(parsed) || parsed.length === 0) {
       addMessage('assistant', 'Welcome to OmanX. Ask a question to begin.');
       return;
     }
-
-    messages.innerHTML = ''; // Clear default welcome message
+    messages.innerHTML = '';
     parsed.forEach((m) => {
       if (!m || typeof m.text !== 'string') return;
       addMessage(m.role === 'user' ? 'user' : 'assistant', m.text);
@@ -125,16 +111,10 @@ function loadMessages() {
 
 async function checkHealth() {
   try {
-    // Try both endpoints for maximum compatibility
     const res = await fetch('/api/ready', { method: 'GET' }).catch(() => null);
     if (!res || !res.ok) {
-      // Fallback to non-api route
       const fallbackRes = await fetch('/ready', { method: 'GET' });
-      if (fallbackRes.ok) {
-        setServiceState('online', 'Online');
-      } else {
-        setServiceState('offline', 'Offline');
-      }
+      setServiceState(fallbackRes.ok ? 'online' : 'offline', fallbackRes.ok ? 'Online' : 'Offline');
     } else {
       setServiceState('online', 'Online');
     }
@@ -143,32 +123,27 @@ async function checkHealth() {
   }
 }
 
-
 function setAuthState({ authenticated, user, message }) {
   currentUser = authenticated ? user : null;
-  logoutBtn.hidden = !authenticated;
-  loginBtn.disabled = authenticated;
-  emailInput.disabled = authenticated;
+  if (logoutBtn) logoutBtn.hidden = !authenticated;
+  if (loginBtn) loginBtn.disabled = !!authenticated;
+  if (emailInput) emailInput.disabled = !!authenticated;
   sendBtn.disabled = !authenticated;
   input.disabled = !authenticated;
 
   if (authenticated) {
-    authStatus.textContent = `Signed in as ${user.email || user.id}.`;
-    if (message) authStatus.textContent = message;
     input.placeholder = 'Ask a question…';
+    if (authStatus) authStatus.textContent = message || `Signed in as ${user?.email || user?.id}.`;
   } else {
-    authStatus.textContent = message || 'Sign in to access personalized compliance guidance.';
     input.placeholder = 'Sign in to start chatting…';
+    if (authStatus) authStatus.textContent = message || 'Sign in to access personalized compliance guidance.';
   }
 }
 
 async function refreshSession() {
   try {
     const res = await fetch('/api/auth/session');
-    if (!res.ok) {
-      setAuthState({ authenticated: false });
-      return;
-    }
+    if (!res.ok) { setAuthState({ authenticated: false }); return; }
     const payload = await res.json();
     setAuthState({ authenticated: true, user: payload.user });
   } catch {
@@ -180,25 +155,17 @@ async function completeMagicLinkIfPresent() {
   const params = new URLSearchParams(window.location.search);
   const tokenHash = params.get('token_hash');
   const type = params.get('type');
-
   if (!tokenHash || !type) return;
-
-  authStatus.textContent = 'Completing sign-in…';
-
+  if (authStatus) authStatus.textContent = 'Completing sign-in…';
   try {
     const res = await fetch('/api/auth/verify', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ token_hash: tokenHash, type }),
     });
-
     const payload = await res.json();
-    if (!res.ok) {
-      throw new Error(payload?.error || 'Sign-in failed.');
-    }
-
-    const cleanUrl = `${window.location.origin}${window.location.pathname}`;
-    window.history.replaceState({}, document.title, cleanUrl);
+    if (!res.ok) throw new Error(payload?.error || 'Sign-in failed.');
+    window.history.replaceState({}, document.title, `${window.location.origin}${window.location.pathname}`);
     setAuthState({ authenticated: true, user: payload.user, message: 'Sign-in complete.' });
   } catch (err) {
     setAuthState({ authenticated: false, message: err.message || 'Sign-in failed.' });
@@ -219,12 +186,8 @@ async function sendMessage(message) {
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ message }),
     });
-
     const payload = await res.json();
-    if (!res.ok) {
-      throw new Error(payload?.error || 'Request failed');
-    }
-
+    if (!res.ok) throw new Error(payload?.error || 'Request failed');
     bubble.textContent = payload.text || 'No response generated.';
     setServiceState('online', 'Online');
   } catch (err) {
@@ -239,17 +202,14 @@ async function sendMessage(message) {
 
 form.addEventListener('submit', async (event) => {
   event.preventDefault();
-
   const message = input.value.trim();
   if (!message) return;
-
   addMessage('user', message);
   input.value = '';
   autoResize();
-
   sendBtn.disabled = true;
   await sendMessage(message);
-  sendBtn.disabled = !currentUser;
+  sendBtn.disabled = false; // always re-enable since auth is bypassed
   input.focus();
 });
 
@@ -261,42 +221,36 @@ input.addEventListener('keydown', (event) => {
   }
 });
 
-
-authForm.addEventListener('submit', async (event) => {
-  event.preventDefault();
-  const email = emailInput.value.trim();
-  if (!email) return;
-
-  loginBtn.disabled = true;
-  authStatus.textContent = 'Sending magic link…';
-
-  try {
-    const res = await fetch('/api/auth/start', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ email }),
-    });
-
-    const payload = await res.json();
-    if (!res.ok) {
-      throw new Error(payload?.error || 'Unable to send magic link.');
+if (authForm) {
+  authForm.addEventListener('submit', async (event) => {
+    event.preventDefault();
+    const email = emailInput.value.trim();
+    if (!email) return;
+    loginBtn.disabled = true;
+    authStatus.textContent = 'Sending magic link…';
+    try {
+      const res = await fetch('/api/auth/start', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email }),
+      });
+      const payload = await res.json();
+      if (!res.ok) throw new Error(payload?.error || 'Unable to send magic link.');
+      authStatus.textContent = 'Check your email for the sign-in link.';
+    } catch (err) {
+      authStatus.textContent = err.message || 'Unable to send magic link.';
+    } finally {
+      loginBtn.disabled = false;
     }
+  });
+}
 
-    authStatus.textContent = 'Check your email for the sign-in link.';
-  } catch (err) {
-    authStatus.textContent = err.message || 'Unable to send magic link.';
-  } finally {
-    loginBtn.disabled = false;
-  }
-});
-
-logoutBtn.addEventListener('click', async () => {
-  try {
-    await fetch('/api/auth/logout', { method: 'POST' });
-  } finally {
+if (logoutBtn) {
+  logoutBtn.addEventListener('click', async () => {
+    try { await fetch('/api/auth/logout', { method: 'POST' }); } catch {}
     setAuthState({ authenticated: false, message: 'Signed out.' });
-  }
-});
+  });
+}
 
 clearBtn.addEventListener('click', () => {
   messages.innerHTML = '';
@@ -305,12 +259,17 @@ clearBtn.addEventListener('click', () => {
   input.focus();
 });
 
-// Initial setup
+// ── Init ──────────────────────────────────────────────────────────────────────
 checkHealth();
 setInterval(checkHealth, 30000);
 loadMessages();
 autoResize();
-(async () => {
-  await completeMagicLinkIfPresent();
-  await refreshSession();
-})();
+
+// Auth temporarily bypassed — remove this block and uncomment the lines below when re-enabling
+setAuthState({ authenticated: true, user: { id: 'dev', email: 'dev@omanx.com' } });
+
+// Uncomment when auth is re-enabled:
+// (async () => {
+//   await completeMagicLinkIfPresent();
+//   await refreshSession();
+// })();
