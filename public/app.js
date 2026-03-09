@@ -36,6 +36,7 @@ const authStatus = document.getElementById('authStatus');
 
 let currentUser = null;
 const STORAGE_KEY = 'omanx.chat.messages.v1';
+let healthFailures = 0;
 
 function setServiceState(state, text) {
   statusPill.dataset.state = state;
@@ -110,16 +111,22 @@ function loadMessages() {
 }
 
 async function checkHealth() {
+  const endpoints = ['/api/ready', '/api/health', '/ready'];
   try {
-    const res = await fetch('/api/ready', { method: 'GET' }).catch(() => null);
-    if (!res || !res.ok) {
-      const fallbackRes = await fetch('/ready', { method: 'GET' });
-      setServiceState(fallbackRes.ok ? 'online' : 'offline', fallbackRes.ok ? 'Online' : 'Offline');
-    } else {
-      setServiceState('online', 'Online');
+    for (const endpoint of endpoints) {
+      const res = await fetch(endpoint, { method: 'GET' }).catch(() => null);
+      if (res && res.ok) {
+        healthFailures = 0;
+        setServiceState('online', 'Online');
+        return;
+      }
     }
+
+    healthFailures += 1;
+    if (healthFailures >= 2) setServiceState('offline', 'Offline');
   } catch {
-    setServiceState('offline', 'Offline');
+    healthFailures += 1;
+    if (healthFailures >= 2) setServiceState('offline', 'Offline');
   }
 }
 
@@ -189,6 +196,7 @@ async function sendMessage(message) {
     const payload = await res.json();
     if (!res.ok) throw new Error(payload?.error || 'Request failed');
     bubble.textContent = payload.text || 'No response generated.';
+    healthFailures = 0;
     setServiceState('online', 'Online');
   } catch (err) {
     console.error('Chat error:', err);
