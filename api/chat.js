@@ -5,7 +5,7 @@ import fs from "fs/promises";
 import path from "path";
 import { fileURLToPath } from "url";
 import crypto from "crypto";
-// import { requireAuth } from "./_auth.js"; // temporarily disabled
+import { requireAuth } from "../auth/_auth.js";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
@@ -159,11 +159,9 @@ export default async function handler(req, res) {
   if (req.method === "OPTIONS") return res.status(200).end();
   if (req.method !== "POST") return res.status(405).json({ error: "Method not allowed" });
 
-  // ── Auth temporarily disabled ─────────────────────────────────────────────
-  // const auth = await requireAuth(req);
-  // if (!auth.ok) return res.status(auth.status).json({ error: auth.error });
-  const auth = { ok: true, user: { id: "dev", email: "dev@omanx.com" } };
-  // ─────────────────────────────────────────────────────────────────────────
+  const auth = await requireAuth(req);
+  if (!auth.ok) return res.status(auth.status).json({ error: auth.error });
+
 
   const { message } = req.body || {};
 

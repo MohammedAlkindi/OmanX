@@ -217,7 +217,7 @@ form.addEventListener('submit', async (event) => {
   autoResize();
   sendBtn.disabled = true;
   await sendMessage(message);
-  sendBtn.disabled = false; // always re-enable since auth is bypassed
+  sendBtn.disabled = !currentUser;
   input.focus();
 });
 
@@ -273,11 +273,7 @@ setInterval(checkHealth, 30000);
 loadMessages();
 autoResize();
 
-// Auth temporarily bypassed — remove this block and uncomment the lines below when re-enabling
-setAuthState({ authenticated: true, user: { id: 'dev', email: 'dev@omanx.com' } });
-
-// Uncomment when auth is re-enabled:
-// (async () => {
-//   await completeMagicLinkIfPresent();
-//   await refreshSession();
-// })();
+(async () => {
+  await completeMagicLinkIfPresent();
+  await refreshSession();
+})();

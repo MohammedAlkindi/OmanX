@@ -9,10 +9,10 @@ import chatHandler from "./api/chat.js";
 import healthHandler from "./api/health.js";
 import readyHandler from "./api/ready.js";
 import metricsHandler from "./api/metrics.js";
-import authStartHandler from "./api/auth/start.js";
-import authVerifyHandler from "./api/auth/verify.js";
-import authSessionHandler from "./api/auth/session.js";
-import authLogoutHandler from "./api/auth/logout.js";
+import authStartHandler from "./auth/start.js";
+import authVerifyHandler from "./auth/verify.js";
+import authSessionHandler from "./auth/session.js";
+import authLogoutHandler from "./auth/logout.js";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const PORT = Number(process.env.PORT || 3000);
