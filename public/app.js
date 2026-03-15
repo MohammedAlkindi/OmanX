@@ -1,359 +1,256 @@
-/* ── State ───────────────────────────────────────────────────── */
-let currentView = "decisions"; // decisions | overdue | today
-let editingId = null;
+const form = document.getElementById("form");
+const input = document.getElementById("input");
+const sendBtn = document.getElementById("send");
+const messagesEl = document.getElementById("messages");
+const clearBtn = document.getElementById("clearBtn");
+const statusPill = document.getElementById("statusPill");
+const statusBanner = document.getElementById("statusBanner");
 
-/* ── API helpers ─────────────────────────────────────────────── */
-const api = {
-  async get(path) {
-    const res = await fetch(path);
-    if (!res.ok) throw new Error(await res.text());
-    return res.json();
-  },
-  async post(path, body) {
-    const res = await fetch(path, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(body),
-    });
-    if (!res.ok) throw new Error(await res.text());
-    return res.json();
-  },
-  async patch(path, body) {
-    const res = await fetch(path, {
-      method: "PATCH",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(body),
-    });
-    if (!res.ok) throw new Error(await res.text());
-    return res.json();
-  },
-  async del(path) {
-    const res = await fetch(path, { method: "DELETE" });
-    if (!res.ok) throw new Error(await res.text());
-    return res.json();
-  },
-};
+const authPanel = document.getElementById("authPanel");
+const authForm = document.getElementById("authForm");
+const emailInput = document.getElementById("emailInput");
+const authStatus = document.getElementById("authStatus");
+const loginBtn = document.getElementById("loginBtn");
+const logoutBtn = document.getElementById("logoutBtn");
 
-/* ── DOM refs ────────────────────────────────────────────────── */
-const grid          = document.getElementById("decisions-grid");
-const emptyState    = document.getElementById("empty-state");
-const decisionModal = document.getElementById("decisionModal");
-const detailModal   = document.getElementById("detailModal");
+const STORAGE_KEY = "omanx.chat.messages.v1";
 
-const fTitle       = document.getElementById("f-title");
-const fContext     = document.getElementById("f-context");
-const fAlternatives = document.getElementById("f-alternatives");
-const fConfidence  = document.getElementById("f-confidence");
-const fReview      = document.getElementById("f-review");
-const fTags        = document.getElementById("f-tags");
-const fOutcome     = document.getElementById("f-outcome");
-const confDisplay  = document.getElementById("confidenceDisplay");
-const outcomeSection = document.getElementById("outcomeSection");
-const modalTitle   = document.getElementById("modal-title");
+let session = { authenticated: false, user: null };
 
-/* ── Utilities ───────────────────────────────────────────────── */
-function formatDate(dateStr) {
-  if (!dateStr) return null;
-  const [y, m, d] = dateStr.split("-");
-  return new Date(y, m - 1, d).toLocaleDateString("en-US", {
-    month: "short", day: "numeric", year: "numeric",
-  });
+function setOnlineState(online) {
+  if (!statusPill || !statusBanner) return;
+  const text = statusPill.querySelector(".pill-text");
+  if (text) text.textContent = online ? "Online" : "Unavailable";
+  statusPill.classList.toggle("offline", !online);
+  statusBanner.hidden = online;
 }
 
-function today() {
-  return new Date().toISOString().split("T")[0];
-}
-
-function isOverdue(decision) {
-  return decision.reviewDate && decision.reviewDate < today() && !decision.outcome;
-}
-
-function isDueToday(decision) {
-  return decision.reviewDate === today();
-}
-
-function parseCsv(str) {
-  return str.split(",").map((s) => s.trim()).filter(Boolean);
-}
-
-/* ── Render helpers ──────────────────────────────────────────── */
-function renderCard(d, index) {
-  const card = document.createElement("div");
-  card.className = "card" +
-    (d.outcome ? " resolved" : "") +
-    (isOverdue(d) ? " overdue" : "");
-  card.style.animationDelay = `${index * 40}ms`;
-
-  const dateLabel = d.reviewDate
-    ? `<span class="card-date ${isOverdue(d) ? "overdue" : isDueToday(d) ? "due-today" : ""}">
-         ${isOverdue(d) ? "⚠ " : ""}Review ${formatDate(d.reviewDate)}
-       </span>`
-    : "";
-
-  const tags = d.tags.length
-    ? d.tags.map((t) => `<span class="tag">${t}</span>`).join("")
-    : "";
-
-  const outcome = d.outcome
-    ? `<div class="outcome-chip">Outcome logged</div>`
-    : "";
-
-  card.innerHTML = `
-    <div class="card-top">
-      <div class="card-title">${d.title}</div>
-      ${d.confidenceScore !== null ? `<span class="confidence-badge">${d.confidenceScore}/10</span>` : ""}
-    </div>
-    <div class="card-context">${d.context}</div>
-    ${outcome}
-    <div class="card-meta">
-      ${tags}
-      ${dateLabel}
-    </div>
-  `;
-
-  card.addEventListener("click", () => openDetail(d.id));
-  return card;
-}
-
-/* ── Load & render decisions ─────────────────────────────────── */
-async function loadDecisions() {
-  const query = currentView === "decisions" ? "" : `?due=${currentView}`;
-  const decisions = await api.get(`/api/decisions${query}`);
-
-  grid.innerHTML = "";
-
-  if (decisions.length === 0) {
-    emptyState.classList.remove("hidden");
-  } else {
-    emptyState.classList.add("hidden");
-    decisions.forEach((d, i) => grid.appendChild(renderCard(d, i)));
+async function pingHealth() {
+  try {
+    const res = await fetch("/api/health");
+    setOnlineState(res.ok);
+  } catch {
+    setOnlineState(false);
   }
 }
 
-async function loadStats() {
-  const s = await api.get("/api/stats");
-  document.querySelector("#stat-total .stat-num").textContent    = s.total;
-  document.querySelector("#stat-resolved .stat-num").textContent = s.resolved;
-  document.querySelector("#stat-overdue .stat-num").textContent  = s.overdue;
-  document.querySelector("#stat-confidence .stat-num").textContent =
-    s.avgConfidence ? `${s.avgConfidence}` : "—";
+function setComposerEnabled(enabled) {
+  input.disabled = !enabled;
+  sendBtn.disabled = !enabled;
+  input.placeholder = enabled
+    ? "Ask a question…"
+    : "Sign in to send messages…";
 }
 
-async function refresh() {
-  await Promise.all([loadDecisions(), loadStats()]);
+function escapeHtml(text) {
+  const div = document.createElement("div");
+  div.textContent = text;
+  return div.innerHTML;
 }
 
-/* ── Add / Edit modal ────────────────────────────────────────── */
-function openAddModal() {
-  editingId = null;
-  modalTitle.textContent = "Log a Decision";
-  fTitle.value = "";
-  fContext.value = "";
-  fAlternatives.value = "";
-  fConfidence.value = 7;
-  confDisplay.textContent = "7";
-  fReview.value = "";
-  fTags.value = "";
-  fOutcome.value = "";
-  outcomeSection.classList.add("hidden");
-  document.getElementById("saveDecision").textContent = "Save Decision";
-  decisionModal.classList.remove("hidden");
-  fTitle.focus();
+function scrollToBottom() {
+  const chatContainer = document.getElementById("chat");
+  chatContainer.scrollTop = chatContainer.scrollHeight;
 }
 
-async function openEditModal(id) {
-  const d = await api.get(`/api/decisions/${id}`);
-  editingId = id;
-  modalTitle.textContent = "Edit Decision";
-  fTitle.value = d.title;
-  fContext.value = d.context;
-  fAlternatives.value = d.alternatives.join(", ");
-  fConfidence.value = d.confidenceScore ?? 7;
-  confDisplay.textContent = d.confidenceScore ?? 7;
-  fReview.value = d.reviewDate || "";
-  fTags.value = d.tags.join(", ");
-  fOutcome.value = d.outcome || "";
-  outcomeSection.classList.remove("hidden");
-  document.getElementById("saveDecision").textContent = "Update Decision";
-  detailModal.classList.add("hidden");
-  decisionModal.classList.remove("hidden");
-  fTitle.focus();
+function renderMessage(message) {
+  const row = document.createElement("div");
+  row.className = `msg ${message.role === "assistant" ? "bot" : "user"}`;
+  row.innerHTML = `<div class="bubble">${escapeHtml(message.text)}</div>`;
+  messagesEl.appendChild(row);
 }
 
-function closeAddModal() {
-  decisionModal.classList.add("hidden");
-  editingId = null;
+function saveMessages() {
+  const nodes = [...messagesEl.querySelectorAll(".msg")];
+  const serialized = nodes.map((node) => ({
+    role: node.classList.contains("bot") ? "assistant" : "user",
+    text: node.querySelector(".bubble")?.textContent || "",
+  }));
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(serialized));
 }
 
-async function saveDecision() {
-  const title = fTitle.value.trim();
-  const context = fContext.value.trim();
-  if (!title || !context) {
-    fTitle.style.borderColor = title ? "" : "var(--danger)";
-    fContext.style.borderColor = context ? "" : "var(--danger)";
+function loadMessages() {
+  const raw = localStorage.getItem(STORAGE_KEY);
+  if (!raw) return false;
+
+  try {
+    const parsed = JSON.parse(raw);
+    if (!Array.isArray(parsed) || parsed.length === 0) return false;
+    parsed.forEach(renderMessage);
+    scrollToBottom();
+    return true;
+  } catch {
+    localStorage.removeItem(STORAGE_KEY);
+    return false;
+  }
+}
+
+function addMessage(role, text) {
+  renderMessage({ role, text });
+  saveMessages();
+  scrollToBottom();
+}
+
+window.addMessage = addMessage;
+
+function setAuthUi(authenticated, email = "") {
+  session.authenticated = authenticated;
+  authPanel.hidden = false;
+  loginBtn.hidden = authenticated;
+  logoutBtn.hidden = !authenticated;
+  emailInput.disabled = authenticated;
+  if (authenticated) {
+    authStatus.textContent = `Signed in as ${email}`;
+    authStatus.className = "auth-status success";
+  } else {
+    authStatus.textContent = "Sign in to access personalized compliance guidance.";
+    authStatus.className = "auth-status";
+  }
+  setComposerEnabled(authenticated);
+}
+
+async function checkSession() {
+  const res = await fetch("/api/auth/session", { credentials: "include" });
+  if (!res.ok) {
+    setAuthUi(false);
     return;
   }
-  fTitle.style.borderColor = "";
-  fContext.style.borderColor = "";
-
-  const payload = {
-    title,
-    context,
-    alternatives: parseCsv(fAlternatives.value),
-    confidenceScore: parseInt(fConfidence.value, 10),
-    reviewDate: fReview.value || null,
-    tags: parseCsv(fTags.value),
-  };
-
-  if (editingId) {
-    if (fOutcome.value.trim()) payload.outcome = fOutcome.value.trim();
-    await api.patch(`/api/decisions/${editingId}`, payload);
+  const payload = await res.json();
+  if (payload.authenticated) {
+    setAuthUi(true, payload.user?.email || "your account");
   } else {
-    await api.post("/api/decisions", payload);
+    setAuthUi(false);
   }
-
-  closeAddModal();
-  await refresh();
 }
 
-/* ── Detail modal ────────────────────────────────────────────── */
-async function openDetail(id) {
-  const d = await api.get(`/api/decisions/${id}`);
+async function verifyMagicLinkIfPresent() {
+  const params = new URLSearchParams(window.location.search);
+  const token_hash = params.get("token_hash");
+  const type = params.get("type");
+  if (!token_hash || !type) return;
 
-  document.getElementById("detail-title").textContent = d.title;
+  authStatus.textContent = "Verifying your sign-in link…";
+  authStatus.className = "auth-status";
 
-  const body = document.getElementById("detail-body");
-  const fillPct = d.confidenceScore !== null ? (d.confidenceScore / 10) * 100 : 0;
-
-  const alts = d.alternatives.length
-    ? d.alternatives.map((a) => `<div class="detail-alt-item">${a}</div>`).join("")
-    : `<span style="color:var(--text-dim);font-style:italic;">None recorded</span>`;
-
-  const tags = d.tags.length
-    ? `<div class="detail-tags">${d.tags.map((t) => `<span class="tag">${t}</span>`).join("")}</div>`
-    : `<span style="color:var(--text-dim);font-style:italic;">No tags</span>`;
-
-  const outcomeBlock = d.outcome
-    ? `<div class="detail-section">
-         <span class="detail-label">Outcome / Result</span>
-         <div class="detail-outcome-box">${d.outcome}</div>
-       </div>`
-    : "";
-
-  body.innerHTML = `
-    <div class="detail-section">
-      <span class="detail-label">Context</span>
-      <div class="detail-value">${d.context}</div>
-    </div>
-
-    <div class="detail-section">
-      <span class="detail-label">Alternatives Considered</span>
-      <div class="detail-alt-list">${alts}</div>
-    </div>
-
-    <div class="detail-section">
-      <span class="detail-label">Confidence Score</span>
-      <div class="detail-confidence">
-        <span style="font-family:var(--mono);color:var(--accent);font-size:18px;">
-          ${d.confidenceScore !== null ? d.confidenceScore + "/10" : "—"}
-        </span>
-        <div class="confidence-bar-track">
-          <div class="confidence-bar-fill" style="width:${fillPct}%"></div>
-        </div>
-      </div>
-    </div>
-
-    <div class="detail-section">
-      <span class="detail-label">Review Date</span>
-      <div class="detail-value ${isOverdue(d) ? "card-date overdue" : ""}">
-        ${d.reviewDate ? formatDate(d.reviewDate) + (isOverdue(d) ? " — overdue" : "") : "—"}
-      </div>
-    </div>
-
-    <div class="detail-section">
-      <span class="detail-label">Tags</span>
-      ${tags}
-    </div>
-
-    <div class="detail-divider"></div>
-
-    ${outcomeBlock}
-
-    <div class="detail-section">
-      <span class="detail-label">Logged</span>
-      <div class="detail-value" style="font-size:12px;color:var(--text-dim);">
-        ${new Date(d.createdAt).toLocaleDateString("en-US", { dateStyle: "long" })}
-      </div>
-    </div>
-  `;
-
-  // Wire footer buttons
-  document.getElementById("detail-edit").onclick = () => openEditModal(id);
-  document.getElementById("detail-delete").onclick = () => deleteDecision(id);
-  document.getElementById("detail-outcome").onclick = () => openOutcomePrompt(d);
-  document.getElementById("detail-outcome").textContent = d.outcome
-    ? "Update Outcome"
-    : "Log Outcome";
-
-  detailModal.classList.remove("hidden");
-}
-
-function closeDetail() {
-  detailModal.classList.add("hidden");
-}
-
-async function deleteDecision(id) {
-  if (!confirm("Delete this decision? This cannot be undone.")) return;
-  await api.del(`/api/decisions/${id}`);
-  closeDetail();
-  await refresh();
-}
-
-function openOutcomePrompt(d) {
-  closeDetail();
-  setTimeout(() => openEditModal(d.id), 50);
-}
-
-/* ── Event Listeners ─────────────────────────────────────────── */
-document.getElementById("openAddModal").addEventListener("click", openAddModal);
-document.getElementById("closeModal").addEventListener("click", closeAddModal);
-document.getElementById("cancelModal").addEventListener("click", closeAddModal);
-document.getElementById("saveDecision").addEventListener("click", saveDecision);
-document.getElementById("closeDetail").addEventListener("click", closeDetail);
-
-// Close modals on overlay click
-decisionModal.addEventListener("click", (e) => {
-  if (e.target === decisionModal) closeAddModal();
-});
-detailModal.addEventListener("click", (e) => {
-  if (e.target === detailModal) closeDetail();
-});
-
-// Nav buttons
-document.querySelectorAll(".nav-btn").forEach((btn) => {
-  btn.addEventListener("click", () => {
-    document.querySelectorAll(".nav-btn").forEach((b) => b.classList.remove("active"));
-    btn.classList.add("active");
-    currentView = btn.dataset.view;
-    loadDecisions();
+  const res = await fetch("/api/auth/verify", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    credentials: "include",
+    body: JSON.stringify({ token_hash, type }),
   });
-});
 
-// Confidence slider
-fConfidence.addEventListener("input", () => {
-  confDisplay.textContent = fConfidence.value;
-});
-
-// Keyboard shortcuts
-document.addEventListener("keydown", (e) => {
-  if (e.key === "Escape") {
-    if (!decisionModal.classList.contains("hidden")) closeAddModal();
-    if (!detailModal.classList.contains("hidden")) closeDetail();
+  const payload = await res.json();
+  if (!res.ok) {
+    authStatus.textContent = payload.error || "Verification failed.";
+    authStatus.className = "auth-status error";
+    return;
   }
-  if ((e.metaKey || e.ctrlKey) && e.key === "Enter") {
-    if (!decisionModal.classList.contains("hidden")) saveDecision();
+
+  const cleanUrl = `${window.location.origin}${window.location.pathname}`;
+  window.history.replaceState({}, "", cleanUrl);
+}
+
+async function sendMessage(message) {
+  const res = await fetch("/api/chat", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    credentials: "include",
+    body: JSON.stringify({ message }),
+  });
+
+  const payload = await res.json();
+  if (!res.ok) {
+    throw new Error(payload.error || payload.text || "Chat request failed.");
+  }
+  return payload.text;
+}
+
+form.addEventListener("submit", async (event) => {
+  event.preventDefault();
+
+  const message = input.value.trim();
+  if (!message || !session.authenticated) return;
+
+  addMessage("user", message);
+  input.value = "";
+
+  const pending = document.createElement("div");
+  pending.className = "msg bot pending";
+  pending.innerHTML = `<div class="bubble">Thinking…</div>`;
+  messagesEl.appendChild(pending);
+  scrollToBottom();
+
+  sendBtn.disabled = true;
+
+  try {
+    const reply = await sendMessage(message);
+    pending.remove();
+    addMessage("assistant", reply);
+  } catch (error) {
+    pending.remove();
+    addMessage("assistant", `Sorry — ${error.message}`);
+  } finally {
+    sendBtn.disabled = false;
+    input.focus();
   }
 });
 
-/* ── Init ────────────────────────────────────────────────────── */
-refresh();
+input.addEventListener("keydown", (event) => {
+  if (event.key === "Enter" && !event.shiftKey) {
+    event.preventDefault();
+    form.requestSubmit();
+  }
+});
+
+clearBtn.addEventListener("click", () => {
+  messagesEl.innerHTML = "";
+  localStorage.removeItem(STORAGE_KEY);
+  addMessage("assistant", "Chat cleared. Ask a new question anytime.");
+});
+
+authForm.addEventListener("submit", async (event) => {
+  event.preventDefault();
+
+  const email = emailInput.value.trim();
+  if (!email) return;
+
+  authStatus.textContent = "Sending magic link…";
+  authStatus.className = "auth-status";
+  loginBtn.disabled = true;
+
+  try {
+    const res = await fetch("/api/auth/start", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ email }),
+    });
+    const payload = await res.json();
+    if (!res.ok) throw new Error(payload.error || "Unable to send magic link.");
+    authStatus.textContent = "Magic link sent. Check your email to continue.";
+    authStatus.className = "auth-status success";
+  } catch (error) {
+    authStatus.textContent = error.message;
+    authStatus.className = "auth-status error";
+  } finally {
+    loginBtn.disabled = false;
+  }
+});
+
+logoutBtn.addEventListener("click", async () => {
+  await fetch("/api/auth/logout", {
+    method: "POST",
+    credentials: "include",
+  });
+  setAuthUi(false);
+});
+
+(async function init() {
+  setComposerEnabled(false);
+  await pingHealth();
+  await verifyMagicLinkIfPresent();
+  await checkSession();
+
+  if (!loadMessages()) {
+    addMessage("assistant", "Welcome to OmanX. Sign in, then ask your question.");
+  }
+})();
