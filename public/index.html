@@ -3,86 +3,381 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>OmanX</title>
-    <meta name="description" content="Minimal AI guidance for Omani scholars and everyday questions." />
+    <title>OmanX — AI Guidance for Omani Scholars</title>
+    <meta name="description" content="OmanX is a government-ready AI onboarding platform that guides Omani scholars through studying and living in the United States." />
     <link rel="stylesheet" href="/styles.css" />
     <link rel="icon" type="image/png" sizes="16x16" href="/assets/favicon-16x16.png">
     <link rel="icon" type="image/png" sizes="32x32" href="/assets/favicon-32x32.png">
     <link rel="icon" href="/assets/favicon.ico" sizes="any" />
   </head>
-  <body>
+  <body class="landing">
+
     <div class="scroll-progress"></div>
 
-    <main class="shell">
-      <header class="topbar">
-        <div class="brand">
-          <div class="logo" aria-hidden="true">OX</div>
-          <div class="brand-text">
-            <h1>OmanX</h1>
-            <p>AI guidance for Omani scholars and everyday questions.</p>
+    <!-- ── HEADER ─────────────────────────────────────────── -->
+    <header class="lp-header">
+      <div class="lp-wrap">
+        <nav class="lp-nav">
+          <div class="brand">
+            <div class="logo" aria-hidden="true">OX</div>
+            <span class="brand-name">OmanX</span>
+          </div>
+          <div class="lp-nav-right">
+            <a href="#what" class="lp-link">What it does</a>
+            <a href="#who" class="lp-link">Who it's for</a>
+            <a href="#features" class="lp-link">Features</a>
+            <a href="/chat.html" class="primary">Open App →</a>
+          </div>
+        </nav>
+      </div>
+    </header>
+
+    <main>
+
+      <!-- ── HERO ───────────────────────────────────────────── -->
+      <section class="lp-hero">
+        <div class="lp-wrap">
+          <div class="lp-eyebrow">Government-Ready AI Guidance</div>
+          <h1 class="lp-headline">
+            Navigate the US.<br />
+            <span class="lp-blue">Without the guesswork.</span>
+          </h1>
+          <p class="lp-sub">
+            OmanX is a structured AI assistant built specifically for Omani scholars
+            heading to the United States — using only approved sources, official
+            checklists, and clear escalation paths when stakes are high.
+          </p>
+          <div class="lp-actions">
+            <a href="/chat.html" class="primary lp-btn-lg">Get Started</a>
+            <a href="#features" class="ghost lp-btn-lg">See Features</a>
           </div>
         </div>
-        <span class="status-pill" id="statusPill" aria-label="Service status">
-          <span class="dot" aria-hidden="true"></span>
-          <span class="pill-text">Online</span>
-        </span>
-      </header>
-
-      <!-- Auth panel — hidden until auth is re-enabled -->
-      <section class="auth-panel" id="authPanel" hidden>
-        <form id="authForm" class="auth-form">
-          <label for="emailInput">Sign in with your university or personal email</label>
-          <div class="auth-actions">
-            <input id="emailInput" type="email" placeholder="name@example.com" required />
-            <button id="loginBtn" class="primary" type="submit">Send Magic Link</button>
-            <button id="logoutBtn" class="ghost" type="button" hidden>Log out</button>
-          </div>
-        </form>
-        <p id="authStatus" class="auth-status">Sign in to access personalized compliance guidance.</p>
       </section>
 
-      <section class="assistant-panel">
-        <div class="status-banner" id="statusBanner" role="status" hidden>
-          <span class="status-banner-text">
-            Service unavailable. We will not guess—please contact the relevant office.
-          </span>
+      <!-- ── WHAT IT DOES ────────────────────────────────────── -->
+      <section class="lp-section" id="what">
+        <div class="lp-wrap">
+          <p class="lp-label">What it does</p>
+          <h2 class="lp-title">Structured guidance,<br />not improvised answers.</h2>
+          <p class="lp-body">
+            Most AI tools guess. OmanX doesn't. Every response is constrained to
+            verified, approved sources. When stakes are high — immigration, health,
+            legal compliance — OmanX escalates to the right authority rather than
+            fabricating an answer. It's built to be auditable, trustworthy, and
+            aligned with what Omani institutions actually need.
+          </p>
         </div>
-        <div class="chat-head">
-          <h2>Chat</h2>
-          <button class="ghost" id="clearBtn" type="button">Clear</button>
-        </div>
-
-        <div id="chat" class="chat-scroll" role="log" aria-live="polite" aria-relevant="additions">
-          <div class="messages" id="messages"></div>
-        </div>
-
-        <form id="form" class="composer">
-          <textarea
-            id="input"
-            rows="1"
-            placeholder="Ask a question…"
-            aria-label="Message input"
-          ></textarea>
-          <div class="composer-actions">
-            <span class="hint">
-              <kbd>Enter</kbd> send · <kbd>Shift</kbd>+<kbd>Enter</kbd> newline
-            </span>
-            <button id="send" class="primary" type="submit">Send</button>
-          </div>
-        </form>
-
-        <p class="disclaimer">
-          Informational guidance only. Always verify with official institutions for
-          legal, immigration, or medical matters.
-        </p>
       </section>
+
+      <div class="lp-rule"><div class="lp-wrap"><hr /></div></div>
+
+      <!-- ── WHO IT'S FOR ────────────────────────────────────── -->
+      <section class="lp-section" id="who">
+        <div class="lp-wrap">
+          <p class="lp-label">Who it's for</p>
+          <h2 class="lp-title">Built for a specific journey.</h2>
+          <div class="lp-cards">
+            <div class="lp-card">
+              <span class="lp-icon">🎓</span>
+              <h3>Scholarship Recipients</h3>
+              <p>Omani students on government scholarships preparing to study at US universities.</p>
+            </div>
+            <div class="lp-card">
+              <span class="lp-icon">✈️</span>
+              <h3>Pre-Departure</h3>
+              <p>Anyone in the weeks before departure who needs clear, structured pre-travel checklists.</p>
+            </div>
+            <div class="lp-card">
+              <span class="lp-icon">🏫</span>
+              <h3>First-Semester Students</h3>
+              <p>Newly arrived scholars navigating banking, housing, campus setup, and US systems for the first time.</p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <div class="lp-rule"><div class="lp-wrap"><hr /></div></div>
+
+      <!-- ── FEATURES ────────────────────────────────────────── -->
+      <section class="lp-section" id="features">
+        <div class="lp-wrap">
+          <p class="lp-label">Key features</p>
+          <h2 class="lp-title">Everything you need.<br />Nothing you don't.</h2>
+          <div class="lp-features">
+            <div class="lp-feature">
+              <span class="lp-tag">Onboarding</span>
+              <h3>Pre-Departure Checklists</h3>
+              <p>Step-by-step guidance from visa approval to landing — nothing missed, nothing assumed.</p>
+            </div>
+            <div class="lp-feature">
+              <span class="lp-tag">Practical</span>
+              <h3>US Systems Explained</h3>
+              <p>Banking, SIM cards, housing, healthcare — clear answers for systems you've never encountered.</p>
+            </div>
+            <div class="lp-feature">
+              <span class="lp-tag">Safety</span>
+              <h3>High-Stakes Escalation</h3>
+              <p>For immigration, legal, or medical questions — OmanX routes you to the right official, not a guess.</p>
+            </div>
+            <div class="lp-feature">
+              <span class="lp-tag">Trust</span>
+              <h3>Approved Sources Only</h3>
+              <p>Responses constrained to verified institutional and government sources. Always auditable.</p>
+            </div>
+            <div class="lp-feature">
+              <span class="lp-tag">Structure</span>
+              <h3>First-Week Guidance</h3>
+              <p>A structured onboarding flow for your first days on campus — orientation, admin, and setup.</p>
+            </div>
+            <div class="lp-feature">
+              <span class="lp-tag">Compliance</span>
+              <h3>MoHE Alignment</h3>
+              <p>Built in alignment with the Ministry of Higher Education scholarship standards and expectations.</p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ── CTA ─────────────────────────────────────────────── -->
+      <section class="lp-cta-wrap">
+        <div class="lp-wrap">
+          <div class="lp-cta-box">
+            <h2>Ready to get started?</h2>
+            <p>Open the app and ask your first question. No setup required.</p>
+            <a href="/chat.html" class="primary lp-btn-lg">Open OmanX →</a>
+          </div>
+        </div>
+      </section>
+
     </main>
 
-    <footer class="footer">
-      <span>© <span id="year"></span> OmanX</span>
-      <span>Verify with MoHE, embassy, and university offices.</span>
+    <!-- ── FOOTER ──────────────────────────────────────────── -->
+    <footer class="lp-footer">
+      <div class="lp-wrap">
+        <div class="lp-footer-inner">
+          <span>© <span id="year"></span> OmanX</span>
+          <span>Always verify with MoHE, your embassy, and university offices.</span>
+        </div>
+      </div>
     </footer>
 
-    <script src="/app.js"></script>
+    <style>
+      /* Landing-page additive styles — builds on styles.css variables */
+
+      body.landing { display: block; min-height: 100vh; }
+
+      .lp-wrap { max-width: 860px; margin: 0 auto; padding: 0 24px; }
+
+      /* Header */
+      .lp-header {
+        position: sticky; top: 0; z-index: 100;
+        background: rgba(255,255,255,0.94);
+        backdrop-filter: blur(16px);
+        border-bottom: 1px solid var(--border);
+      }
+
+      .lp-nav {
+        display: flex; justify-content: space-between;
+        align-items: center; height: 64px; gap: 24px;
+      }
+
+      .brand { display: flex; align-items: center; gap: 10px; text-decoration: none; }
+      .brand-name { font-size: 0.9375rem; font-weight: 600; color: var(--text); letter-spacing: -0.01em; }
+
+      .lp-nav-right { display: flex; align-items: center; gap: 4px; }
+
+      .lp-link {
+        font-size: 0.875rem; font-weight: 500;
+        color: var(--text-3); text-decoration: none;
+        padding: 6px 12px; border-radius: var(--radius-sm);
+        transition: color var(--duration) var(--ease), background var(--duration) var(--ease);
+        white-space: nowrap;
+      }
+      .lp-link:hover { color: var(--text); background: var(--bg-subtle); }
+
+      /* Hero */
+      .lp-hero {
+        padding: 100px 0 84px;
+        text-align: center;
+        animation: lp-fade 0.55s var(--ease-out) both;
+      }
+
+      @keyframes lp-fade {
+        from { opacity: 0; transform: translateY(12px); }
+        to   { opacity: 1; transform: translateY(0); }
+      }
+
+      .lp-eyebrow {
+        display: inline-block;
+        font-family: var(--mono); font-size: 0.6875rem;
+        letter-spacing: 0.12em; text-transform: uppercase;
+        color: var(--accent); background: var(--accent-dim);
+        border: 1px solid var(--accent-border);
+        padding: 4px 14px; border-radius: 20px;
+        margin-bottom: 28px;
+      }
+
+      .lp-headline {
+        font-size: clamp(2rem, 5.5vw, 3.2rem);
+        font-weight: 700; line-height: 1.15;
+        letter-spacing: -0.04em; color: var(--text);
+        margin-bottom: 20px;
+      }
+
+      .lp-blue { color: var(--accent); }
+
+      .lp-sub {
+        font-size: 1.05rem; color: var(--text-3);
+        max-width: 540px; margin: 0 auto 36px;
+        line-height: 1.75;
+      }
+
+      .lp-actions { display: flex; gap: 12px; justify-content: center; flex-wrap: wrap; }
+      .lp-btn-lg { padding: 12px 28px; font-size: 0.9375rem; }
+
+      /* Sections */
+      .lp-section { padding: 72px 0; animation: lp-fade 0.5s var(--ease-out) both; }
+
+      .lp-label {
+        font-family: var(--mono); font-size: 0.6875rem;
+        letter-spacing: 0.12em; text-transform: uppercase;
+        color: var(--text-4); margin-bottom: 14px;
+      }
+
+      .lp-title {
+        font-size: clamp(1.5rem, 3vw, 2rem);
+        font-weight: 700; letter-spacing: -0.03em;
+        line-height: 1.2; color: var(--text); margin-bottom: 16px;
+      }
+
+      .lp-body {
+        font-size: 0.9375rem; color: var(--text-3);
+        line-height: 1.8; max-width: 620px;
+      }
+
+      .lp-rule hr { border: none; border-top: 1px solid var(--border); }
+
+      /* Audience cards */
+      .lp-cards {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+        gap: 12px; margin-top: 32px;
+      }
+
+      .lp-card {
+        background: var(--bg-subtle); border: 1px solid var(--border);
+        border-radius: var(--radius-lg); padding: 24px;
+        transition: border-color var(--duration) var(--ease), box-shadow var(--duration) var(--ease);
+      }
+
+      .lp-card:hover { border-color: var(--accent-border); box-shadow: var(--shadow-sm); }
+      .lp-icon { font-size: 1.4rem; display: block; margin-bottom: 12px; }
+
+      .lp-card h3 {
+        font-size: 0.9rem; font-weight: 600; color: var(--text);
+        margin-bottom: 6px; letter-spacing: -0.01em;
+      }
+
+      .lp-card p { font-size: 0.8125rem; color: var(--text-3); line-height: 1.6; }
+
+      /* Features */
+      .lp-features {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+        gap: 12px; margin-top: 32px;
+      }
+
+      .lp-feature {
+        background: var(--bg-subtle); border: 1px solid var(--border);
+        border-radius: var(--radius-lg); padding: 22px;
+        display: flex; flex-direction: column; gap: 8px;
+        transition: border-color var(--duration) var(--ease), transform var(--duration) var(--ease);
+      }
+
+      .lp-feature:hover {
+        border-color: var(--accent-border);
+        transform: translateY(-2px); box-shadow: var(--shadow-sm);
+      }
+
+      .lp-tag {
+        font-family: var(--mono); font-size: 0.675rem;
+        letter-spacing: 0.08em; text-transform: uppercase;
+        color: var(--accent); background: var(--accent-dim);
+        border: 1px solid var(--accent-border);
+        border-radius: var(--radius-xs); padding: 2px 8px;
+        align-self: flex-start;
+      }
+
+      .lp-feature h3 { font-size: 0.875rem; font-weight: 600; color: var(--text); letter-spacing: -0.01em; }
+      .lp-feature p  { font-size: 0.8rem; color: var(--text-3); line-height: 1.6; }
+
+      /* CTA */
+      .lp-cta-wrap { padding: 24px 0 80px; }
+
+      .lp-cta-box {
+        background: var(--bg-subtle); border: 1px solid var(--border);
+        border-radius: var(--radius-xl); padding: 56px 40px;
+        text-align: center; position: relative; overflow: hidden;
+      }
+
+      .lp-cta-box::before {
+        content: '';
+        position: absolute; top: -80px; left: 50%;
+        transform: translateX(-50%);
+        width: 360px; height: 240px;
+        background: radial-gradient(ellipse, var(--accent-dim) 0%, transparent 70%);
+        pointer-events: none;
+      }
+
+      .lp-cta-box h2 {
+        font-size: clamp(1.3rem, 3vw, 1.75rem); font-weight: 700;
+        letter-spacing: -0.03em; color: var(--text);
+        margin-bottom: 10px; position: relative;
+      }
+
+      .lp-cta-box p {
+        font-size: 0.9rem; color: var(--text-3);
+        margin-bottom: 28px; position: relative;
+      }
+
+      /* Footer */
+      .lp-footer { border-top: 1px solid var(--border); }
+
+      .lp-footer-inner {
+        display: flex; justify-content: space-between; align-items: center;
+        padding: 18px 0; font-size: 0.6875rem; color: var(--text-4);
+        font-family: var(--mono); letter-spacing: 0.02em;
+        flex-wrap: wrap; gap: 8px;
+      }
+
+      /* Responsive */
+      @media (max-width: 600px) {
+        .lp-wrap { padding: 0 16px; }
+        .lp-hero { padding: 60px 0 52px; }
+        .lp-section { padding: 52px 0; }
+        .lp-nav-right .lp-link { display: none; }
+        .lp-cta-box { padding: 36px 20px; }
+        .lp-footer-inner { flex-direction: column; text-align: center; }
+      }
+    </style>
+
+    <script>
+      document.body.classList.add('loaded');
+      document.getElementById('year').textContent = new Date().getFullYear();
+
+      document.querySelectorAll('a[href^="#"]').forEach(a => {
+        a.addEventListener('click', e => {
+          const target = document.querySelector(a.getAttribute('href'));
+          if (target) { e.preventDefault(); target.scrollIntoView({ behavior: 'smooth' }); }
+        });
+      });
+
+      window.addEventListener('scroll', () => {
+        const h = document.documentElement;
+        const pct = h.scrollTop / (h.scrollHeight - h.clientHeight) * 100;
+        document.querySelector('.scroll-progress').style.width = pct + '%';
+      });
+    </script>
+
   </body>
 </html>

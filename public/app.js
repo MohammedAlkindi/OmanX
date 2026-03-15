@@ -1,279 +1,359 @@
-// app.js - OmanX frontend application
+/* ── State ───────────────────────────────────────────────────── */
+let currentView = "decisions"; // decisions | overdue | today
+let editingId = null;
 
-document.addEventListener('DOMContentLoaded', function() {
-  document.body.classList.add('loaded');
-});
+/* ── API helpers ─────────────────────────────────────────────── */
+const api = {
+  async get(path) {
+    const res = await fetch(path);
+    if (!res.ok) throw new Error(await res.text());
+    return res.json();
+  },
+  async post(path, body) {
+    const res = await fetch(path, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(body),
+    });
+    if (!res.ok) throw new Error(await res.text());
+    return res.json();
+  },
+  async patch(path, body) {
+    const res = await fetch(path, {
+      method: "PATCH",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(body),
+    });
+    if (!res.ok) throw new Error(await res.text());
+    return res.json();
+  },
+  async del(path) {
+    const res = await fetch(path, { method: "DELETE" });
+    if (!res.ok) throw new Error(await res.text());
+    return res.json();
+  },
+};
 
-document.addEventListener('keydown', function(e) {
-  if (e.key === 'Tab') document.body.classList.add('keyboard-nav');
-});
+/* ── DOM refs ────────────────────────────────────────────────── */
+const grid          = document.getElementById("decisions-grid");
+const emptyState    = document.getElementById("empty-state");
+const decisionModal = document.getElementById("decisionModal");
+const detailModal   = document.getElementById("detailModal");
 
-document.addEventListener('mousedown', function() {
-  document.body.classList.remove('keyboard-nav');
-});
+const fTitle       = document.getElementById("f-title");
+const fContext     = document.getElementById("f-context");
+const fAlternatives = document.getElementById("f-alternatives");
+const fConfidence  = document.getElementById("f-confidence");
+const fReview      = document.getElementById("f-review");
+const fTags        = document.getElementById("f-tags");
+const fOutcome     = document.getElementById("f-outcome");
+const confDisplay  = document.getElementById("confidenceDisplay");
+const outcomeSection = document.getElementById("outcomeSection");
+const modalTitle   = document.getElementById("modal-title");
 
-window.addEventListener('scroll', function() {
-  const winScroll = document.body.scrollTop || document.documentElement.scrollTop;
-  const height = document.documentElement.scrollHeight - document.documentElement.clientHeight;
-  const scrolled = (winScroll / height) * 100;
-  const progressBar = document.querySelector('.scroll-progress');
-  if (progressBar) progressBar.style.width = scrolled + '%';
-});
-
-const form       = document.getElementById('form');
-const input      = document.getElementById('input');
-const messages   = document.getElementById('messages');
-const chat       = document.getElementById('chat');
-const sendBtn    = document.getElementById('send');
-const clearBtn   = document.getElementById('clearBtn');
-const statusPill = document.getElementById('statusPill');
-const statusBanner = document.getElementById('statusBanner');
-const authForm   = document.getElementById('authForm');
-const emailInput = document.getElementById('emailInput');
-const loginBtn   = document.getElementById('loginBtn');
-const logoutBtn  = document.getElementById('logoutBtn');
-const authStatus = document.getElementById('authStatus');
-
-let currentUser = null;
-const STORAGE_KEY = 'omanx.chat.messages.v1';
-let healthFailures = 0;
-
-function setServiceState(state, text) {
-  statusPill.dataset.state = state;
-  const textEl = statusPill.querySelector('.pill-text');
-  if (textEl) textEl.textContent = text;
-  statusBanner.hidden = state !== 'offline';
-}
-
-function autoResize() {
-  input.style.height = 'auto';
-  input.style.height = `${Math.min(input.scrollHeight, 200)}px`;
-}
-
-function scrollToBottom() {
-  requestAnimationFrame(() => { chat.scrollTop = chat.scrollHeight; });
-}
-
-function createMessage(role, text) {
-  const wrapper = document.createElement('div');
-  wrapper.className = `msg ${role === 'user' ? 'me' : 'bot'}`;
-
-  const avatar = document.createElement('div');
-  avatar.className = 'avatar';
-  avatar.textContent = role === 'user' ? 'You' : 'OX';
-
-  const bubble = document.createElement('div');
-  bubble.className = 'bubble';
-  bubble.textContent = text;
-
-  wrapper.appendChild(avatar);
-  wrapper.appendChild(bubble);
-  return { wrapper, bubble };
-}
-
-function persistMessages() {
-  const data = [];
-  messages.querySelectorAll('.msg').forEach((el) => {
-    const role = el.classList.contains('me') ? 'user' : 'assistant';
-    const bubble = el.querySelector('.bubble');
-    data.push({ role, text: bubble ? bubble.textContent : '' });
+/* ── Utilities ───────────────────────────────────────────────── */
+function formatDate(dateStr) {
+  if (!dateStr) return null;
+  const [y, m, d] = dateStr.split("-");
+  return new Date(y, m - 1, d).toLocaleDateString("en-US", {
+    month: "short", day: "numeric", year: "numeric",
   });
-  localStorage.setItem(STORAGE_KEY, JSON.stringify(data.slice(-40)));
 }
 
-function addMessage(role, text) {
-  const { wrapper } = createMessage(role, text);
-  messages.appendChild(wrapper);
-  scrollToBottom();
-  persistMessages();
+function today() {
+  return new Date().toISOString().split("T")[0];
 }
 
-function loadMessages() {
-  const raw = localStorage.getItem(STORAGE_KEY);
-  if (!raw) {
-    addMessage('assistant', 'Welcome to OmanX. Ask a question to begin.');
+function isOverdue(decision) {
+  return decision.reviewDate && decision.reviewDate < today() && !decision.outcome;
+}
+
+function isDueToday(decision) {
+  return decision.reviewDate === today();
+}
+
+function parseCsv(str) {
+  return str.split(",").map((s) => s.trim()).filter(Boolean);
+}
+
+/* ── Render helpers ──────────────────────────────────────────── */
+function renderCard(d, index) {
+  const card = document.createElement("div");
+  card.className = "card" +
+    (d.outcome ? " resolved" : "") +
+    (isOverdue(d) ? " overdue" : "");
+  card.style.animationDelay = `${index * 40}ms`;
+
+  const dateLabel = d.reviewDate
+    ? `<span class="card-date ${isOverdue(d) ? "overdue" : isDueToday(d) ? "due-today" : ""}">
+         ${isOverdue(d) ? "⚠ " : ""}Review ${formatDate(d.reviewDate)}
+       </span>`
+    : "";
+
+  const tags = d.tags.length
+    ? d.tags.map((t) => `<span class="tag">${t}</span>`).join("")
+    : "";
+
+  const outcome = d.outcome
+    ? `<div class="outcome-chip">Outcome logged</div>`
+    : "";
+
+  card.innerHTML = `
+    <div class="card-top">
+      <div class="card-title">${d.title}</div>
+      ${d.confidenceScore !== null ? `<span class="confidence-badge">${d.confidenceScore}/10</span>` : ""}
+    </div>
+    <div class="card-context">${d.context}</div>
+    ${outcome}
+    <div class="card-meta">
+      ${tags}
+      ${dateLabel}
+    </div>
+  `;
+
+  card.addEventListener("click", () => openDetail(d.id));
+  return card;
+}
+
+/* ── Load & render decisions ─────────────────────────────────── */
+async function loadDecisions() {
+  const query = currentView === "decisions" ? "" : `?due=${currentView}`;
+  const decisions = await api.get(`/api/decisions${query}`);
+
+  grid.innerHTML = "";
+
+  if (decisions.length === 0) {
+    emptyState.classList.remove("hidden");
+  } else {
+    emptyState.classList.add("hidden");
+    decisions.forEach((d, i) => grid.appendChild(renderCard(d, i)));
+  }
+}
+
+async function loadStats() {
+  const s = await api.get("/api/stats");
+  document.querySelector("#stat-total .stat-num").textContent    = s.total;
+  document.querySelector("#stat-resolved .stat-num").textContent = s.resolved;
+  document.querySelector("#stat-overdue .stat-num").textContent  = s.overdue;
+  document.querySelector("#stat-confidence .stat-num").textContent =
+    s.avgConfidence ? `${s.avgConfidence}` : "—";
+}
+
+async function refresh() {
+  await Promise.all([loadDecisions(), loadStats()]);
+}
+
+/* ── Add / Edit modal ────────────────────────────────────────── */
+function openAddModal() {
+  editingId = null;
+  modalTitle.textContent = "Log a Decision";
+  fTitle.value = "";
+  fContext.value = "";
+  fAlternatives.value = "";
+  fConfidence.value = 7;
+  confDisplay.textContent = "7";
+  fReview.value = "";
+  fTags.value = "";
+  fOutcome.value = "";
+  outcomeSection.classList.add("hidden");
+  document.getElementById("saveDecision").textContent = "Save Decision";
+  decisionModal.classList.remove("hidden");
+  fTitle.focus();
+}
+
+async function openEditModal(id) {
+  const d = await api.get(`/api/decisions/${id}`);
+  editingId = id;
+  modalTitle.textContent = "Edit Decision";
+  fTitle.value = d.title;
+  fContext.value = d.context;
+  fAlternatives.value = d.alternatives.join(", ");
+  fConfidence.value = d.confidenceScore ?? 7;
+  confDisplay.textContent = d.confidenceScore ?? 7;
+  fReview.value = d.reviewDate || "";
+  fTags.value = d.tags.join(", ");
+  fOutcome.value = d.outcome || "";
+  outcomeSection.classList.remove("hidden");
+  document.getElementById("saveDecision").textContent = "Update Decision";
+  detailModal.classList.add("hidden");
+  decisionModal.classList.remove("hidden");
+  fTitle.focus();
+}
+
+function closeAddModal() {
+  decisionModal.classList.add("hidden");
+  editingId = null;
+}
+
+async function saveDecision() {
+  const title = fTitle.value.trim();
+  const context = fContext.value.trim();
+  if (!title || !context) {
+    fTitle.style.borderColor = title ? "" : "var(--danger)";
+    fContext.style.borderColor = context ? "" : "var(--danger)";
     return;
   }
-  try {
-    const parsed = JSON.parse(raw);
-    if (!Array.isArray(parsed) || parsed.length === 0) {
-      addMessage('assistant', 'Welcome to OmanX. Ask a question to begin.');
-      return;
-    }
-    messages.innerHTML = '';
-    parsed.forEach((m) => {
-      if (!m || typeof m.text !== 'string') return;
-      addMessage(m.role === 'user' ? 'user' : 'assistant', m.text);
-    });
-  } catch {
-    addMessage('assistant', 'Welcome to OmanX. Ask a question to begin.');
-  }
-}
+  fTitle.style.borderColor = "";
+  fContext.style.borderColor = "";
 
-async function checkHealth() {
-  const endpoints = ['/api/ready', '/api/health', '/ready'];
-  try {
-    for (const endpoint of endpoints) {
-      const res = await fetch(endpoint, { method: 'GET' }).catch(() => null);
-      if (res && res.ok) {
-        healthFailures = 0;
-        setServiceState('online', 'Online');
-        return;
-      }
-    }
+  const payload = {
+    title,
+    context,
+    alternatives: parseCsv(fAlternatives.value),
+    confidenceScore: parseInt(fConfidence.value, 10),
+    reviewDate: fReview.value || null,
+    tags: parseCsv(fTags.value),
+  };
 
-    healthFailures += 1;
-    if (healthFailures >= 2) setServiceState('offline', 'Offline');
-  } catch {
-    healthFailures += 1;
-    if (healthFailures >= 2) setServiceState('offline', 'Offline');
-  }
-}
-
-function setAuthState({ authenticated, user, message }) {
-  currentUser = authenticated ? user : null;
-  if (logoutBtn) logoutBtn.hidden = !authenticated;
-  if (loginBtn) loginBtn.disabled = !!authenticated;
-  if (emailInput) emailInput.disabled = !!authenticated;
-  sendBtn.disabled = !authenticated;
-  input.disabled = !authenticated;
-
-  if (authenticated) {
-    input.placeholder = 'Ask a question…';
-    if (authStatus) authStatus.textContent = message || `Signed in as ${user?.email || user?.id}.`;
+  if (editingId) {
+    if (fOutcome.value.trim()) payload.outcome = fOutcome.value.trim();
+    await api.patch(`/api/decisions/${editingId}`, payload);
   } else {
-    input.placeholder = 'Sign in to start chatting…';
-    if (authStatus) authStatus.textContent = message || 'Sign in to access personalized compliance guidance.';
-  }
-}
-
-async function refreshSession() {
-  try {
-    const res = await fetch('/api/auth/session');
-    if (!res.ok) { setAuthState({ authenticated: false }); return; }
-    const payload = await res.json();
-    setAuthState({ authenticated: true, user: payload.user });
-  } catch {
-    setAuthState({ authenticated: false, message: 'Unable to reach auth service.' });
-  }
-}
-
-async function completeMagicLinkIfPresent() {
-  const params = new URLSearchParams(window.location.search);
-  const tokenHash = params.get('token_hash');
-  const type = params.get('type');
-  if (!tokenHash || !type) return;
-  if (authStatus) authStatus.textContent = 'Completing sign-in…';
-  try {
-    const res = await fetch('/api/auth/verify', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ token_hash: tokenHash, type }),
-    });
-    const payload = await res.json();
-    if (!res.ok) throw new Error(payload?.error || 'Sign-in failed.');
-    window.history.replaceState({}, document.title, `${window.location.origin}${window.location.pathname}`);
-    setAuthState({ authenticated: true, user: payload.user, message: 'Sign-in complete.' });
-  } catch (err) {
-    setAuthState({ authenticated: false, message: err.message || 'Sign-in failed.' });
-  }
-}
-
-async function sendMessage(message) {
-  setServiceState('busy', 'Thinking…');
-
-  const { wrapper, bubble } = createMessage('assistant', '');
-  bubble.textContent = '…';
-  messages.appendChild(wrapper);
-  scrollToBottom();
-
-  try {
-    const res = await fetch('/api/chat', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ message }),
-    });
-    const payload = await res.json();
-    if (!res.ok) throw new Error(payload?.error || 'Request failed');
-    bubble.textContent = payload.text || 'No response generated.';
-    healthFailures = 0;
-    setServiceState('online', 'Online');
-  } catch (err) {
-    console.error('Chat error:', err);
-    bubble.textContent = `I couldn't complete this request. ${err.message || 'Please try again.'}`;
-    setServiceState('offline', 'Offline');
+    await api.post("/api/decisions", payload);
   }
 
-  persistMessages();
-  scrollToBottom();
+  closeAddModal();
+  await refresh();
 }
 
-form.addEventListener('submit', async (event) => {
-  event.preventDefault();
-  const message = input.value.trim();
-  if (!message) return;
-  addMessage('user', message);
-  input.value = '';
-  autoResize();
-  sendBtn.disabled = true;
-  await sendMessage(message);
-  sendBtn.disabled = !currentUser;
-  input.focus();
+/* ── Detail modal ────────────────────────────────────────────── */
+async function openDetail(id) {
+  const d = await api.get(`/api/decisions/${id}`);
+
+  document.getElementById("detail-title").textContent = d.title;
+
+  const body = document.getElementById("detail-body");
+  const fillPct = d.confidenceScore !== null ? (d.confidenceScore / 10) * 100 : 0;
+
+  const alts = d.alternatives.length
+    ? d.alternatives.map((a) => `<div class="detail-alt-item">${a}</div>`).join("")
+    : `<span style="color:var(--text-dim);font-style:italic;">None recorded</span>`;
+
+  const tags = d.tags.length
+    ? `<div class="detail-tags">${d.tags.map((t) => `<span class="tag">${t}</span>`).join("")}</div>`
+    : `<span style="color:var(--text-dim);font-style:italic;">No tags</span>`;
+
+  const outcomeBlock = d.outcome
+    ? `<div class="detail-section">
+         <span class="detail-label">Outcome / Result</span>
+         <div class="detail-outcome-box">${d.outcome}</div>
+       </div>`
+    : "";
+
+  body.innerHTML = `
+    <div class="detail-section">
+      <span class="detail-label">Context</span>
+      <div class="detail-value">${d.context}</div>
+    </div>
+
+    <div class="detail-section">
+      <span class="detail-label">Alternatives Considered</span>
+      <div class="detail-alt-list">${alts}</div>
+    </div>
+
+    <div class="detail-section">
+      <span class="detail-label">Confidence Score</span>
+      <div class="detail-confidence">
+        <span style="font-family:var(--mono);color:var(--accent);font-size:18px;">
+          ${d.confidenceScore !== null ? d.confidenceScore + "/10" : "—"}
+        </span>
+        <div class="confidence-bar-track">
+          <div class="confidence-bar-fill" style="width:${fillPct}%"></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="detail-section">
+      <span class="detail-label">Review Date</span>
+      <div class="detail-value ${isOverdue(d) ? "card-date overdue" : ""}">
+        ${d.reviewDate ? formatDate(d.reviewDate) + (isOverdue(d) ? " — overdue" : "") : "—"}
+      </div>
+    </div>
+
+    <div class="detail-section">
+      <span class="detail-label">Tags</span>
+      ${tags}
+    </div>
+
+    <div class="detail-divider"></div>
+
+    ${outcomeBlock}
+
+    <div class="detail-section">
+      <span class="detail-label">Logged</span>
+      <div class="detail-value" style="font-size:12px;color:var(--text-dim);">
+        ${new Date(d.createdAt).toLocaleDateString("en-US", { dateStyle: "long" })}
+      </div>
+    </div>
+  `;
+
+  // Wire footer buttons
+  document.getElementById("detail-edit").onclick = () => openEditModal(id);
+  document.getElementById("detail-delete").onclick = () => deleteDecision(id);
+  document.getElementById("detail-outcome").onclick = () => openOutcomePrompt(d);
+  document.getElementById("detail-outcome").textContent = d.outcome
+    ? "Update Outcome"
+    : "Log Outcome";
+
+  detailModal.classList.remove("hidden");
+}
+
+function closeDetail() {
+  detailModal.classList.add("hidden");
+}
+
+async function deleteDecision(id) {
+  if (!confirm("Delete this decision? This cannot be undone.")) return;
+  await api.del(`/api/decisions/${id}`);
+  closeDetail();
+  await refresh();
+}
+
+function openOutcomePrompt(d) {
+  closeDetail();
+  setTimeout(() => openEditModal(d.id), 50);
+}
+
+/* ── Event Listeners ─────────────────────────────────────────── */
+document.getElementById("openAddModal").addEventListener("click", openAddModal);
+document.getElementById("closeModal").addEventListener("click", closeAddModal);
+document.getElementById("cancelModal").addEventListener("click", closeAddModal);
+document.getElementById("saveDecision").addEventListener("click", saveDecision);
+document.getElementById("closeDetail").addEventListener("click", closeDetail);
+
+// Close modals on overlay click
+decisionModal.addEventListener("click", (e) => {
+  if (e.target === decisionModal) closeAddModal();
+});
+detailModal.addEventListener("click", (e) => {
+  if (e.target === detailModal) closeDetail();
 });
 
-input.addEventListener('input', autoResize);
-input.addEventListener('keydown', (event) => {
-  if (event.key === 'Enter' && !event.shiftKey) {
-    event.preventDefault();
-    form.requestSubmit();
-  }
-});
-
-if (authForm) {
-  authForm.addEventListener('submit', async (event) => {
-    event.preventDefault();
-    const email = emailInput.value.trim();
-    if (!email) return;
-    loginBtn.disabled = true;
-    authStatus.textContent = 'Sending magic link…';
-    try {
-      const res = await fetch('/api/auth/start', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email }),
-      });
-      const payload = await res.json();
-      if (!res.ok) throw new Error(payload?.error || 'Unable to send magic link.');
-      authStatus.textContent = 'Check your email for the sign-in link.';
-    } catch (err) {
-      authStatus.textContent = err.message || 'Unable to send magic link.';
-    } finally {
-      loginBtn.disabled = false;
-    }
+// Nav buttons
+document.querySelectorAll(".nav-btn").forEach((btn) => {
+  btn.addEventListener("click", () => {
+    document.querySelectorAll(".nav-btn").forEach((b) => b.classList.remove("active"));
+    btn.classList.add("active");
+    currentView = btn.dataset.view;
+    loadDecisions();
   });
-}
-
-if (logoutBtn) {
-  logoutBtn.addEventListener('click', async () => {
-    try { await fetch('/api/auth/logout', { method: 'POST' }); } catch {}
-    setAuthState({ authenticated: false, message: 'Signed out.' });
-  });
-}
-
-clearBtn.addEventListener('click', () => {
-  messages.innerHTML = '';
-  localStorage.removeItem(STORAGE_KEY);
-  addMessage('assistant', 'Chat cleared. Ask a new question when ready.');
-  input.focus();
 });
 
-// ── Init ──────────────────────────────────────────────────────────────────────
-checkHealth();
-setInterval(checkHealth, 30000);
-loadMessages();
-autoResize();
+// Confidence slider
+fConfidence.addEventListener("input", () => {
+  confDisplay.textContent = fConfidence.value;
+});
 
-(async () => {
-  await completeMagicLinkIfPresent();
-  await refreshSession();
-})();
+// Keyboard shortcuts
+document.addEventListener("keydown", (e) => {
+  if (e.key === "Escape") {
+    if (!decisionModal.classList.contains("hidden")) closeAddModal();
+    if (!detailModal.classList.contains("hidden")) closeDetail();
+  }
+  if ((e.metaKey || e.ctrlKey) && e.key === "Enter") {
+    if (!decisionModal.classList.contains("hidden")) saveDecision();
+  }
+});
+
+/* ── Init ────────────────────────────────────────────────────── */
+refresh();
