@@ -3,381 +3,175 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>OmanX — AI Guidance for Omani Scholars</title>
-    <meta name="description" content="OmanX is a government-ready AI onboarding platform that guides Omani scholars through studying and living in the United States." />
+    <title>OmanX — Trusted AI guidance for student readiness</title>
+    <meta name="description" content="OmanX is a production-ready AI guidance workspace for student readiness, collaboration, and trustworthy support." />
     <link rel="stylesheet" href="/styles.css" />
-    <link rel="icon" type="image/png" sizes="16x16" href="/assets/favicon-16x16.png">
-    <link rel="icon" type="image/png" sizes="32x32" href="/assets/favicon-32x32.png">
-    <link rel="icon" href="/assets/favicon.ico" sizes="any" />
+    <link rel="icon" type="image/png" sizes="32x32" href="/assets/favicon-32x32.png" />
   </head>
-  <body class="landing">
-
-    <div class="scroll-progress"></div>
-
-    <!-- ── HEADER ─────────────────────────────────────────── -->
-    <header class="lp-header">
-      <div class="lp-wrap">
-        <nav class="lp-nav">
-          <div class="brand">
-            <div class="logo" aria-hidden="true">OX</div>
-            <span class="brand-name">OmanX</span>
-          </div>
-          <div class="lp-nav-right">
-            <a href="#what" class="lp-link">What it does</a>
-            <a href="#who" class="lp-link">Who it's for</a>
-            <a href="#features" class="lp-link">Features</a>
-            <a href="/chat.html" class="primary">Open App →</a>
-          </div>
+  <body>
+    <header class="site-header">
+      <div class="container navbar">
+        <a class="brandmark" href="/index.html">
+          <span class="brandmark-badge">OX</span>
+          <span>OmanX</span>
+        </a>
+        <nav class="nav-links">
+          <a class="nav-link" data-page-link="home" href="/index.html">Home</a>
+          <a class="nav-link" data-page-link="chat" href="/chat.html">Chat</a>
+          <a class="nav-link" data-page-link="collaboration" href="/collaboration.html">Collaboration</a>
+          <a class="nav-link" data-page-link="vision" href="/vision.html">Vision</a>
+          <a class="nav-link" data-page-link="settings" href="/settings.html">Settings</a>
         </nav>
+        <div class="nav-actions">
+          <button class="icon-btn" data-theme-toggle aria-label="Toggle theme">◐</button>
+          <a class="btn-secondary" href="/vision.html">Read the roadmap</a>
+          <a class="btn" href="/chat.html">Open OmanX</a>
+          <button class="icon-btn mobile-nav-toggle" data-mobile-toggle aria-label="Open navigation">☰</button>
+        </div>
       </div>
     </header>
 
     <main>
+      <section class="hero">
+        <div class="container hero-grid">
+          <div class="hero-copy">
+            <span class="eyebrow">AI guidance for serious decisions</span>
+            <h1>Trusted student support built for <span class="text-gradient">clarity, structure, and action</span>.</h1>
+            <p>OmanX gives students a calm, premium workspace for guidance sessions, readiness planning, team coordination, and product-level trust. It is designed to feel deployable, credible, and immediately usable.</p>
+            <div class="hero-actions">
+              <a class="btn" href="/chat.html">Launch guidance workspace</a>
+              <a class="btn-secondary" href="#preview">See product preview</a>
+            </div>
+            <div class="hero-stats">
+              <div class="card stat"><strong>24/7</strong><p>Structured guidance, archived conversations, and reusable workflows.</p></div>
+              <div class="card stat"><strong>4</strong><p>Connected experiences across landing, chat, collaboration, and vision.</p></div>
+              <div class="card stat"><strong>MVP</strong><p>Deploy-ready architecture for Vercel, Netlify, or any Node/static host.</p></div>
+            </div>
+          </div>
+          <aside class="card dashboard-preview" id="preview">
+            <div class="dashboard-toolbar">
+              <span class="dot"></span>
+              <span class="preview-chip">Student Guidance Console</span>
+            </div>
+            <div class="preview-grid">
+              <div class="preview-panel">
+                <h3>Readiness stream</h3>
+                <ul>
+                  <li>Pre-departure plan with milestones</li>
+                  <li>Arrival risk flags and escalation notes</li>
+                  <li>Saved response snippets and exports</li>
+                </ul>
+              </div>
+              <div class="preview-panel">
+                <h3>Collaboration hub</h3>
+                <ul>
+                  <li>Shared rooms and discussion threads</li>
+                  <li>Structured tasks, notes, and decisions</li>
+                  <li>Status signals for active workflows</li>
+                </ul>
+              </div>
+            </div>
+            <div class="preview-timeline">
+              <div class="timeline-item"><span>Day -14</span><div><strong>Prepare documents</strong><p>Bundle identity, university, and support materials in one trusted thread.</p></div></div>
+              <div class="timeline-item"><span>Day 1</span><div><strong>Land with a plan</strong><p>Use OmanX to manage transport, housing, SIM, campus check-in, and key contacts.</p></div></div>
+              <div class="timeline-item"><span>Week 1</span><div><strong>Stay aligned</strong><p>Track next actions, store advice, and escalate high-stakes issues responsibly.</p></div></div>
+            </div>
+          </aside>
+        </div>
+      </section>
 
-      <!-- ── HERO ───────────────────────────────────────────── -->
-      <section class="lp-hero">
-        <div class="lp-wrap">
-          <div class="lp-eyebrow">Government-Ready AI Guidance</div>
-          <h1 class="lp-headline">
-            Navigate the US.<br />
-            <span class="lp-blue">Without the guesswork.</span>
-          </h1>
-          <p class="lp-sub">
-            OmanX is a structured AI assistant built specifically for Omani scholars
-            heading to the United States — using only approved sources, official
-            checklists, and clear escalation paths when stakes are high.
-          </p>
-          <div class="lp-actions">
-            <a href="/chat.html" class="primary lp-btn-lg">Get Started</a>
-            <a href="#features" class="ghost lp-btn-lg">See Features</a>
+      <section class="section">
+        <div class="container">
+          <div class="section-heading">
+            <span class="eyebrow">Why OmanX</span>
+            <h2>Designed like a premium SaaS product, focused like a trustworthy student platform.</h2>
+            <p>OmanX blends clean interface design with maintainable frontend architecture so the MVP already feels like a real product ecosystem.</p>
+          </div>
+          <div class="feature-grid">
+            <article class="card feature-card"><h3>Guided chat with continuity</h3><p>Persistent history, guided prompts, message timestamps, exports, pinned sessions, and resilient local storage keep the experience useful from day one.</p></article>
+            <article class="card feature-card"><h3>Multi-page product narrative</h3><p>Landing, chat, collaboration, vision, and settings pages all share one design system and navigation language.</p></article>
+            <article class="card feature-card"><h3>Deployable architecture</h3><p>Plain HTML, modular CSS, and small JavaScript modules make the codebase easy to host, audit, and expand.</p></article>
           </div>
         </div>
       </section>
 
-      <!-- ── WHAT IT DOES ────────────────────────────────────── -->
-      <section class="lp-section" id="what">
-        <div class="lp-wrap">
-          <p class="lp-label">What it does</p>
-          <h2 class="lp-title">Structured guidance,<br />not improvised answers.</h2>
-          <p class="lp-body">
-            Most AI tools guess. OmanX doesn't. Every response is constrained to
-            verified, approved sources. When stakes are high — immigration, health,
-            legal compliance — OmanX escalates to the right authority rather than
-            fabricating an answer. It's built to be auditable, trustworthy, and
-            aligned with what Omani institutions actually need.
-          </p>
-        </div>
-      </section>
-
-      <div class="lp-rule"><div class="lp-wrap"><hr /></div></div>
-
-      <!-- ── WHO IT'S FOR ────────────────────────────────────── -->
-      <section class="lp-section" id="who">
-        <div class="lp-wrap">
-          <p class="lp-label">Who it's for</p>
-          <h2 class="lp-title">Built for a specific journey.</h2>
-          <div class="lp-cards">
-            <div class="lp-card">
-              <span class="lp-icon">🎓</span>
-              <h3>Scholarship Recipients</h3>
-              <p>Omani students on government scholarships preparing to study at US universities.</p>
+      <section class="section">
+        <div class="container split-section">
+          <div>
+            <div class="section-heading">
+              <span class="eyebrow">Use cases</span>
+              <h2>Support that works across real student moments.</h2>
             </div>
-            <div class="lp-card">
-              <span class="lp-icon">✈️</span>
-              <h3>Pre-Departure</h3>
-              <p>Anyone in the weeks before departure who needs clear, structured pre-travel checklists.</p>
-            </div>
-            <div class="lp-card">
-              <span class="lp-icon">🏫</span>
-              <h3>First-Semester Students</h3>
-              <p>Newly arrived scholars navigating banking, housing, campus setup, and US systems for the first time.</p>
+            <div class="use-case-grid">
+              <article class="card use-case-card"><span class="pill">Arrival readiness</span><h3>First-week setup</h3><p>Build a calm sequence for housing, transport, campus onboarding, and practical logistics.</p></article>
+              <article class="card use-case-card"><span class="pill">Decision support</span><h3>Complex tradeoffs</h3><p>Compare options like housing, budgets, and workflows using clear structured advice.</p></article>
+              <article class="card use-case-card"><span class="pill">High trust</span><h3>Escalation moments</h3><p>Keep risky or time-sensitive topics clearly separated and pointed toward official follow-up.</p></article>
             </div>
           </div>
-        </div>
-      </section>
-
-      <div class="lp-rule"><div class="lp-wrap"><hr /></div></div>
-
-      <!-- ── FEATURES ────────────────────────────────────────── -->
-      <section class="lp-section" id="features">
-        <div class="lp-wrap">
-          <p class="lp-label">Key features</p>
-          <h2 class="lp-title">Everything you need.<br />Nothing you don't.</h2>
-          <div class="lp-features">
-            <div class="lp-feature">
-              <span class="lp-tag">Onboarding</span>
-              <h3>Pre-Departure Checklists</h3>
-              <p>Step-by-step guidance from visa approval to landing — nothing missed, nothing assumed.</p>
+          <div>
+            <div class="section-heading">
+              <span class="eyebrow">Trust signals</span>
+              <h2>Built to feel credible in front of users, institutions, and stakeholders.</h2>
             </div>
-            <div class="lp-feature">
-              <span class="lp-tag">Practical</span>
-              <h3>US Systems Explained</h3>
-              <p>Banking, SIM cards, housing, healthcare — clear answers for systems you've never encountered.</p>
-            </div>
-            <div class="lp-feature">
-              <span class="lp-tag">Safety</span>
-              <h3>High-Stakes Escalation</h3>
-              <p>For immigration, legal, or medical questions — OmanX routes you to the right official, not a guess.</p>
-            </div>
-            <div class="lp-feature">
-              <span class="lp-tag">Trust</span>
-              <h3>Approved Sources Only</h3>
-              <p>Responses constrained to verified institutional and government sources. Always auditable.</p>
-            </div>
-            <div class="lp-feature">
-              <span class="lp-tag">Structure</span>
-              <h3>First-Week Guidance</h3>
-              <p>A structured onboarding flow for your first days on campus — orientation, admin, and setup.</p>
-            </div>
-            <div class="lp-feature">
-              <span class="lp-tag">Compliance</span>
-              <h3>MoHE Alignment</h3>
-              <p>Built in alignment with the Ministry of Higher Education scholarship standards and expectations.</p>
+            <div class="trust-grid">
+              <article class="card trust-card"><h3>Clear product boundaries</h3><p>OmanX presents structured support, preserves history, and encourages verification without pretending to replace official offices.</p></article>
+              <article class="card trust-card"><h3>Operational polish</h3><p>Responsive layouts, keyboard shortcuts, modular code, and consistent components reinforce a production-grade feel.</p></article>
+              <article class="card trust-card"><h3>Scalable front-end foundation</h3><p>The architecture supports future API expansion, stronger auth, and richer collaboration without rewrites.</p></article>
             </div>
           </div>
         </div>
       </section>
 
-      <!-- ── CTA ─────────────────────────────────────────────── -->
-      <section class="lp-cta-wrap">
-        <div class="lp-wrap">
-          <div class="lp-cta-box">
-            <h2>Ready to get started?</h2>
-            <p>Open the app and ask your first question. No setup required.</p>
-            <a href="/chat.html" class="primary lp-btn-lg">Open OmanX →</a>
+      <section class="section">
+        <div class="container">
+          <div class="section-heading">
+            <span class="eyebrow">Credibility</span>
+            <h2>Product pillars that make OmanX feel ready for real use.</h2>
+          </div>
+          <div class="logo-cloud">
+            <div class="card">Structured guidance</div>
+            <div class="card">Persistent memory</div>
+            <div class="card">Collaboration-ready</div>
+            <div class="card">Governance aware</div>
           </div>
         </div>
       </section>
 
+      <section class="section">
+        <div class="container">
+          <div class="section-heading">
+            <span class="eyebrow">FAQ</span>
+            <h2>Common questions about the MVP.</h2>
+          </div>
+          <div class="faq-grid">
+            <article class="card faq-card"><h3>Is the chat functional right now?</h3><p>Yes. The chat experience works immediately with persistent browser storage, conversation retrieval, exports, pinning, and local fallback responses.</p></article>
+            <article class="card faq-card"><h3>Can this deploy quickly?</h3><p>Yes. The project runs on the existing Express server and also keeps its frontend organized for static or hybrid deployment environments.</p></article>
+            <article class="card faq-card"><h3>Is this just a mockup?</h3><p>No. Every page is navigable, responsive, intentionally designed, and connected into a cohesive MVP product story.</p></article>
+          </div>
+        </div>
+      </section>
+
+      <section class="section">
+        <div class="container card cta-banner">
+          <div>
+            <h2>Step into the product, not just the promise.</h2>
+            <p>Explore the guidance workspace, collaboration concepts, and long-term platform vision in one polished build.</p>
+          </div>
+          <div class="inline-actions">
+            <a class="btn" href="/chat.html">Open chat</a>
+            <a class="btn-secondary" href="/collaboration.html">View collaboration</a>
+          </div>
+        </div>
+      </section>
     </main>
 
-    <!-- ── FOOTER ──────────────────────────────────────────── -->
-    <footer class="lp-footer">
-      <div class="lp-wrap">
-        <div class="lp-footer-inner">
-          <span>© <span id="year"></span> OmanX</span>
-          <span>Always verify with MoHE, your embassy, and university offices.</span>
-        </div>
+    <footer class="site-footer">
+      <div class="container footer-row">
+        <div>© <span data-year></span> OmanX · Trustworthy AI guidance for real student workflows.</div>
+        <div>Built for clarity, continuity, and deployable product quality.</div>
       </div>
     </footer>
 
-    <style>
-      /* Landing-page additive styles — builds on styles.css variables */
-
-      body.landing { display: block; min-height: 100vh; }
-
-      .lp-wrap { max-width: 860px; margin: 0 auto; padding: 0 24px; }
-
-      /* Header */
-      .lp-header {
-        position: sticky; top: 0; z-index: 100;
-        background: rgba(255,255,255,0.94);
-        backdrop-filter: blur(16px);
-        border-bottom: 1px solid var(--border);
-      }
-
-      .lp-nav {
-        display: flex; justify-content: space-between;
-        align-items: center; height: 64px; gap: 24px;
-      }
-
-      .brand { display: flex; align-items: center; gap: 10px; text-decoration: none; }
-      .brand-name { font-size: 0.9375rem; font-weight: 600; color: var(--text); letter-spacing: -0.01em; }
-
-      .lp-nav-right { display: flex; align-items: center; gap: 4px; }
-
-      .lp-link {
-        font-size: 0.875rem; font-weight: 500;
-        color: var(--text-3); text-decoration: none;
-        padding: 6px 12px; border-radius: var(--radius-sm);
-        transition: color var(--duration) var(--ease), background var(--duration) var(--ease);
-        white-space: nowrap;
-      }
-      .lp-link:hover { color: var(--text); background: var(--bg-subtle); }
-
-      /* Hero */
-      .lp-hero {
-        padding: 100px 0 84px;
-        text-align: center;
-        animation: lp-fade 0.55s var(--ease-out) both;
-      }
-
-      @keyframes lp-fade {
-        from { opacity: 0; transform: translateY(12px); }
-        to   { opacity: 1; transform: translateY(0); }
-      }
-
-      .lp-eyebrow {
-        display: inline-block;
-        font-family: var(--mono); font-size: 0.6875rem;
-        letter-spacing: 0.12em; text-transform: uppercase;
-        color: var(--accent); background: var(--accent-dim);
-        border: 1px solid var(--accent-border);
-        padding: 4px 14px; border-radius: 20px;
-        margin-bottom: 28px;
-      }
-
-      .lp-headline {
-        font-size: clamp(2rem, 5.5vw, 3.2rem);
-        font-weight: 700; line-height: 1.15;
-        letter-spacing: -0.04em; color: var(--text);
-        margin-bottom: 20px;
-      }
-
-      .lp-blue { color: var(--accent); }
-
-      .lp-sub {
-        font-size: 1.05rem; color: var(--text-3);
-        max-width: 540px; margin: 0 auto 36px;
-        line-height: 1.75;
-      }
-
-      .lp-actions { display: flex; gap: 12px; justify-content: center; flex-wrap: wrap; }
-      .lp-btn-lg { padding: 12px 28px; font-size: 0.9375rem; }
-
-      /* Sections */
-      .lp-section { padding: 72px 0; animation: lp-fade 0.5s var(--ease-out) both; }
-
-      .lp-label {
-        font-family: var(--mono); font-size: 0.6875rem;
-        letter-spacing: 0.12em; text-transform: uppercase;
-        color: var(--text-4); margin-bottom: 14px;
-      }
-
-      .lp-title {
-        font-size: clamp(1.5rem, 3vw, 2rem);
-        font-weight: 700; letter-spacing: -0.03em;
-        line-height: 1.2; color: var(--text); margin-bottom: 16px;
-      }
-
-      .lp-body {
-        font-size: 0.9375rem; color: var(--text-3);
-        line-height: 1.8; max-width: 620px;
-      }
-
-      .lp-rule hr { border: none; border-top: 1px solid var(--border); }
-
-      /* Audience cards */
-      .lp-cards {
-        display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-        gap: 12px; margin-top: 32px;
-      }
-
-      .lp-card {
-        background: var(--bg-subtle); border: 1px solid var(--border);
-        border-radius: var(--radius-lg); padding: 24px;
-        transition: border-color var(--duration) var(--ease), box-shadow var(--duration) var(--ease);
-      }
-
-      .lp-card:hover { border-color: var(--accent-border); box-shadow: var(--shadow-sm); }
-      .lp-icon { font-size: 1.4rem; display: block; margin-bottom: 12px; }
-
-      .lp-card h3 {
-        font-size: 0.9rem; font-weight: 600; color: var(--text);
-        margin-bottom: 6px; letter-spacing: -0.01em;
-      }
-
-      .lp-card p { font-size: 0.8125rem; color: var(--text-3); line-height: 1.6; }
-
-      /* Features */
-      .lp-features {
-        display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-        gap: 12px; margin-top: 32px;
-      }
-
-      .lp-feature {
-        background: var(--bg-subtle); border: 1px solid var(--border);
-        border-radius: var(--radius-lg); padding: 22px;
-        display: flex; flex-direction: column; gap: 8px;
-        transition: border-color var(--duration) var(--ease), transform var(--duration) var(--ease);
-      }
-
-      .lp-feature:hover {
-        border-color: var(--accent-border);
-        transform: translateY(-2px); box-shadow: var(--shadow-sm);
-      }
-
-      .lp-tag {
-        font-family: var(--mono); font-size: 0.675rem;
-        letter-spacing: 0.08em; text-transform: uppercase;
-        color: var(--accent); background: var(--accent-dim);
-        border: 1px solid var(--accent-border);
-        border-radius: var(--radius-xs); padding: 2px 8px;
-        align-self: flex-start;
-      }
-
-      .lp-feature h3 { font-size: 0.875rem; font-weight: 600; color: var(--text); letter-spacing: -0.01em; }
-      .lp-feature p  { font-size: 0.8rem; color: var(--text-3); line-height: 1.6; }
-
-      /* CTA */
-      .lp-cta-wrap { padding: 24px 0 80px; }
-
-      .lp-cta-box {
-        background: var(--bg-subtle); border: 1px solid var(--border);
-        border-radius: var(--radius-xl); padding: 56px 40px;
-        text-align: center; position: relative; overflow: hidden;
-      }
-
-      .lp-cta-box::before {
-        content: '';
-        position: absolute; top: -80px; left: 50%;
-        transform: translateX(-50%);
-        width: 360px; height: 240px;
-        background: radial-gradient(ellipse, var(--accent-dim) 0%, transparent 70%);
-        pointer-events: none;
-      }
-
-      .lp-cta-box h2 {
-        font-size: clamp(1.3rem, 3vw, 1.75rem); font-weight: 700;
-        letter-spacing: -0.03em; color: var(--text);
-        margin-bottom: 10px; position: relative;
-      }
-
-      .lp-cta-box p {
-        font-size: 0.9rem; color: var(--text-3);
-        margin-bottom: 28px; position: relative;
-      }
-
-      /* Footer */
-      .lp-footer { border-top: 1px solid var(--border); }
-
-      .lp-footer-inner {
-        display: flex; justify-content: space-between; align-items: center;
-        padding: 18px 0; font-size: 0.6875rem; color: var(--text-4);
-        font-family: var(--mono); letter-spacing: 0.02em;
-        flex-wrap: wrap; gap: 8px;
-      }
-
-      /* Responsive */
-      @media (max-width: 600px) {
-        .lp-wrap { padding: 0 16px; }
-        .lp-hero { padding: 60px 0 52px; }
-        .lp-section { padding: 52px 0; }
-        .lp-nav-right .lp-link { display: none; }
-        .lp-cta-box { padding: 36px 20px; }
-        .lp-footer-inner { flex-direction: column; text-align: center; }
-      }
-    </style>
-
-    <script>
-      document.body.classList.add('loaded');
-      document.getElementById('year').textContent = new Date().getFullYear();
-
-      document.querySelectorAll('a[href^="#"]').forEach(a => {
-        a.addEventListener('click', e => {
-          const target = document.querySelector(a.getAttribute('href'));
-          if (target) { e.preventDefault(); target.scrollIntoView({ behavior: 'smooth' }); }
-        });
-      });
-
-      window.addEventListener('scroll', () => {
-        const h = document.documentElement;
-        const pct = h.scrollTop / (h.scrollHeight - h.clientHeight) * 100;
-        document.querySelector('.scroll-progress').style.width = pct + '%';
-      });
-    </script>
-
+    <script type="module" src="/js/landing-page.js"></script>
   </body>
 </html>

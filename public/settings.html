@@ -1,0 +1,78 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>OmanX — Workspace settings</title>
+    <meta name="description" content="Workspace settings and mock account preferences for OmanX." />
+    <link rel="stylesheet" href="/styles.css" />
+  </head>
+  <body>
+    <header class="site-header">
+      <div class="container navbar">
+        <a class="brandmark" href="/index.html"><span class="brandmark-badge">OX</span><span>OmanX</span></a>
+        <nav class="nav-links">
+          <a class="nav-link" data-page-link="home" href="/index.html">Home</a>
+          <a class="nav-link" data-page-link="chat" href="/chat.html">Chat</a>
+          <a class="nav-link" data-page-link="collaboration" href="/collaboration.html">Collaboration</a>
+          <a class="nav-link" data-page-link="vision" href="/vision.html">Vision</a>
+          <a class="nav-link" data-page-link="settings" href="/settings.html">Settings</a>
+        </nav>
+        <div class="nav-actions">
+          <button class="icon-btn" data-theme-toggle aria-label="Toggle theme">◐</button>
+          <a class="btn" href="/chat.html">Back to chat</a>
+        </div>
+      </div>
+    </header>
+
+    <main class="page-shell">
+      <section class="container section-heading">
+        <span class="eyebrow">Settings</span>
+        <h1>Configure your OmanX workspace preferences.</h1>
+        <p>This mock account layer makes the MVP feel complete and supports personalized labels across the chat interface.</p>
+      </section>
+
+      <section class="container">
+        <form class="settings-grid" data-settings-form>
+          <article class="card settings-card">
+            <h3>Profile basics</h3>
+            <p class="muted">Used for workspace personalization.</p>
+            <div style="display:grid; gap:12px; margin-top:16px;">
+              <label>Display name<input class="sidebar-search" name="studentName" type="text" /></label>
+              <label>Campus or program<input class="sidebar-search" name="homeCampus" type="text" /></label>
+              <label>Current priority<input class="sidebar-search" name="priority" type="text" /></label>
+            </div>
+          </article>
+          <article class="card settings-card">
+            <h3>Preferences</h3>
+            <div style="display:grid; gap:14px; margin-top:16px;">
+              <label><input type="checkbox" name="notifications" /> Enable toast confirmations</label>
+              <label><input type="checkbox" name="conciseMode" /> Prefer concise assistant responses</label>
+            </div>
+          </article>
+          <article class="card settings-card">
+            <h3>Workspace notes</h3>
+            <p>OmanX stores MVP preferences locally in your browser for immediate usability and zero setup.</p>
+            <button class="btn" style="margin-top:16px;" type="submit">Save settings</button>
+          </article>
+        </form>
+      </section>
+    </main>
+
+    <nav class="mobile-bottom-nav">
+      <a data-page-link="home" href="/index.html">Home</a>
+      <a data-page-link="chat" href="/chat.html">Chat</a>
+      <a data-page-link="collaboration" href="/collaboration.html">Workspaces</a>
+      <a data-page-link="vision" href="/vision.html">Vision</a>
+    </nav>
+
+    <footer class="site-footer">
+      <div class="container footer-row">
+        <div>© <span data-year></span> OmanX settings</div>
+        <div>Personalization without complexity.</div>
+      </div>
+    </footer>
+
+    <script type="module" src="/js/settings-page.js"></script>
+  </body>
+</html>
