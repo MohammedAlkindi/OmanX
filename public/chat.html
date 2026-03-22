@@ -3,294 +3,81 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>OmanX — Chat</title>
-    <meta name="description" content="AI guidance for Omani scholars and everyday questions." />
+    <title>OmanX — Guidance workspace</title>
+    <meta name="description" content="OmanX chat workspace with persistent history, quick prompts, and deployable MVP interactions." />
     <link rel="stylesheet" href="/styles.css" />
-    <link rel="icon" type="image/png" sizes="16x16" href="/assets/favicon-16x16.png">
-    <link rel="icon" type="image/png" sizes="32x32" href="/assets/favicon-32x32.png">
-    <link rel="icon" href="/assets/favicon.ico" sizes="any" />
   </head>
   <body>
-    <div class="scroll-progress"></div>
+    <header class="site-header">
+      <div class="container navbar">
+        <a class="brandmark" href="/index.html"><span class="brandmark-badge">OX</span><span>OmanX</span></a>
+        <nav class="nav-links">
+          <a class="nav-link" data-page-link="home" href="/index.html">Home</a>
+          <a class="nav-link" data-page-link="chat" href="/chat.html">Chat</a>
+          <a class="nav-link" data-page-link="collaboration" href="/collaboration.html">Collaboration</a>
+          <a class="nav-link" data-page-link="vision" href="/vision.html">Vision</a>
+          <a class="nav-link" data-page-link="settings" href="/settings.html">Settings</a>
+        </nav>
+        <div class="nav-actions">
+          <button class="icon-btn" data-theme-toggle aria-label="Toggle theme">◐</button>
+          <button class="icon-btn mobile-nav-toggle" data-sidebar-toggle aria-label="Open chat history">☰</button>
+        </div>
+      </div>
+    </header>
 
-    <main class="shell">
-
-      <!-- ── TOPBAR ─────────────────────────────────────────── -->
-      <header class="topbar">
-        <div class="topbar-left">
-          <a href="/" class="btn-icon" aria-label="Back to home" title="Back to home">
-            <svg viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
-              <path d="M10 3L5 8L10 13" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
-            </svg>
-          </a>
-          <div class="topbar-divider"></div>
-          <div class="brand">
-            <div class="logo" aria-hidden="true">OX</div>
-            <div class="brand-text">
-              <h1>OmanX</h1>
-              <p>AI guidance for Omani scholars and everyday questions.</p>
+    <main class="page-shell">
+      <div class="container app-layout">
+        <aside class="card sidebar" data-chat-sidebar>
+          <div class="sidebar-header">
+            <div>
+              <div class="sidebar-section-title">Conversations</div>
+              <h3>Guidance history</h3>
             </div>
+            <button class="btn" data-new-chat>New chat</button>
           </div>
-        </div>
-        <span class="status-pill" id="statusPill" aria-label="Service status">
-          <span class="dot" aria-hidden="true"></span>
-          <span class="pill-text">Online</span>
-        </span>
-      </header>
+          <input class="sidebar-search" data-chat-search type="search" placeholder="Search chats, themes, or notes" />
+          <div class="row-between muted"><span>Persistent local workspace</span><span>Ready offline</span></div>
+          <div class="chat-list" data-chat-list></div>
+        </aside>
 
-      <!-- Auth panel — hidden until auth is re-enabled -->
-      <section class="auth-panel" id="authPanel" hidden>
-        <form id="authForm" class="auth-form">
-          <label for="emailInput">Sign in with your university or personal email</label>
-          <div class="auth-actions">
-            <input id="emailInput" type="email" placeholder="name@example.com" required />
-            <button id="loginBtn" class="primary" type="submit">Send Magic Link</button>
-            <button id="logoutBtn" class="ghost" type="button" hidden>Log out</button>
-          </div>
-        </form>
-        <p id="authStatus" class="auth-status">Sign in to access personalized compliance guidance.</p>
-      </section>
+        <section class="card assistant-shell">
+          <header class="card chat-header">
+            <div>
+              <div class="eyebrow">Core product experience</div>
+              <h1 data-chat-title>Guidance workspace</h1>
+              <p data-chat-subtitle>Persistent conversation state with premium UI patterns.</p>
+            </div>
+            <div class="chat-actions-wrap">
+              <button class="btn-secondary" data-copy-last>Copy last answer</button>
+              <button class="btn-secondary" data-export-chat>Export</button>
+              <button class="btn-secondary" data-rename-chat>Rename</button>
+              <button class="btn-ghost" data-delete-chat>Delete</button>
+            </div>
+          </header>
 
-      <section class="assistant-panel">
-        <div class="status-banner" id="statusBanner" role="status" hidden>
-          <span class="status-banner-text">
-            Service unavailable. We will not guess — please contact the relevant office.
-          </span>
-        </div>
+          <section class="chat-body" data-message-list></section>
 
-        <!-- ── CHAT HEAD ───────────────────────────────────── -->
-        <div class="chat-head">
-          <h2>Chat</h2>
-          <div class="chat-head-actions">
-            <button class="btn-icon" id="copyBtn" aria-label="Copy last response" title="Copy last response">
-              <svg viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
-                <rect x="5" y="5" width="8" height="9" rx="1.5" stroke="currentColor" stroke-width="1.4"/>
-                <path d="M3 11V3.5A1.5 1.5 0 014.5 2H11" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/>
-              </svg>
-            </button>
-            <button class="btn-icon" id="newChatBtn" aria-label="New chat" title="New chat">
-              <svg viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
-                <path d="M8 3v10M3 8h10" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
-              </svg>
-            </button>
-            <button class="ghost chat-head-clear" id="clearBtn" type="button">Clear</button>
-          </div>
-        </div>
-
-        <div id="chat" class="chat-scroll" role="log" aria-live="polite" aria-relevant="additions">
-          <div class="messages" id="messages"></div>
-        </div>
-
-        <!-- ── COMPOSER ────────────────────────────────────── -->
-        <form id="form" class="composer">
-          <div class="composer-inner">
-            <textarea
-              id="input"
-              rows="1"
-              placeholder="Ask a question…"
-              aria-label="Message input"
-            ></textarea>
-            <button id="send" class="send-btn" type="submit" aria-label="Send message">
-              <svg viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
-                <path d="M1 8L14 8M14 8L8 2M14 8L8 14" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
-              </svg>
-            </button>
-          </div>
-          <div class="composer-meta">
-            <span class="hint">
-              <kbd>Enter</kbd> send · <kbd>Shift</kbd>+<kbd>Enter</kbd> newline
-            </span>
-          </div>
-        </form>
-
-        <p class="disclaimer">
-          Informational guidance only. Always verify with official institutions for
-          legal, immigration, or medical matters.
-        </p>
-      </section>
+          <form class="composer" data-chat-form>
+            <div class="card composer-box">
+              <textarea data-chat-input placeholder="Ask OmanX for a checklist, decision memo, or safe next-step plan."></textarea>
+              <div class="composer-footer">
+                <div class="status-inline"><i></i><span>Local-first persistence, API-backed when available.</span></div>
+                <div>Press <span class="kbd">Enter</span> to send · <span class="kbd">Shift + Enter</span> for a new line</div>
+                <button class="btn" type="submit">Send message</button>
+              </div>
+            </div>
+          </form>
+        </section>
+      </div>
     </main>
 
-    <footer class="footer">
-      <span>© <span id="year"></span> OmanX</span>
-      <span>Verify with MoHE, embassy, and university offices.</span>
-    </footer>
+    <nav class="mobile-bottom-nav">
+      <a data-page-link="home" href="/index.html">Home</a>
+      <a data-page-link="chat" href="/chat.html">Chat</a>
+      <a data-page-link="collaboration" href="/collaboration.html">Workspaces</a>
+      <a data-page-link="vision" href="/vision.html">Vision</a>
+    </nav>
 
-    <!-- ── SCROLL TO TOP ─────────────────────────────────────── -->
-    <button class="scroll-top-btn" id="scrollTopBtn" aria-label="Scroll to top" title="Scroll to top" hidden>
-      <svg viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
-        <path d="M3 10L8 5L13 10" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
-      </svg>
-    </button>
-
-    <!-- ── TOAST ─────────────────────────────────────────────── -->
-    <div class="toast" id="toast" aria-live="polite"></div>
-
-    <style>
-      /* ── Fix horizontal scroll ── */
-      html, body { overflow-x: hidden; max-width: 100%; }
-
-      /* ── Topbar left ── */
-      .topbar-left {
-        display: flex;
-        align-items: center;
-        gap: 10px;
-        min-width: 0;
-        overflow: hidden;
-      }
-
-      .topbar-divider {
-        width: 1px;
-        height: 20px;
-        background: var(--border-medium);
-        flex-shrink: 0;
-      }
-
-      /* ── Icon button ── */
-      .btn-icon {
-        width: 32px; height: 32px;
-        display: grid; place-items: center;
-        border-radius: var(--radius-md);
-        border: 1px solid var(--border-medium);
-        background: transparent;
-        color: var(--text-tertiary);
-        cursor: pointer;
-        text-decoration: none;
-        flex-shrink: 0;
-        transition: background var(--duration-150) var(--ease-out-cubic),
-                    border-color var(--duration-150) var(--ease-out-cubic),
-                    color var(--duration-150) var(--ease-out-cubic);
-      }
-
-      .btn-icon svg { width: 14px; height: 14px; }
-
-      .btn-icon:hover {
-        background: var(--gray-800);
-        border-color: var(--border-heavy);
-        color: var(--text-primary);
-      }
-
-      .btn-icon:active { transform: scale(0.95); }
-
-      /* ── Chat head actions ── */
-      .chat-head-actions {
-        display: flex;
-        align-items: center;
-        gap: 6px;
-      }
-
-      .chat-head-clear {
-        padding: 6px 12px;
-        font-size: 0.8rem;
-      }
-
-      /* ── Scroll to top ── */
-      .scroll-top-btn {
-        position: fixed;
-        bottom: 100px; right: 24px;
-        width: 36px; height: 36px;
-        display: grid; place-items: center;
-        border-radius: 50%;
-        border: 1px solid var(--border-medium);
-        background: var(--gray-850);
-        color: var(--text-secondary);
-        cursor: pointer;
-        z-index: 200;
-        box-shadow: var(--shadow-md);
-        transition: background var(--duration-150) var(--ease-out-cubic),
-                    transform var(--duration-150) var(--ease-out-cubic),
-                    box-shadow var(--duration-150) var(--ease-out-cubic);
-      }
-
-      .scroll-top-btn svg { width: 14px; height: 14px; }
-
-      .scroll-top-btn:hover {
-        background: var(--gray-800);
-        transform: translateY(-2px);
-        box-shadow: var(--shadow-lg);
-      }
-
-      .scroll-top-btn[hidden] { display: none; }
-
-      /* ── Toast ── */
-      .toast {
-        position: fixed;
-        bottom: 24px; left: 50%;
-        transform: translateX(-50%) translateY(8px);
-        background: var(--gray-750);
-        color: var(--text-primary);
-        font-family: var(--font-mono);
-        font-size: 0.75rem;
-        padding: 8px 16px;
-        border-radius: var(--radius-full);
-        border: 1px solid var(--border-medium);
-        box-shadow: var(--shadow-md);
-        opacity: 0;
-        pointer-events: none;
-        transition: opacity var(--duration-200) var(--ease-out-cubic),
-                    transform var(--duration-200) var(--ease-out-cubic);
-        z-index: 300;
-        white-space: nowrap;
-      }
-
-      .toast.show {
-        opacity: 1;
-        transform: translateX(-50%) translateY(0);
-      }
-
-      /* ── Responsive ── */
-      @media (max-width: 640px) {
-        .scroll-top-btn { right: 16px; bottom: 90px; }
-        .topbar-divider { display: none; }
-        .brand-text p   { display: none; }
-      }
-    </style>
-
-    <script>
-      document.getElementById('year').textContent = new Date().getFullYear();
-
-      // ── Scroll to top ────────────────────────────────────────
-      const scrollTopBtn = document.getElementById('scrollTopBtn');
-      const chatScroll   = document.getElementById('chat');
-
-      chatScroll.addEventListener('scroll', () => {
-        scrollTopBtn.hidden = chatScroll.scrollTop < 200;
-      });
-
-      scrollTopBtn.addEventListener('click', () => {
-        chatScroll.scrollTo({ top: 0, behavior: 'smooth' });
-      });
-
-      // ── Toast ────────────────────────────────────────────────
-      function showToast(msg) {
-        const toast = document.getElementById('toast');
-        toast.textContent = msg;
-        toast.classList.add('show');
-        setTimeout(() => toast.classList.remove('show'), 2200);
-      }
-
-      // ── Copy last response ───────────────────────────────────
-      document.getElementById('copyBtn').addEventListener('click', () => {
-        const bubbles = document.querySelectorAll('.msg.bot .bubble');
-        if (!bubbles.length) { showToast('Nothing to copy yet'); return; }
-        const last = bubbles[bubbles.length - 1].textContent.trim();
-        navigator.clipboard.writeText(last)
-          .then(() => showToast('Copied to clipboard'))
-          .catch(() => showToast('Copy failed'));
-      });
-
-      // ── New chat ─────────────────────────────────────────────
-      document.getElementById('newChatBtn').addEventListener('click', () => {
-        if (!confirm('Start a new chat? This will clear the current conversation.')) return;
-        document.getElementById('messages').innerHTML = '';
-        localStorage.removeItem('omanx.chat.messages.v1');
-        if (typeof addMessage === 'function') {
-          addMessage('assistant', 'New chat started. Ask a question to begin.');
-        }
-        document.getElementById('input').focus();
-        showToast('New chat started');
-      });
-    </script>
-
-    <script src="/app.js"></script>
+    <script type="module" src="/js/chat-page.js"></script>
   </body>
 </html>

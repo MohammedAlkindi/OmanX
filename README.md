@@ -1,35 +1,90 @@
-# OmanX.org
+# OmanX MVP
 
-**OmanX** is a government-ready AI onboarding platform built to guide Omani scholars through studying and living in the United States with clarity, safety, and official alignment.
+OmanX is a polished, deployable MVP for an AI-powered student guidance platform. The product includes a premium landing page, a local-first chat workspace with persistent history, a collaboration concept page, a vision and roadmap page, and workspace settings for light personalization.
 
-## What it is
-A structured digital assistant that combines approved knowledge, step-by-step checklists, and constrained AI guidance to support students from pre-departure through their first semester in the U.S.
+## Product overview
 
-## Focus
-- Pre-departure and arrival checklists  
-- First-week and first-semester onboarding  
-- U.S. systems (banking, housing, connectivity, campus setup)  
-- High-stakes escalation (immigration, health, compliance)  
-- Clear references to official and institutional sources  
+### Pages
+- `public/index.html` — investor-ready landing page and product story
+- `public/chat.html` — core guidance workspace with persistent chat history
+- `public/collaboration.html` — shared workspace and workflow concepts
+- `public/vision.html` — mission, roadmap, trust, and product pillars
+- `public/settings.html` — local workspace preferences and mock account state
 
-## Philosophy
-No guessing. No noise.  
-Guidance is constrained to approved sources, designed for auditability, and built to escalate—not improvise—when stakes are high.
+### MVP capabilities
+- Multi-page navigation with a shared design system
+- Responsive layouts for desktop and mobile
+- Theme toggle with persistent preference
+- Persistent chat history in `localStorage`
+- New, rename, delete, pin, search, copy, and export chat sessions
+- Keyboard-friendly composer with `Enter` to send
+- Local-first assistant replies with optional `/api/chat` fallback when available
+- Modular JavaScript architecture for maintainability
 
-## Status
-Pilot MVP in active development.
+## Project structure
 
----
-OmanX.org • Structured guidance for Omani scholars abroad
+```text
+.
+├── api/                      # Optional backend/serverless handlers
+├── auth/                     # Authentication utilities from the original backend
+├── config/                   # Environment configuration for the Node server
+├── data/                     # Structured knowledge content
+├── docs/                     # Supporting documentation
+├── public/
+│   ├── assets/               # Favicons and static assets
+│   ├── js/
+│   │   ├── core.js           # Shared UI helpers and app shell behavior
+│   │   ├── chat-store.js     # Local persistence for chats and settings
+│   │   ├── chat-page.js      # Chat page interactions and fallback assistant logic
+│   │   ├── landing-page.js   # Landing page boot logic
+│   │   ├── collaboration-page.js
+│   │   ├── vision-page.js
+│   │   └── settings-page.js
+│   ├── index.html
+│   ├── chat.html
+│   ├── collaboration.html
+│   ├── vision.html
+│   ├── settings.html
+│   └── styles.css           # Shared design system and responsive UI styles
+├── server.js                 # Express server for local development / Node deployment
+├── package.json
+└── vercel.json
+```
 
+## Running locally
 
-## Authentication
-OmanX now supports passwordless authentication (magic link) for protected API access.
+### Option 1: Node / Express
+1. Install dependencies:
+   ```bash
+   npm install
+   ```
+2. Start the app:
+   ```bash
+   npm start
+   ```
+3. Open `http://localhost:3000`.
 
-- Start sign-in: `POST /api/auth/start`
-- Verify callback token: `POST /api/auth/verify`
-- Check session: `GET /api/auth/session`
-- Logout: `POST /api/auth/logout`
-- Protected endpoint example: `POST /api/chat`
+### Option 2: Static hosting
+The frontend is fully functional without a backend thanks to local-first persistence. You can deploy the contents of `public/` to Netlify, Vercel static hosting, GitHub Pages, or any static host.
 
-See `docs/authentication.md` for architecture and setup details.
+## Deployment notes
+
+### Vercel
+- Current `vercel.json` routes all non-API traffic to `public/`.
+- The frontend works immediately as static files.
+- If you configure backend environment variables later, `/api/chat` can provide server responses.
+
+### Netlify
+- Publish directory: `public`
+- Optional Node functions are not required for the current MVP experience.
+
+## Chat storage behavior
+- OmanX stores conversations in browser `localStorage`.
+- Chats persist across refreshes on the same browser profile.
+- The active conversation, pinned state, and user settings are also stored locally.
+
+## Future expansion ideas
+- Replace local-only settings with authenticated profiles
+- Connect collaboration rooms to a real backend
+- Introduce formal markdown rendering, citations, and live knowledge sources
+- Add richer analytics and advisor workflows
