@@ -4,7 +4,7 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>OmanX — Guidance workspace</title>
-    <meta name="description" content="OmanX chat workspace with persistent history, quick prompts, and deployable MVP interactions." />
+    <meta name="description" content="OmanX chat workspace with persistent history and structured decision support." />
     <link rel="stylesheet" href="/styles.css" />
   </head>
   <body>
@@ -13,10 +13,10 @@
         <a class="brandmark" href="/index.html"><span class="brandmark-badge">OX</span><span>OmanX</span></a>
         <nav class="nav-links">
           <a class="nav-link" data-page-link="home" href="/index.html">Home</a>
-          <a class="nav-link" data-page-link="chat" href="/chat.html">Chat</a>
+          <a class="nav-link" data-page-link="chat" href="/chat.html">Product</a>
           <a class="nav-link" data-page-link="collaboration" href="/collaboration.html">Collaboration</a>
-          <a class="nav-link" data-page-link="vision" href="/vision.html">Vision</a>
-          <a class="nav-link" data-page-link="settings" href="/settings.html">Settings</a>
+          <a class="nav-link" data-page-link="vision" href="/vision.html">Roadmap</a>
+          <a class="nav-link" data-page-link="trust" href="/trust.html">Trust</a>
         </nav>
         <div class="nav-actions">
           <button class="icon-btn" data-theme-toggle aria-label="Toggle theme">◐</button>
@@ -31,21 +31,20 @@
           <div class="sidebar-header">
             <div>
               <div class="sidebar-section-title">Conversations</div>
-              <h3>Guidance history</h3>
+              <h3>Decision history</h3>
             </div>
             <button class="btn" data-new-chat>New chat</button>
           </div>
-          <input class="sidebar-search" data-chat-search type="search" placeholder="Search chats, themes, or notes" />
-          <div class="row-between muted"><span>Persistent local workspace</span><span>Ready offline</span></div>
+          <input class="sidebar-search" data-chat-search type="search" placeholder="Search conversations" />
+          <div class="row-between muted"><span>Local-first storage</span><span>Private by default</span></div>
           <div class="chat-list" data-chat-list></div>
         </aside>
 
         <section class="card assistant-shell">
-          <header class="card chat-header">
+          <header class="chat-header">
             <div>
-              <div class="eyebrow">Core product experience</div>
               <h1 data-chat-title>Guidance workspace</h1>
-              <p data-chat-subtitle>Persistent conversation state with premium UI patterns.</p>
+              <p data-chat-subtitle>Structured guidance for high-stakes decisions.</p>
             </div>
             <div class="chat-actions-wrap">
               <button class="btn-secondary" data-copy-last>Copy last answer</button>
@@ -59,11 +58,11 @@
 
           <form class="composer" data-chat-form>
             <div class="card composer-box">
-              <textarea data-chat-input placeholder="Ask OmanX for a checklist, decision memo, or safe next-step plan."></textarea>
+              <textarea data-chat-input placeholder="Ask for a checklist, decision brief, or next-step plan."></textarea>
               <div class="composer-footer">
-                <div class="status-inline"><i></i><span>Local-first persistence, API-backed when available.</span></div>
+                <div class="status-inline"><i></i><span>Saved locally. API response when available.</span></div>
                 <div>Press <span class="kbd">Enter</span> to send · <span class="kbd">Shift + Enter</span> for a new line</div>
-                <button class="btn" type="submit">Send message</button>
+                <button class="btn" type="submit">Send</button>
               </div>
             </div>
           </form>
@@ -73,9 +72,9 @@
 
     <nav class="mobile-bottom-nav">
       <a data-page-link="home" href="/index.html">Home</a>
-      <a data-page-link="chat" href="/chat.html">Chat</a>
-      <a data-page-link="collaboration" href="/collaboration.html">Workspaces</a>
-      <a data-page-link="vision" href="/vision.html">Vision</a>
+      <a data-page-link="chat" href="/chat.html">Product</a>
+      <a data-page-link="trust" href="/trust.html">Trust</a>
+      <a data-page-link="vision" href="/vision.html">Roadmap</a>
     </nav>
 
     <script type="module" src="/js/chat-page.js"></script>
