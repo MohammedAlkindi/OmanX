@@ -27,7 +27,11 @@ export default async function handler(req, res) {
   }
 
   const supabaseUrl = process.env.SUPABASE_URL.replace(/\/$/, "");
-  const redirectTo = process.env.AUTH_REDIRECT_URL || `${process.env.APP_BASE_URL || ""}/`;
+  const redirectTo = process.env.AUTH_REDIRECT_URL || `${process.env.APP_BASE_URL || ""}/workspace`;
+
+  if (!redirectTo) {
+    return res.status(500).json({ error: "AUTH_REDIRECT_URL is not configured." });
+  }
 
   try {
     const response = await fetch(`${supabaseUrl}/auth/v1/otp`, {
@@ -39,21 +43,22 @@ export default async function handler(req, res) {
       body: JSON.stringify({
         email,
         create_user: true,
-        gotrue_meta_security: { captcha_token: null },
         data: { app: "omanx" },
-        options: {
-          email_redirect_to: redirectTo,
-        },
+        redirect_to: redirectTo,
       }),
     });
 
     const payload = await response.json();
     if (!response.ok) {
-      return res.status(response.status).json({ error: payload?.msg || "Failed to send magic link." });
+      const supabaseError = payload?.error_description || payload?.msg || payload?.message || "Failed to send magic link.";
+      console.error("[auth/start] Supabase OTP error:", { status: response.status, error: supabaseError, email });
+      return res.status(response.status).json({ error: supabaseError });
     }
 
+    console.info("[auth/start] Magic link sent:", { email, redirectTo });
     return res.status(200).json({ ok: true, message: "Magic link sent." });
   } catch (error) {
+    console.error("[auth/start] Fetch error:", error.message);
     return res.status(500).json({ error: error.message || "Auth provider request failed." });
   }
 }
