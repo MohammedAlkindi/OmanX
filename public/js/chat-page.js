@@ -40,7 +40,7 @@ function persist() {
 }
 
 function bindEvents() {
-  qs('[data-new-chat]').addEventListener('click', () => {
+  qs('[data-new-chat]')?.addEventListener('click', () => {
     const chat = createChat({ title: 'Untitled session' });
     state.chats.unshift(chat);
     state.activeChatId = chat.id;
@@ -49,16 +49,12 @@ function bindEvents() {
     showToast('New chat created.');
   });
 
-  qs('[data-sidebar-toggle]').addEventListener('click', () => {
-    qs('[data-chat-sidebar]').classList.toggle('open');
-  });
-
-  qs('[data-chat-search]').addEventListener('input', (event) => {
+  qs('[data-chat-search]')?.addEventListener('input', (event) => {
     state.filter = event.target.value.trim().toLowerCase();
     renderSidebar();
   });
 
-  qs('[data-chat-form]').addEventListener('submit', async (event) => {
+  qs('[data-chat-form]')?.addEventListener('submit', async (event) => {
     event.preventDefault();
     const textarea = qs('[data-chat-input]');
     const content = textarea.value.trim();
@@ -76,30 +72,30 @@ function bindEvents() {
     render();
   });
 
-  qs('[data-chat-input]').addEventListener('keydown', (event) => {
+  qs('[data-chat-input]')?.addEventListener('keydown', (event) => {
     if (event.key === 'Enter' && !event.shiftKey) {
       event.preventDefault();
       qs('[data-chat-form]').requestSubmit();
     }
   });
 
-  qs('[data-chat-input]').addEventListener('input', (event) => autoGrow(event.target));
+  qs('[data-chat-input]')?.addEventListener('input', (event) => autoGrow(event.target));
 
-  qs('[data-export-chat]').addEventListener('click', () => {
+  qs('[data-export-chat]')?.addEventListener('click', () => {
     const chat = getActiveChat();
     const content = chat.messages.map((message) => `[${message.role}] ${message.content}`).join('\n\n');
     downloadFile(`${slugify(chat.title)}.txt`, content);
     showToast('Conversation exported.');
   });
 
-  qs('[data-copy-last]').addEventListener('click', async () => {
+  qs('[data-copy-last]')?.addEventListener('click', async () => {
     const chat = getActiveChat();
     const message = [...chat.messages].reverse().find((item) => item.role === 'assistant');
     if (!message) return showToast('No assistant message to copy yet.');
     await copyText(message.content, 'Last assistant message copied.');
   });
 
-  qs('[data-rename-chat]').addEventListener('click', () => {
+  qs('[data-rename-chat]')?.addEventListener('click', () => {
     const chat = getActiveChat();
     const title = window.prompt('Rename this chat', chat.title);
     if (!title) return;
@@ -107,7 +103,7 @@ function bindEvents() {
     render();
   });
 
-  qs('[data-delete-chat]').addEventListener('click', () => {
+  qs('[data-delete-chat]')?.addEventListener('click', () => {
     const chat = getActiveChat();
     if (!chat || !window.confirm(`Delete "${chat.title}"?`)) return;
     state.chats = deleteChat(state.chats, chat.id);
@@ -261,11 +257,17 @@ async function createAssistantReply(message, chat) {
     const response = await fetch('/api/chat', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
+      credentials: 'include',
       body: JSON.stringify({ message }),
     });
 
-    if (!response.ok) throw new Error('API unavailable');
-    const payload = await response.json();
+    const payload = await response.json().catch(() => ({}));
+    if (!response.ok) {
+      if (response.status === 401) {
+        return `${localReply}\n\n**Note:** Sign in is required for server-verified responses.`;
+      }
+      throw new Error(payload.error || payload.text || 'API unavailable');
+    }
     return payload.text || localReply;
   } catch {
     return localReply;

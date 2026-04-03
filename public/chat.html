@@ -3,25 +3,21 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>OmanX — Guidance workspace</title>
-    <meta name="description" content="OmanX chat workspace with persistent history and structured decision support." />
+    <title>OmanX Workspace</title>
+    <meta name="description" content="Structured workspace for policy-aware decision guidance." />
     <link rel="stylesheet" href="/styles.css" />
   </head>
   <body>
     <header class="site-header">
       <div class="container navbar">
-        <a class="brandmark" href="/index.html"><span class="brandmark-badge">OX</span><span>OmanX</span></a>
-        <nav class="nav-links">
-          <a class="nav-link" data-page-link="home" href="/index.html">Home</a>
-          <a class="nav-link" data-page-link="chat" href="/chat.html">Product</a>
-          <a class="nav-link" data-page-link="collaboration" href="/collaboration.html">Collaboration</a>
-          <a class="nav-link" data-page-link="vision" href="/vision.html">Roadmap</a>
-          <a class="nav-link" data-page-link="trust" href="/trust.html">Trust</a>
+        <a class="brandmark" href="/">OmanX</a>
+        <nav class="nav-links" aria-label="Primary">
+          <a class="nav-link" href="/system">System</a>
+          <a class="nav-link" href="/method">Method</a>
+          <a class="nav-link" href="/vision">Vision</a>
+          <a class="nav-link" href="/contact">Contact</a>
         </nav>
-        <div class="nav-actions">
-          <button class="icon-btn" data-theme-toggle aria-label="Toggle theme">◐</button>
-          <button class="icon-btn mobile-nav-toggle" data-sidebar-toggle aria-label="Open chat history">☰</button>
-        </div>
+        <div class="nav-actions"><a class="btn-secondary" href="/">Home</a></div>
       </div>
     </header>
 
@@ -30,27 +26,28 @@
         <aside class="card sidebar" data-chat-sidebar>
           <div class="sidebar-header">
             <div>
-              <div class="sidebar-section-title">Conversations</div>
+              <div class="muted">Conversations</div>
               <h3>Decision history</h3>
             </div>
-            <button class="btn" data-new-chat>New chat</button>
+            <button class="btn" data-new-chat type="button">New</button>
           </div>
-          <input class="sidebar-search" data-chat-search type="search" placeholder="Search conversations" />
-          <div class="row-between muted"><span>Local-first storage</span><span>Private by default</span></div>
+          <label class="muted" for="chat-search">Search</label>
+          <input id="chat-search" class="sidebar-search" data-chat-search type="search" placeholder="Search conversations" />
+          <div class="row-between muted"><span>Local continuity</span><span>Structured outputs</span></div>
           <div class="chat-list" data-chat-list></div>
         </aside>
 
-        <section class="card assistant-shell">
+        <section class="card assistant-shell" aria-label="Decision workspace">
           <header class="chat-header">
             <div>
-              <h1 data-chat-title>Guidance workspace</h1>
-              <p data-chat-subtitle>Structured guidance for high-stakes decisions.</p>
+              <h1 data-chat-title>Decision workspace</h1>
+              <p data-chat-subtitle>Structured outputs with policy-aware framing.</p>
             </div>
             <div class="chat-actions-wrap">
-              <button class="btn-secondary" data-copy-last>Copy last answer</button>
-              <button class="btn-secondary" data-export-chat>Export</button>
-              <button class="btn-secondary" data-rename-chat>Rename</button>
-              <button class="btn-ghost" data-delete-chat>Delete</button>
+              <button class="btn-secondary" data-copy-last type="button">Copy last</button>
+              <button class="btn-secondary" data-export-chat type="button">Export</button>
+              <button class="btn-secondary" data-rename-chat type="button">Rename</button>
+              <button class="btn-secondary" data-delete-chat type="button">Delete</button>
             </div>
           </header>
 
@@ -58,10 +55,11 @@
 
           <form class="composer" data-chat-form>
             <div class="card composer-box">
-              <textarea data-chat-input placeholder="Ask for a checklist, decision brief, or next-step plan."></textarea>
+              <label class="muted" for="chat-input">Your decision question</label>
+              <textarea id="chat-input" data-chat-input placeholder="Describe your decision context, constraints, and timeline."></textarea>
               <div class="composer-footer">
-                <div class="status-inline"><i></i><span>Saved locally. API response when available.</span></div>
-                <div>Press <span class="kbd">Enter</span> to send · <span class="kbd">Shift + Enter</span> for a new line</div>
+                <div class="status-inline"><i></i><span>Local save enabled. API used when available.</span></div>
+                <div>Press <span class="kbd">Enter</span> to send</div>
                 <button class="btn" type="submit">Send</button>
               </div>
             </div>
@@ -69,13 +67,6 @@
         </section>
       </div>
     </main>
-
-    <nav class="mobile-bottom-nav">
-      <a data-page-link="home" href="/index.html">Home</a>
-      <a data-page-link="chat" href="/chat.html">Product</a>
-      <a data-page-link="trust" href="/trust.html">Trust</a>
-      <a data-page-link="vision" href="/vision.html">Roadmap</a>
-    </nav>
 
     <script type="module" src="/js/chat-page.js"></script>
   </body>
