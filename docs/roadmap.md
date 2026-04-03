@@ -1,150 +1,55 @@
-# OmanX Roadmap
+# OmanX Roadmap (Enterprise Track)
 
-This roadmap outlines the phased evolution of OmanX from MVP to institutional-grade infrastructure for Omani scholars studying abroad.
+This roadmap aligns OmanX with institutional deployment requirements and audit-grade decisioning.
 
-The goal is not feature accumulation. The goal is reliability, governance, and scale.
+## Phase 1 — MVP Stabilization (0–8 weeks)
 
----
-
-## Phase 0 — MVP Stabilization (Current)
-
-Objective: Make the system stable, predictable, and demo-ready.
+Objective: make decisions deterministic and contracts stable.
 
 Scope:
-- Harden Express server
-- Eliminate serverless invocation failures
-- Validate strict routing triggers
-- Ensure deterministic knowledge responses
-- Add structured error handling
-- Production deployment on Vercel
-- Basic rate limiting and logging
+- Freeze typed API contracts for eligibility/pathway/decision-trace endpoints
+- Implement deterministic rule engine for primary destination jurisdictions
+- Replace free-form decision responses with structured outputs
+- Add baseline observability: latency, error rate, idempotency metrics
 
-Success Criteria:
-- 99% uptime in test window
-- No unhandled exceptions
-- Sub-2s average response latency
-- Clean demo flow for Ministry presentation
+Exit criteria:
+- Same input + policy version returns identical outcome
+- 0 untyped decision responses in production paths
+- Operational dashboards for core API health
 
-Status: In progress
+## Phase 2 — Systemization + Trust Layer (2–5 months)
 
----
-
-## Phase 1 — Governance Hardening
-
-Objective: Transform MVP into a compliance-aware system.
+Objective: establish auditability and explainability at policy level.
 
 Scope:
-- Formalize strict vs normal response lanes
-- Add explicit citation injection from knowledge.json
-- Add refusal logic for unsupported legal questions
-- Log all compliance-triggered queries
-- Create admin visibility for strict-mode activations
+- Deploy policy registry with versioning, authority level, and effective windows
+- Add confidence scoring and cross-source conflict detection
+- Ship decision breakdown with source attribution and rule trace views
+- Introduce human review queue for low-confidence and conflicted cases
 
-Add:
-- compliance-model.md documentation
-- structured response schema
+Exit criteria:
+- Every decision has traceable source set and executed-rule list
+- Policy changes are versioned and reviewable before publish
+- Explainability available without reading raw logs
 
-Success Criteria:
-- Zero uncited compliance responses
-- Reproducible outputs for identical strict queries
-- Clear audit trail for sensitive responses
+## Phase 3 — Enterprise + Scale (5–12 months)
 
----
-
-## Phase 2 — Knowledge Layer Expansion
-
-Objective: Move from static JSON to structured policy engine.
+Objective: operationalize for ministries and institutional partners.
 
 Scope:
-- Migrate knowledge.json to versioned schema
-- Introduce metadata fields:
-  - source
-  - last_updated
-  - authority_level
-- Add knowledge validation pipeline
-- Create policy update workflow
+- Multi-tenant access model with RBAC and institutional boundaries
+- Admin dashboard for rule editing, staging, rollback, and impact simulation
+- Signed audit exports (PDF + structured JSON)
+- Reliability program: SLOs, policy drift checks, evaluation harness
 
-Optional:
-- Move to lightweight database (e.g., Postgres)
-- Admin interface for content updates
+Exit criteria:
+- Institution-ready governance controls in production
+- Exportable compliance artifacts accepted by pilot partners
+- Quarterly reliability and quality reports generated automatically
 
-Success Criteria:
-- Policy entries version-controlled
-- Update workflow documented
-- No direct production file edits
+## Program Principles
 
----
-
-## Phase 3 — Observability & Metrics
-
-Objective: Make the system measurable.
-
-Scope:
-- Request classification metrics
-- Strict-mode frequency tracking
-- Response latency metrics
-- Error rate tracking
-- Basic analytics dashboard
-
-Add:
-- metrics endpoint expansion
-- evaluation framework for answer accuracy
-
-Success Criteria:
-- Monthly performance report
-- Latency and error thresholds defined
-- Usage insights available for stakeholders
-
----
-
-## Phase 4 — Institutional Readiness
-
-Objective: Prepare OmanX for Ministry-level integration.
-
-Scope:
-- Role-based access control
-- Admin dashboard
-- Structured user authentication
-- SLA definition
-- Data retention policy
-- Formal security review
-
-Add:
-- threat-model.md
-- security hardening checklist
-- legal disclaimer framework
-
-Success Criteria:
-- Deployment architecture documented
-- Risk mitigation documented
-- Clear operational ownership model
-
----
-
-## Phase 5 — Platform Expansion
-
-Objective: Evolve from assistant to infrastructure.
-
-Potential Extensions:
-- Integration with Ministry APIs
-- Multi-country compliance modules
-- Scholar dashboard
-- Case tracking system
-- Human escalation workflow
-- Verified response tagging
-
-Long-Term Direction:
-- OmanX as official compliance co-pilot
-- Shared knowledge layer across embassies
-- Centralized policy distribution system
-
----
-
-## Guiding Principles
-
-1. Determinism before scale  
-2. Governance before growth  
-3. Auditability before automation  
-4. Stability before expansion  
-
-OmanX should evolve as infrastructure, not as a chatbot.
+1. Determinism before automation
+2. Auditability before scale
+3. Governance before growth
+4. Simplicity at the interface, rigor in the core
