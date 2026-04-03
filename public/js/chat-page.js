@@ -251,8 +251,6 @@ function getActiveChat() {
 }
 
 async function createAssistantReply(message, chat) {
-  const localReply = buildLocalReply(message, chat, state.settings);
-
   try {
     const response = await fetch('/api/chat', {
       method: 'POST',
@@ -264,13 +262,14 @@ async function createAssistantReply(message, chat) {
     const payload = await response.json().catch(() => ({}));
     if (!response.ok) {
       if (response.status === 401) {
-        return `${localReply}\n\n**Note:** Sign in is required for server-verified responses.`;
+        return '**Authentication required.** Please sign in to use OmanX.';
       }
-      throw new Error(payload.error || payload.text || 'API unavailable');
+      const errorMsg = payload.error || payload.text || `Server error (HTTP ${response.status})`;
+      return `**Error:** ${errorMsg}`;
     }
-    return payload.text || localReply;
-  } catch {
-    return localReply;
+    return payload.text;
+  } catch (err) {
+    return `**Network error:** ${err.message || 'Could not reach the server. Check your connection and try again.'}`;
   }
 }
 
