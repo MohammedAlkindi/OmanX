@@ -7,13 +7,19 @@
     }
   },
   "routes": [
-    {
-      "src": "/api/(.*)",
-      "dest": "/api/$1"
-    },
-    {
-      "src": "/(.*)",
-      "dest": "/public/$1"
-    }
+    { "src": "/api/(.*)", "dest": "/api/$1" },
+
+    { "src": "/", "dest": "/index.html" },
+    { "src": "/(chat|workspace)", "dest": "/chat.html" },
+    { "src": "/system", "dest": "/system.html" },
+    { "src": "/method", "dest": "/method.html" },
+    { "src": "/vision", "dest": "/vision.html" },
+    { "src": "/contact", "dest": "/contact.html" },
+    { "src": "/examples", "dest": "/examples.html" },
+    { "src": "/trust", "dest": "/trust.html" },
+
+    { "src": "/(index|chat|system|method|vision|contact|examples)\\.html", "status": 301, "headers": { "Location": "/$1" } },
+
+    { "src": "/(.*)", "dest": "/$1" }
   ]
 }
