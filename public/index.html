@@ -3,102 +3,78 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>OmanX — Structured guidance for decisions that matter</title>
-    <meta name="description" content="OmanX is a structured guidance workspace that helps teams and students track decisions with clarity and continuity." />
+    <title>OmanX — Decision intelligence for Omani scholars</title>
+    <meta name="description" content="Policy-aware decision intelligence for Omani scholars navigating applications, sponsorship, visas, and academic pathways." />
     <link rel="stylesheet" href="/styles.css" />
-    <link rel="icon" type="image/png" sizes="32x32" href="/assets/favicon-32x32.png" />
   </head>
   <body>
     <header class="site-header">
       <div class="container navbar">
-        <a class="brandmark" href="/index.html">
-          <span class="brandmark-badge">OX</span>
-          <span>OmanX</span>
-        </a>
-        <nav class="nav-links">
-          <a class="nav-link" data-page-link="home" href="/index.html">Home</a>
-          <a class="nav-link" data-page-link="chat" href="/chat.html">Product</a>
-          <a class="nav-link" data-page-link="collaboration" href="/collaboration.html">Collaboration</a>
-          <a class="nav-link" data-page-link="vision" href="/vision.html">Roadmap</a>
-          <a class="nav-link" data-page-link="trust" href="/trust.html">Trust</a>
+        <a class="brandmark" href="/">OmanX</a>
+        <nav class="nav-links" aria-label="Primary">
+          <a class="nav-link" data-page-link="system" href="/system">System</a>
+          <a class="nav-link" data-page-link="method" href="/method">Method</a>
+          <a class="nav-link" data-page-link="vision" href="/vision">Vision</a>
+          <a class="nav-link" data-page-link="contact" href="/contact">Contact</a>
         </nav>
         <div class="nav-actions">
-          <button class="icon-btn" data-theme-toggle aria-label="Toggle theme">◐</button>
-          <a class="btn" href="/chat.html">Open Product</a>
+          <a class="btn" href="/chat.html">Start</a>
         </div>
       </div>
     </header>
 
     <main>
       <section class="hero">
-        <div class="container hero-grid compact-hero-grid">
-          <div class="hero-copy">
-            <h1>Structured guidance for high-stakes student decisions.</h1>
-            <p>OmanX helps teams and students keep decisions clear, traceable, and actionable across real support workflows.</p>
-            <div class="hero-actions">
-              <a class="btn" href="/chat.html">Open Product</a>
-              <a class="btn-secondary" href="#preview">Preview</a>
-            </div>
+        <div class="container hero-copy">
+          <h1>Decision intelligence for Omani scholars.</h1>
+          <p>Built for applications, sponsorship constraints, visas, and academic pathways. OmanX turns uncertainty into structured next steps grounded in policy and context.</p>
+          <div class="hero-actions">
+            <a class="btn" href="/chat.html">Start a decision</a>
+            <a class="btn-secondary" href="/method">View method</a>
           </div>
-          <aside class="card dashboard-preview minimal-preview" id="preview">
-            <div class="preview-panel">
-              <h3>Guidance workspace</h3>
-              <ul>
-                <li>Persistent conversation history</li>
-                <li>Decision-ready response structure</li>
-                <li>Clear handoff notes for teams</li>
-              </ul>
-            </div>
-            <div class="preview-panel">
-              <h3>Workflow snapshot</h3>
-              <div class="timeline-item">
-                <span>Now</span>
-                <div><strong>Document context</strong><p>Capture facts, options, and constraints in one thread.</p></div>
-              </div>
-              <div class="timeline-item">
-                <span>Next</span>
-                <div><strong>Choose with confidence</strong><p>Track owners, next steps, and escalation points.</p></div>
-              </div>
-            </div>
-          </aside>
         </div>
       </section>
 
-      <section class="section compact-section">
-        <div class="container feature-grid compact-grid-3">
-          <article class="card feature-card">
-            <h3>What it does</h3>
-            <p>Turns fragmented conversations into structured guidance records that stay usable over time.</p>
-          </article>
-          <article class="card feature-card">
-            <h3>Why it matters</h3>
-            <p>Important decisions need clarity, continuity, and accountable follow-through—not one-off replies.</p>
-          </article>
-          <article class="card feature-card">
-            <h3>Trust and boundaries</h3>
-            <p>OmanX supports decision quality while preserving clear limits for high-risk and official matters.</p>
-          </article>
+      <section class="section-tight">
+        <div class="container trust-band" aria-label="Trust signals">
+          <div class="trust-item">Policy-grounded</div>
+          <div class="trust-item">Constraint-aware</div>
+          <div class="trust-item">Structured outputs</div>
+          <div class="trust-item">Built for high-stakes decisions</div>
         </div>
       </section>
 
-      <section class="section compact-section">
-        <div class="container card cta-banner">
-          <div>
-            <h2>Built for real workflows, not demo theater.</h2>
-            <p>Review roadmap depth and trust model on dedicated pages.</p>
+      <section class="section-tight">
+        <div class="container-narrow card preview-card">
+          <h2>Decision artifact preview</h2>
+          <div class="preview-row">
+            <dt>User question</dt>
+            <dd>"My scholarship requires full-time enrollment, but one course conflicts with my visa compliance timeline. What should I do first?"</dd>
           </div>
-          <div class="inline-actions">
-            <a class="btn" href="/vision.html">View roadmap</a>
-            <a class="btn-secondary" href="/trust.html">Learn more</a>
+          <div class="preview-row">
+            <dt>Detected constraints</dt>
+            <dd>Scholarship continuity, full-time enrollment minimum, visa reporting obligations, term deadline windows.</dd>
+          </div>
+          <div class="preview-row">
+            <dt>Interpretation</dt>
+            <dd>The immediate risk is compliance exposure from registration delay. Scholarship impact is secondary but still time-sensitive.</dd>
+          </div>
+          <div class="preview-row">
+            <dt>Recommended next step</dt>
+            <dd>Submit a same-day status note to your international office and scholarship sponsor, then request approved alternatives before add/drop closes.</dd>
+          </div>
+          <div class="preview-row">
+            <dt>Assumptions</dt>
+            <dd>Assumes F-1 reporting requirements apply and no approved reduced course load is already in place.</dd>
           </div>
         </div>
       </section>
     </main>
 
-    <footer class="site-footer">
+    <footer class="footer">
       <div class="container footer-row">
         <div>© <span data-year></span> OmanX</div>
-        <div>Track decisions, not just conversations.</div>
+        <div>Policy-aware decision intelligence.</div>
       </div>
     </footer>
 

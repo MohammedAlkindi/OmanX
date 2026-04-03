@@ -1,2 +1,2 @@
 import { initCore } from './core.js';
-initCore();
+initCore({ page: 'system' });
