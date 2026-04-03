@@ -14,12 +14,14 @@ const state = {
   filter: '',
   typing: false,
   settings: loadSettings(),
+  user: null,
 };
 
 initCore({ page: 'chat' });
 ensureActiveChat();
 render();
 bindEvents();
+initAuth();
 
 function ensureActiveChat() {
   const existing = state.chats.find((chat) => chat.id === state.activeChatId);
@@ -120,6 +122,49 @@ function bindEvents() {
       autoGrow(qs('[data-chat-input]'));
       qs('[data-chat-input]').focus();
     });
+  });
+
+  qs('[data-auth-form]')?.addEventListener('submit', async (event) => {
+    event.preventDefault();
+    const email = qs('[data-auth-email]').value.trim();
+    if (!email) return;
+    setAuthError('');
+    const btn = qs('.auth-submit');
+    btn.disabled = true;
+    btn.textContent = 'Sending…';
+    try {
+      const res = await fetch('/api/auth/start', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email }),
+      });
+      const payload = await res.json().catch(() => ({}));
+      if (!res.ok) {
+        setAuthError(payload.error || 'Could not send link. Try again.');
+      } else {
+        qs('[data-auth-sent-email]').textContent = email;
+        qs('[data-auth-step="email"]').hidden = true;
+        qs('[data-auth-step="sent"]').hidden = false;
+      }
+    } catch {
+      setAuthError('Network error. Check your connection and try again.');
+    } finally {
+      btn.disabled = false;
+      btn.textContent = 'Send sign-in link';
+    }
+  });
+
+  qs('[data-auth-resend]')?.addEventListener('click', () => {
+    qs('[data-auth-step="sent"]').hidden = true;
+    qs('[data-auth-step="email"]').hidden = false;
+    setAuthError('');
+  });
+
+  qs('[data-logout-btn]')?.addEventListener('click', async () => {
+    await fetch('/api/auth/logout', { method: 'POST', credentials: 'include' });
+    state.user = null;
+    renderAuthState(false, null);
+    showToast('Signed out.');
   });
 }
 
@@ -250,6 +295,78 @@ function getActiveChat() {
   return state.chats.find((chat) => chat.id === state.activeChatId) || state.chats[0];
 }
 
+async function initAuth() {
+  // Handle magic link callback
+  const params = new URLSearchParams(window.location.search);
+  const tokenHash = params.get('token_hash');
+  const type = params.get('type');
+  if (tokenHash && type) {
+    try {
+      const res = await fetch('/api/auth/verify', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
+        body: JSON.stringify({ token_hash: tokenHash, type }),
+      });
+      const payload = await res.json().catch(() => ({}));
+      if (res.ok && payload.user) {
+        state.user = payload.user;
+        // Clean URL
+        const url = new URL(window.location.href);
+        url.searchParams.delete('token_hash');
+        url.searchParams.delete('type');
+        window.history.replaceState({}, '', url.pathname + (url.search || ''));
+        renderAuthState(true, payload.user);
+        showToast('Signed in successfully.');
+        return;
+      }
+    } catch { /* fall through to session check */ }
+  }
+
+  // Check existing session
+  try {
+    const res = await fetch('/api/auth/session', { credentials: 'include' });
+    if (res.ok) {
+      const payload = await res.json().catch(() => ({}));
+      state.user = payload.user || null;
+      renderAuthState(true, state.user);
+      return;
+    }
+  } catch { /* fall through */ }
+
+  renderAuthState(false, null);
+}
+
+function renderAuthState(authenticated, user) {
+  const overlay = qs('[data-auth-overlay]');
+  const emailEl = qs('[data-user-email]');
+  const logoutBtn = qs('[data-logout-btn]');
+  const composer = qs('[data-chat-form]');
+  const input = qs('[data-chat-input]');
+
+  overlay.hidden = authenticated;
+
+  if (authenticated && user) {
+    emailEl.textContent = user.email || '';
+    emailEl.hidden = !user.email;
+    logoutBtn.hidden = false;
+    if (composer) composer.removeAttribute('inert');
+    if (input) input.disabled = false;
+  } else {
+    emailEl.hidden = true;
+    logoutBtn.hidden = true;
+    if (composer) composer.setAttribute('inert', '');
+    if (input) input.disabled = true;
+  }
+}
+
+function setAuthError(message) {
+  const el = qs('[data-auth-error]');
+  if (!el) return;
+  el.textContent = message;
+  el.hidden = !message;
+}
+
 async function createAssistantReply(message, chat) {
   try {
     const response = await fetch('/api/chat', {
@@ -262,7 +379,9 @@ async function createAssistantReply(message, chat) {
     const payload = await response.json().catch(() => ({}));
     if (!response.ok) {
       if (response.status === 401) {
-        return '**Authentication required.** Please sign in to use OmanX.';
+        state.user = null;
+        renderAuthState(false, null);
+        return '**Session expired.** Please sign in again to continue.';
       }
       const errorMsg = payload.error || payload.text || `Server error (HTTP ${response.status})`;
       return `**Error:** ${errorMsg}`;
