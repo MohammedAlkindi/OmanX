@@ -17,7 +17,11 @@
           <a class="nav-link" href="/vision">Vision</a>
           <a class="nav-link" href="/contact">Contact</a>
         </nav>
-        <div class="nav-actions"><a class="btn-secondary" href="/">Home</a></div>
+        <div class="nav-actions">
+          <span class="user-email muted" data-user-email hidden></span>
+          <button class="btn-secondary" data-logout-btn type="button" hidden>Sign out</button>
+          <a class="btn-secondary" href="/">Home</a>
+        </div>
       </div>
     </header>
 
@@ -67,6 +71,44 @@
         </section>
       </div>
     </main>
+
+    <!-- Auth overlay — shown when user is not signed in -->
+    <div class="auth-overlay" data-auth-overlay hidden aria-modal="true" role="dialog" aria-labelledby="auth-title">
+      <div class="auth-card card">
+        <div class="auth-header">
+          <a class="brandmark" href="/">OmanX</a>
+          <p class="muted">Sign in to access your workspace</p>
+        </div>
+
+        <form class="auth-form" data-auth-form>
+          <div class="auth-step" data-auth-step="email">
+            <label class="form-label" for="auth-email">Email address</label>
+            <input
+              id="auth-email"
+              class="form-input"
+              data-auth-email
+              type="email"
+              placeholder="you@example.com"
+              autocomplete="email"
+              required
+            />
+            <p class="muted auth-hint">We'll send you a sign-in link — no password needed.</p>
+            <button class="btn auth-submit" type="submit">Send sign-in link</button>
+          </div>
+
+          <div class="auth-step" data-auth-step="sent" hidden>
+            <div class="auth-sent">
+              <div class="auth-sent-icon">✓</div>
+              <h2 id="auth-title">Check your email</h2>
+              <p class="muted">A sign-in link was sent to <strong data-auth-sent-email></strong>. Click the link in your email to continue.</p>
+              <button class="btn-secondary" data-auth-resend type="button">Resend link</button>
+            </div>
+          </div>
+        </form>
+
+        <div class="auth-error muted" data-auth-error hidden></div>
+      </div>
+    </div>
 
     <script type="module" src="/js/chat-page.js"></script>
   </body>
