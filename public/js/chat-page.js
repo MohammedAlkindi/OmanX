@@ -160,6 +160,19 @@ function bindEvents() {
     setAuthError('');
   });
 
+  // Close button
+  qs('[data-auth-close]')?.addEventListener('click', closeAuthModal);
+
+  // Backdrop click — only close when clicking the overlay itself, not the card
+  qs('[data-auth-overlay]')?.addEventListener('click', (event) => {
+    if (event.target === qs('[data-auth-overlay]')) closeAuthModal();
+  });
+
+  // ESC key
+  document.addEventListener('keydown', (event) => {
+    if (event.key === 'Escape' && !qs('[data-auth-overlay]')?.hidden) closeAuthModal();
+  });
+
   qs('[data-logout-btn]')?.addEventListener('click', async () => {
     await fetch('/api/auth/logout', { method: 'POST', credentials: 'include' });
     state.user = null;
@@ -365,6 +378,11 @@ function setAuthError(message) {
   if (!el) return;
   el.textContent = message;
   el.hidden = !message;
+}
+
+function closeAuthModal() {
+  const overlay = qs('[data-auth-overlay]');
+  if (overlay) overlay.hidden = true;
 }
 
 async function createAssistantReply(message, chat) {

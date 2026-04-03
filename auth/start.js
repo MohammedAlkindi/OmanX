@@ -27,10 +27,13 @@ export default async function handler(req, res) {
   }
 
   const supabaseUrl = process.env.SUPABASE_URL.replace(/\/$/, "");
-  const redirectTo = process.env.AUTH_REDIRECT_URL || `${process.env.APP_BASE_URL || ""}/workspace`;
+  const redirectTo =
+    process.env.AUTH_REDIRECT_URL ||
+    (process.env.APP_BASE_URL ? `${process.env.APP_BASE_URL}/workspace` : null);
 
   if (!redirectTo) {
-    return res.status(500).json({ error: "AUTH_REDIRECT_URL is not configured." });
+    console.error("[auth/start] AUTH_REDIRECT_URL is not set and APP_BASE_URL is not set.");
+    return res.status(500).json({ error: "Auth service is misconfigured. Please contact support." });
   }
 
   try {
@@ -39,6 +42,7 @@ export default async function handler(req, res) {
       headers: {
         "Content-Type": "application/json",
         apikey: process.env.SUPABASE_ANON_KEY,
+        Authorization: `Bearer ${process.env.SUPABASE_ANON_KEY}`,
       },
       body: JSON.stringify({
         email,
@@ -50,8 +54,14 @@ export default async function handler(req, res) {
 
     const payload = await response.json();
     if (!response.ok) {
-      const supabaseError = payload?.error_description || payload?.msg || payload?.message || "Failed to send magic link.";
-      console.error("[auth/start] Supabase OTP error:", { status: response.status, error: supabaseError, email });
+      const supabaseError =
+        payload?.error_description || payload?.msg || payload?.message || "Failed to send magic link.";
+      console.error("[auth/start] Supabase OTP error:", {
+        status: response.status,
+        payload,
+        email,
+        redirectTo,
+      });
       return res.status(response.status).json({ error: supabaseError });
     }
 
