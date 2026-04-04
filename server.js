@@ -13,6 +13,8 @@ import authStartHandler from './auth/start.js';
 import authVerifyHandler from './auth/verify.js';
 import authSessionHandler from './auth/session.js';
 import authLogoutHandler from './auth/logout.js';
+import authGoogleHandler from './auth/google.js';
+import authExchangeHandler from './auth/exchange.js';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const PORT = Number(process.env.PORT || 3000);
@@ -32,6 +34,8 @@ app.post('/api/auth/start', authStartHandler);
 app.post('/api/auth/verify', authVerifyHandler);
 app.get('/api/auth/session', authSessionHandler);
 app.post('/api/auth/logout', authLogoutHandler);
+app.get('/api/auth/google', authGoogleHandler);
+app.post('/api/auth/exchange', authExchangeHandler);
 
 // Canonical redirects from file-based routes
 app.get('/index.html', (req, res) => res.redirect(301, '/'));

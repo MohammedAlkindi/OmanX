@@ -124,6 +124,18 @@ function bindEvents() {
     });
   });
 
+  qs('[data-google-signin]')?.addEventListener('click', async () => {
+    const btn = qs('[data-google-signin]');
+    btn.disabled = true;
+    setAuthError('');
+    try {
+      window.location.href = '/api/auth/google';
+    } catch {
+      setAuthError('Could not start Google sign-in. Try again.');
+      btn.disabled = false;
+    }
+  });
+
   qs('[data-auth-form]')?.addEventListener('submit', async (event) => {
     event.preventDefault();
     const email = qs('[data-auth-email]').value.trim();
@@ -309,6 +321,28 @@ function getActiveChat() {
 }
 
 async function initAuth() {
+  // Handle Google OAuth callback (tokens arrive in the URL hash)
+  const hash = new URLSearchParams(window.location.hash.slice(1));
+  const oauthToken = hash.get('access_token');
+  if (oauthToken) {
+    try {
+      const res = await fetch('/api/auth/exchange', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
+        body: JSON.stringify({ access_token: oauthToken, expires_in: hash.get('expires_in') }),
+      });
+      const payload = await res.json().catch(() => ({}));
+      if (res.ok && payload.user) {
+        state.user = payload.user;
+        window.history.replaceState({}, '', window.location.pathname);
+        renderAuthState(true, payload.user);
+        showToast('Signed in successfully.');
+        return;
+      }
+    } catch { /* fall through to session check */ }
+  }
+
   // Handle magic link callback
   const params = new URLSearchParams(window.location.search);
   const tokenHash = params.get('token_hash');
