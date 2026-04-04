@@ -14,6 +14,7 @@ import authVerifyHandler from './auth/verify.js';
 import authSessionHandler from './auth/session.js';
 import authLogoutHandler from './auth/logout.js';
 import authGoogleHandler from './auth/google.js';
+import authGithubHandler from './auth/github.js';
 import authExchangeHandler from './auth/exchange.js';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
@@ -35,6 +36,7 @@ app.post('/api/auth/verify', authVerifyHandler);
 app.get('/api/auth/session', authSessionHandler);
 app.post('/api/auth/logout', authLogoutHandler);
 app.get('/api/auth/google', authGoogleHandler);
+app.get('/api/auth/github', authGithubHandler);
 app.post('/api/auth/exchange', authExchangeHandler);
 
 // Canonical redirects from file-based routes

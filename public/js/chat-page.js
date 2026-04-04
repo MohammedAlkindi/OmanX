@@ -128,6 +128,18 @@ function bindEvents() {
     }
   });
 
+  qs('[data-github-signin]')?.addEventListener('click', async () => {
+    const btn = qs('[data-github-signin]');
+    btn.disabled = true;
+    setAuthError('');
+    try {
+      window.location.href = '/api/auth/github';
+    } catch {
+      setAuthError('Could not start GitHub sign-in. Try again.');
+      btn.disabled = false;
+    }
+  });
+
   qs('[data-auth-form]')?.addEventListener('submit', async (event) => {
     event.preventDefault();
     const email = qs('[data-auth-email]').value.trim();
