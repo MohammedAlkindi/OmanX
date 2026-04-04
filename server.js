@@ -45,6 +45,9 @@ app.get('/method.html', (req, res) => res.redirect(301, '/method'));
 app.get('/vision.html', (req, res) => res.redirect(301, '/vision'));
 app.get('/contact.html', (req, res) => res.redirect(301, '/contact'));
 app.get('/examples.html', (req, res) => res.redirect(301, '/examples'));
+app.get('/settings.html', (req, res) => res.redirect(301, '/settings'));
+app.get('/collaboration.html', (req, res) => res.redirect(301, '/collaboration'));
+app.get('/trust.html', (req, res) => res.redirect(301, '/trust'));
 
 // Page routes
 app.get('/', (req, res) => {
@@ -77,6 +80,14 @@ app.get('/examples', (req, res) => {
 
 app.get('/trust', (req, res) => {
   res.sendFile(path.join(PUBLIC_DIR, 'trust.html'));
+});
+
+app.get('/settings', (req, res) => {
+  res.sendFile(path.join(PUBLIC_DIR, 'settings.html'));
+});
+
+app.get('/collaboration', (req, res) => {
+  res.sendFile(path.join(PUBLIC_DIR, 'collaboration.html'));
 });
 
 // Legacy redirects

@@ -116,14 +116,6 @@ function bindEvents() {
     showToast('Chat deleted.');
   });
 
-  qsa('[data-quick-prompt]').forEach((button) => {
-    button.addEventListener('click', () => {
-      qs('[data-chat-input]').value = button.dataset.quickPrompt;
-      autoGrow(qs('[data-chat-input]'));
-      qs('[data-chat-input]').focus();
-    });
-  });
-
   qs('[data-google-signin]')?.addEventListener('click', async () => {
     const btn = qs('[data-google-signin]');
     btn.disabled = true;
