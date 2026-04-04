@@ -1088,6 +1088,34 @@ input[type="checkbox"] { accent-color: var(--accent); }
   cursor: not-allowed;
 }
 
+.github-signin-btn {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-3);
+  padding: var(--space-3) var(--space-4);
+  margin-top: var(--space-2);
+  border: 1px solid #30363d;
+  border-radius: var(--radius-sm, 4px);
+  background: #24292f;
+  color: #fff;
+  font-size: var(--text-sm);
+  font-weight: 500;
+  cursor: pointer;
+  transition: background 0.15s, border-color 0.15s;
+}
+
+.github-signin-btn:hover {
+  background: #32383f;
+  border-color: #586069;
+}
+
+.github-signin-btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
 .auth-divider {
   display: flex;
   align-items: center;
