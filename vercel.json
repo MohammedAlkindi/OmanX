@@ -4,9 +4,13 @@
   "functions": {
     "api/*.js": {
       "maxDuration": 10
+    },
+    "auth/*.js": {
+      "maxDuration": 10
     }
   },
   "routes": [
+    { "src": "/api/auth/(.*)", "dest": "/auth/$1" },
     { "src": "/api/(.*)", "dest": "/api/$1" },
 
     { "src": "/", "dest": "/index.html" },
@@ -17,8 +21,10 @@
     { "src": "/contact", "dest": "/contact.html" },
     { "src": "/examples", "dest": "/examples.html" },
     { "src": "/trust", "dest": "/trust.html" },
+    { "src": "/settings", "dest": "/settings.html" },
+    { "src": "/collaboration", "dest": "/collaboration.html" },
 
-    { "src": "/(index|chat|system|method|vision|contact|examples)\\.html", "status": 301, "headers": { "Location": "/$1" } },
+    { "src": "/(index|chat|system|method|vision|contact|examples|settings|collaboration|trust)\\.html", "status": 301, "headers": { "Location": "/$1" } },
 
     { "src": "/(.*)", "dest": "/$1" }
   ]
