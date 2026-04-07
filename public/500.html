@@ -1,0 +1,32 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Temporary Issue · OmanX</title>
+    <meta name="description" content="OmanX encountered a temporary issue." />
+    <link rel="stylesheet" href="/styles.css" />
+  </head>
+  <body class="error-page">
+    <main class="container error-shell" role="main">
+      <p class="error-code">500</p>
+      <h1>We hit a temporary issue.</h1>
+      <p data-error-message>Something went wrong on our side. Please try again shortly.</p>
+      <div class="error-actions">
+        <a class="btn" href="/">Go to homepage</a>
+        <a class="btn-secondary" href="/workspace">Open workspace</a>
+      </div>
+    </main>
+
+    <script>
+      const params = new URLSearchParams(window.location.search);
+      const message = params.get('message');
+      if (message) {
+        const target = document.querySelector('[data-error-message]');
+        if (target) {
+          target.textContent = message;
+        }
+      }
+    </script>
+  </body>
+</html>
