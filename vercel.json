@@ -2,15 +2,11 @@
   "version": 2,
   "outputDirectory": "public",
   "functions": {
-    "api/*.js": {
-      "maxDuration": 10
-    },
-    "auth/*.js": {
+    "api/**/*.js": {
       "maxDuration": 10
     }
   },
   "routes": [
-    { "src": "/api/auth/(.*)", "dest": "/auth/$1" },
     { "src": "/api/(.*)", "dest": "/api/$1" },
 
     { "src": "/", "dest": "/index.html" },

@@ -5,7 +5,7 @@ import fs from "fs/promises";
 import path from "path";
 import { fileURLToPath } from "url";
 import crypto from "crypto";
-import { requireAuth } from "../auth/_auth.js";
+import { requireAuth } from "./auth/_auth.js";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
