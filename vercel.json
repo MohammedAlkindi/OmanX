@@ -3,12 +3,11 @@
   "outputDirectory": "public",
   "functions": {
     "api/**/*.js": {
-      "maxDuration": 10
+      "maxDuration": 60
     }
   },
   "routes": [
     { "src": "/api/(.*)", "dest": "/api/$1" },
-
     { "src": "/", "dest": "/index.html" },
     { "src": "/(chat|workspace)", "dest": "/chat.html" },
     { "src": "/system", "dest": "/system.html" },
@@ -19,9 +18,7 @@
     { "src": "/trust", "dest": "/trust.html" },
     { "src": "/settings", "dest": "/settings.html" },
     { "src": "/collaboration", "dest": "/collaboration.html" },
-
     { "src": "/(index|chat|system|method|vision|contact|examples|settings|collaboration|trust)\\.html", "status": 301, "headers": { "Location": "/$1" } },
-
     { "src": "/(.*)", "dest": "/$1" }
   ]
 }
