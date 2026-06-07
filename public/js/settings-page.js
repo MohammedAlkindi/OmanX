@@ -21,6 +21,8 @@ form.addEventListener('submit', (event) => {
     priority: form.priority.value.trim() || 'Arrival readiness',
     notifications: form.notifications.checked,
     conciseMode: form.conciseMode.checked,
+    model: form.model.value || 'claude-sonnet-4-6',
+    userContext: form.userContext.value.trim(),
   };
   saveSettings(next);
   showToast('Workspace preferences saved.');

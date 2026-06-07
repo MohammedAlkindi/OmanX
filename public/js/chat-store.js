@@ -55,23 +55,22 @@ export function deleteChat(chats, chatId) {
   return chats.filter((chat) => chat.id !== chatId);
 }
 
+const SETTINGS_DEFAULTS = {
+  studentName: 'Student',
+  homeCampus: 'University partner',
+  priority: 'Arrival readiness',
+  notifications: true,
+  conciseMode: false,
+  model: 'claude-sonnet-4-6',
+  userContext: '',
+};
+
 export function loadSettings() {
   try {
-    return JSON.parse(localStorage.getItem(SETTINGS_KEY)) || {
-      studentName: 'Student',
-      homeCampus: 'University partner',
-      priority: 'Arrival readiness',
-      notifications: true,
-      conciseMode: false,
-    };
+    const stored = JSON.parse(localStorage.getItem(SETTINGS_KEY));
+    return stored ? { ...SETTINGS_DEFAULTS, ...stored } : { ...SETTINGS_DEFAULTS };
   } catch {
-    return {
-      studentName: 'Student',
-      homeCampus: 'University partner',
-      priority: 'Arrival readiness',
-      notifications: true,
-      conciseMode: false,
-    };
+    return { ...SETTINGS_DEFAULTS };
   }
 }
 

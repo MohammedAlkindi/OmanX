@@ -66,8 +66,20 @@ function bindEvents() {
     state.typing = true;
     renderMessages();
 
-    const reply = await createAssistantReply(content);
-    appendMessage('assistant', reply);
+    // Build history from all persisted messages except the user turn we just appended
+    const history = getActiveChat().messages.slice(0, -1).map(({ role, content: c }) => ({ role, content: c }));
+
+    // Replace typing indicator with a live streaming bubble
+    const container = qs('[data-message-list]');
+    const streamArticle = document.createElement('article');
+    streamArticle.className = 'message assistant';
+    streamArticle.innerHTML = `<div class="message-bubble" data-stream-target></div><div class="message-meta"><span>OmanX</span><span>Responding…</span></div>`;
+    container.replaceChild(streamArticle, container.lastElementChild);
+
+    const streamTarget = streamArticle.querySelector('[data-stream-target]');
+    const fullText = await createAssistantReply(content, history, streamTarget, container);
+
+    appendMessage('assistant', fullText);
     state.typing = false;
     render();
   });
@@ -195,7 +207,7 @@ function renderMessages() {
 
   container.innerHTML = chat.messages.map((message) => `
     <article class="message ${message.role}">
-      <div class="message-bubble">${renderRichText(message.content)}</div>
+      <div class="message-bubble">${renderMarkdown(message.content)}</div>
       <div class="message-meta">
         <span>${message.role === 'assistant' ? 'OmanX' : state.settings.studentName}</span>
         <span>${formatDateTime(message.createdAt)}</span>
@@ -243,25 +255,116 @@ function getActiveChat() {
   return state.chats.find((chat) => chat.id === state.activeChatId) || state.chats[0];
 }
 
-async function createAssistantReply(message) {
+async function createAssistantReply(message, history, targetEl, scrollEl) {
+  const { model, userContext } = state.settings;
+  let fullText = '';
+
   try {
     const response = await fetch('/api/chat', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ message }),
+      body: JSON.stringify({
+        message,
+        history,
+        model: model || 'claude-sonnet-4-6',
+        userContext: userContext || '',
+      }),
     });
 
-    const payload = await response.json().catch(() => ({}));
-    if (!response.ok) {
-      const errorMsg = payload.error || payload.text || `Server error (HTTP ${response.status})`;
-      return `**Error:** ${errorMsg}`;
+    // Degrade gracefully: non-SSE response is an error (JSON)
+    if (!(response.headers.get('content-type') || '').includes('text/event-stream')) {
+      const payload = await response.json().catch(() => ({}));
+      return payload.text || payload.error || `**Server error (HTTP ${response.status})**`;
     }
-    return payload.text;
+
+    const reader = response.body.getReader();
+    const decoder = new TextDecoder();
+    let buffer = '';
+
+    outer: while (true) {
+      const { done, value } = await reader.read();
+      if (done) break;
+      buffer += decoder.decode(value, { stream: true });
+      const lines = buffer.split('\n');
+      buffer = lines.pop(); // hold incomplete line for next chunk
+      for (const line of lines) {
+        if (!line.startsWith('data: ')) continue;
+        const data = line.slice(6).trim();
+        if (data === '[DONE]') break outer;
+        try {
+          const parsed = JSON.parse(data);
+          if (parsed.delta) {
+            fullText += parsed.delta;
+            targetEl.innerHTML = renderMarkdown(fullText);
+            scrollEl.scrollTop = scrollEl.scrollHeight;
+          }
+        } catch {
+          // ignore malformed SSE lines
+        }
+      }
+    }
   } catch (err) {
     return `**Network error:** ${err.message || 'Could not reach the server. Check your connection and try again.'}`;
   }
+
+  return fullText || 'No response generated.';
 }
 
+// --- Markdown renderer ---
+
+function renderMarkdown(text) {
+  const out = [];
+  const codeBlockRe = /```(\w*)\n?([\s\S]*?)```/g;
+  let last = 0;
+  let m;
+  while ((m = codeBlockRe.exec(text)) !== null) {
+    if (m.index > last) out.push(renderTextBlock(text.slice(last, m.index)));
+    out.push(`<pre><code>${escapeHtml(m[2])}</code></pre>`);
+    last = m.index + m[0].length;
+  }
+  if (last < text.length) out.push(renderTextBlock(text.slice(last)));
+  return out.join('');
+}
+
+function renderTextBlock(text) {
+  const lines = text.split('\n');
+  const out = [];
+  let inUl = false;
+  let inOl = false;
+
+  function closeList() {
+    if (inUl) { out.push('</ul>'); inUl = false; }
+    if (inOl) { out.push('</ol>'); inOl = false; }
+  }
+
+  for (const line of lines) {
+    const ulMatch = line.match(/^[-*] (.+)$/);
+    const olMatch = line.match(/^\d+\. (.+)$/);
+    if (ulMatch) {
+      if (inOl) { out.push('</ol>'); inOl = false; }
+      if (!inUl) { out.push('<ul>'); inUl = true; }
+      out.push(`<li>${applyInline(ulMatch[1])}</li>`);
+    } else if (olMatch) {
+      if (inUl) { out.push('</ul>'); inUl = false; }
+      if (!inOl) { out.push('<ol>'); inOl = true; }
+      out.push(`<li>${applyInline(olMatch[1])}</li>`);
+    } else {
+      closeList();
+      out.push(line === '' ? '<br>' : `${applyInline(line)}<br>`);
+    }
+  }
+  closeList();
+  return out.join('');
+}
+
+function applyInline(text) {
+  return escapeHtml(text)
+    .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
+    .replace(/\*(.*?)\*/g, '<em>$1</em>')
+    .replace(/`([^`]+)`/g, '<code>$1</code>');
+}
+
+// --- Utilities ---
 
 function deriveTitle(chat, role, content) {
   if (chat.title !== 'Untitled session' && chat.title !== 'New guidance session') return chat.title;
@@ -296,12 +399,5 @@ function slugify(value) {
 }
 
 function escapeHtml(value) {
-  return value.replace(/[&<>"']/g, (char) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[char]));
-}
-
-function renderRichText(content) {
-  return escapeHtml(content)
-    .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
-    .replace(/`([^`]+)`/g, '<span class="code-inline">$1</span>')
-    .replace(/\n/g, '<br>');
+  return String(value).replace(/[&<>"']/g, (char) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[char]));
 }
