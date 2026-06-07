@@ -8,50 +8,104 @@
     <link rel="icon" type="image/png" sizes="16x16" href="/assets/favicon-16x16.png" />
     <link rel="icon" type="image/svg+xml" href="/assets/icon.svg" />
     <link rel="manifest" href="/assets/site.webmanifest" />
-    <title>OmanX Vision</title>
+    <title>OmanX — Roadmap</title>
     <meta name="description" content="Long-term product vision for OmanX." />
     <link rel="stylesheet" href="/styles.css" />
   </head>
   <body>
-    <header class="site-header">
-      <div class="container navbar">
-        <a class="brandmark" href="/">OmanX</a>
-        <nav class="nav-links" aria-label="Primary">
-          <a class="nav-link" data-page-link="system" href="/system">System</a>
-          <a class="nav-link" data-page-link="method" href="/method">Method</a>
-          <a class="nav-link" data-page-link="vision" href="/vision">Vision</a>
-          <a class="nav-link" data-page-link="contact" href="/contact">Contact</a>
-        </nav>
-        <div class="nav-actions"><a class="btn" href="/workspace">Start</a></div>
+    <nav>
+      <a class="nav-logo" href="/">Oman<span>X</span></a>
+      <div class="nav-right">
+        <a class="nav-cta" href="/workspace">Open workspace</a>
+        <button class="nav-hamburger" data-mobile-toggle aria-label="Open menu" aria-expanded="false">
+          <span></span><span></span><span></span>
+        </button>
       </div>
-    </header>
+      <div class="nav-drawer" data-mobile-panel>
+        <a href="/">Home</a>
+        <a href="/workspace">Product</a>
+        <a href="/system">System</a>
+        <a href="/vision">Roadmap</a>
+        <a href="/contact">Contact</a>
+      </div>
+    </nav>
 
     <main>
+
       <section class="page-hero">
-        <div class="container-narrow">
+        <div class="container">
+          <div class="eyebrow">Product roadmap</div>
           <h1>Vision</h1>
-          <p>Build decision infrastructure for institutional complexity, where guidance is auditable, policy-aware, and resilient across scale.</p>
+          <p>Build decision infrastructure for institutional complexity — guidance that is auditable, policy-aware, and resilient across scale.</p>
         </div>
       </section>
+
+      <!-- Strategic direction — grid-divider cells -->
       <section class="section-tight">
-        <div class="container-narrow content-stack">
-          <article class="card content-section">
-            <h3>From assistant to infrastructure</h3>
-            <p>OmanX is not positioned as a conversational novelty. It is a guidance layer that structures institutional decisions and preserves reasoning quality over time.</p>
-          </article>
-          <article class="card content-section">
-            <h3>Institutional-grade decision support</h3>
-            <p>The long-term system supports scholars, sponsors, and advisory teams with shared, traceable decision records and explicit constraint handling.</p>
-          </article>
-          <article class="card content-section">
-            <h3>Scalable and auditable guidance</h3>
-            <p>As adoption grows, OmanX should provide confidence tracking, decision provenance, and robust policy update workflows.</p>
-          </article>
+        <div class="container">
+          <div class="section-label">Strategic direction</div>
+          <div class="grid-divider" style="grid-template-columns:repeat(3,1fr);">
+            <article style="padding:28px 24px;">
+              <h3>From assistant to infrastructure</h3>
+              <p style="margin-top:10px;">OmanX is not positioned as a conversational novelty. It is a guidance layer that structures institutional decisions and preserves reasoning quality over time.</p>
+            </article>
+            <article style="padding:28px 24px;">
+              <h3>Institutional-grade decision support</h3>
+              <p style="margin-top:10px;">The long-term system supports scholars, sponsors, and advisory teams with shared, traceable decision records and explicit constraint handling.</p>
+            </article>
+            <article style="padding:28px 24px;">
+              <h3>Scalable and auditable guidance</h3>
+              <p style="margin-top:10px;">As adoption grows, OmanX will provide confidence tracking, decision provenance, and robust policy update workflows.</p>
+            </article>
+          </div>
         </div>
       </section>
+
+      <!-- Roadmap timeline -->
+      <section class="section">
+        <div class="container">
+          <div class="section-label">Phases</div>
+          <div class="card" style="padding:0 32px;">
+            <div class="roadmap-item">
+              <div class="roadmap-phase">Phase 1 · Now</div>
+              <div>
+                <h3>Single-user decision workspace</h3>
+                <p style="margin-top:8px;">Structured outputs, local continuity, policy-aware framing for individual Omani scholars navigating US institutions.</p>
+              </div>
+            </div>
+            <div class="roadmap-item">
+              <div class="roadmap-phase">Phase 2 · Next</div>
+              <div>
+                <h3>Multi-user collaboration layer</h3>
+                <p style="margin-top:8px;">Shared rooms, thread boards, advisor coordination, and visible status signals across student cohorts.</p>
+              </div>
+            </div>
+            <div class="roadmap-item">
+              <div class="roadmap-phase">Phase 3 · Future</div>
+              <div>
+                <h3>Institutional-grade infrastructure</h3>
+                <p style="margin-top:8px;">Decision provenance, confidence tracking, MoHE policy synchronization, and formal escalation workflows for sponsors and advisors.</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
     </main>
 
-    <footer class="footer"><div class="container footer-row"><div>© <span data-year></span> OmanX</div><div>Calm systems for serious decisions.</div></div></footer>
+    <footer>
+      <div class="container footer-inner">
+        <div class="footer-logo">Oman<span>X</span></div>
+        <div class="footer-links">
+          <a href="/system">System</a>
+          <a href="/vision">Roadmap</a>
+          <a href="/contact">Contact</a>
+          <a href="mailto:alkindi.ceo@gmail.com">alkindi.ceo@gmail.com</a>
+        </div>
+        <div class="footer-copy">© <span data-year></span> OmanX</div>
+      </div>
+    </footer>
+
     <script type="module" src="/js/vision-page.js"></script>
   </body>
 </html>

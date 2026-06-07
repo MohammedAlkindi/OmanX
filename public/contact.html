@@ -8,46 +8,68 @@
     <link rel="icon" type="image/png" sizes="16x16" href="/assets/favicon-16x16.png" />
     <link rel="icon" type="image/svg+xml" href="/assets/icon.svg" />
     <link rel="manifest" href="/assets/site.webmanifest" />
-    <title>Contact OmanX</title>
+    <title>OmanX — Contact</title>
     <meta name="description" content="Contact OmanX for product, partnership, and institutional inquiries." />
     <link rel="stylesheet" href="/styles.css" />
   </head>
   <body>
-    <header class="site-header">
-      <div class="container navbar">
-        <a class="brandmark" href="/">OmanX</a>
-        <nav class="nav-links" aria-label="Primary">
-          <a class="nav-link" data-page-link="system" href="/system">System</a>
-          <a class="nav-link" data-page-link="method" href="/method">Method</a>
-          <a class="nav-link" data-page-link="vision" href="/vision">Vision</a>
-          <a class="nav-link" data-page-link="contact" href="/contact">Contact</a>
-        </nav>
-        <div class="nav-actions"><a class="btn" href="/workspace">Start</a></div>
+    <nav>
+      <a class="nav-logo" href="/">Oman<span>X</span></a>
+      <div class="nav-right">
+        <a class="nav-cta" href="/workspace">Open workspace</a>
+        <button class="nav-hamburger" data-mobile-toggle aria-label="Open menu" aria-expanded="false">
+          <span></span><span></span><span></span>
+        </button>
       </div>
-    </header>
+      <div class="nav-drawer" data-mobile-panel>
+        <a href="/">Home</a>
+        <a href="/workspace">Product</a>
+        <a href="/system">System</a>
+        <a href="/vision">Roadmap</a>
+        <a href="/contact">Contact</a>
+      </div>
+    </nav>
 
     <main>
+
       <section class="page-hero">
-        <div class="container-narrow">
+        <div class="container">
+          <div class="eyebrow">Get in touch</div>
           <h1>Contact</h1>
           <p>For institutional partnerships, implementation discussions, or product inquiries, contact the OmanX team.</p>
         </div>
       </section>
+
       <section class="section-tight">
-        <div class="container-narrow content-stack">
-          <article class="card content-section">
-            <h3>Email</h3>
-            <p><a href="mailto:hello@omanx.ai">hello@omanx.ai</a></p>
-          </article>
-          <article class="card content-section">
-            <h3>Institutional inquiries</h3>
-            <p>Include organization name, decision context, and expected deployment timeline so we can route your request quickly.</p>
-          </article>
+        <div class="container-narrow">
+          <div class="content-stack">
+            <article class="card content-section">
+              <h3>Email</h3>
+              <p><a href="mailto:alkindi.ceo@gmail.com">alkindi.ceo@gmail.com</a></p>
+            </article>
+            <article class="card content-section">
+              <h3>Institutional inquiries</h3>
+              <p>Include organization name, decision context, and expected deployment timeline so we can route your request quickly.</p>
+            </article>
+          </div>
         </div>
       </section>
+
     </main>
 
-    <footer class="footer"><div class="container footer-row"><div>© <span data-year></span> OmanX</div><div>Professional inquiries only.</div></div></footer>
+    <footer>
+      <div class="container footer-inner">
+        <div class="footer-logo">Oman<span>X</span></div>
+        <div class="footer-links">
+          <a href="/system">System</a>
+          <a href="/vision">Roadmap</a>
+          <a href="/contact">Contact</a>
+          <a href="mailto:alkindi.ceo@gmail.com">alkindi.ceo@gmail.com</a>
+        </div>
+        <div class="footer-copy">© <span data-year></span> OmanX</div>
+      </div>
+    </footer>
+
     <script type="module" src="/js/contact-page.js"></script>
   </body>
 </html>

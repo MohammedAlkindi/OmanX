@@ -9,14 +9,6 @@ import chatHandler from './api/chat.js';
 import healthHandler from './api/health.js';
 import readyHandler from './api/ready.js';
 import metricsHandler from './api/metrics.js';
-import authStartHandler from './api/auth/start.js';
-import authVerifyHandler from './api/auth/verify.js';
-import authSessionHandler from './api/auth/session.js';
-import authLogoutHandler from './api/auth/logout.js';
-import authGoogleHandler from './api/auth/google.js';
-import authGithubHandler from './api/auth/github.js';
-import authExchangeHandler from './api/auth/exchange.js';
-
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const PORT = Number(process.env.PORT || 3000);
 
@@ -38,13 +30,6 @@ const ROUTE_METHODS = new Map([
   ['/api/health', new Set(['GET'])],
   ['/api/ready', new Set(['GET'])],
   ['/api/metrics', new Set(['GET'])],
-  ['/api/auth/start', new Set(['POST'])],
-  ['/api/auth/verify', new Set(['POST'])],
-  ['/api/auth/session', new Set(['GET'])],
-  ['/api/auth/logout', new Set(['POST'])],
-  ['/api/auth/google', new Set(['GET'])],
-  ['/api/auth/github', new Set(['GET'])],
-  ['/api/auth/exchange', new Set(['POST'])],
 ]);
 
 // Middleware
@@ -68,14 +53,6 @@ app.post('/api/chat', chatHandler);
 app.get('/api/health', healthHandler);
 app.get('/api/ready', readyHandler);
 app.get('/api/metrics', metricsHandler);
-app.post('/api/auth/start', authStartHandler);
-app.post('/api/auth/verify', authVerifyHandler);
-app.get('/api/auth/session', authSessionHandler);
-app.post('/api/auth/logout', authLogoutHandler);
-app.get('/api/auth/google', authGoogleHandler);
-app.get('/api/auth/github', authGithubHandler);
-app.post('/api/auth/exchange', authExchangeHandler);
-
 // Canonical redirects from file-based routes
 app.get('/index.html', (req, res) => res.redirect(301, '/'));
 app.get('/chat.html', (req, res) => res.redirect(301, '/workspace'));

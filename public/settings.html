@@ -8,62 +8,89 @@
     <link rel="icon" type="image/png" sizes="16x16" href="/assets/favicon-16x16.png" />
     <link rel="icon" type="image/svg+xml" href="/assets/icon.svg" />
     <link rel="manifest" href="/assets/site.webmanifest" />
-    <title>OmanX — Workspace settings</title>
-    <meta name="description" content="Workspace settings and mock account preferences for OmanX." />
+    <title>OmanX — Settings</title>
+    <meta name="description" content="Workspace settings and preferences for OmanX." />
     <link rel="stylesheet" href="/styles.css" />
   </head>
   <body>
-    <header class="site-header">
-      <div class="container navbar">
-        <a class="brandmark" href="/"><span class="brandmark-badge">OX</span><span>OmanX</span></a>
-        <nav class="nav-links">
-          <a class="nav-link" data-page-link="home" href="/">Home</a>
-          <a class="nav-link" data-page-link="chat" href="/workspace">Product</a>
-          <a class="nav-link" data-page-link="collaboration" href="/collaboration">Collaboration</a>
-          <a class="nav-link" data-page-link="vision" href="/vision">Roadmap</a>
-          <a class="nav-link" data-page-link="trust" href="/trust">Trust</a>
-        </nav>
-        <div class="nav-actions">
-          <button class="icon-btn" data-theme-toggle aria-label="Toggle theme">◐</button>
-          <a class="btn" href="/workspace">Open Product</a>
-        </div>
+    <nav>
+      <a class="nav-logo" href="/">Oman<span>X</span></a>
+      <div class="nav-right">
+        <a class="nav-cta" href="/workspace">Open workspace</a>
+        <button class="nav-hamburger" data-mobile-toggle aria-label="Open menu" aria-expanded="false">
+          <span></span><span></span><span></span>
+        </button>
       </div>
-    </header>
+      <div class="nav-drawer" data-mobile-panel>
+        <a href="/">Home</a>
+        <a href="/workspace">Product</a>
+        <a href="/system">System</a>
+        <a href="/vision">Roadmap</a>
+        <a href="/contact">Contact</a>
+      </div>
+    </nav>
 
-    <main class="page-shell">
-      <section class="container section-heading">
-        <span class="eyebrow">Settings</span>
-        <h1>Configure your OmanX workspace preferences.</h1>
-        <p>This mock account layer makes the MVP feel complete and supports personalized labels across the chat interface.</p>
-      </section>
+    <main class="page-shell" style="background:var(--sand);">
 
-      <section class="container">
+      <div class="container">
+        <section class="section-heading" style="padding-top:40px;">
+          <div class="eyebrow">Configuration</div>
+          <h1>Workspace settings</h1>
+          <p>This mock account layer makes the MVP feel complete and supports personalized labels across the chat interface.</p>
+        </section>
+
+        <!-- settings-grid — form name attributes must not change (read by settings-page.js) -->
         <form class="settings-grid" data-settings-form>
-          <article class="card settings-card">
+
+          <!-- Profile basics — name attrs: studentName, homeCampus, priority -->
+          <article class="settings-card card">
             <h3>Profile basics</h3>
             <p class="muted">Used for workspace personalization.</p>
-            <div style="display:grid; gap:12px; margin-top:16px;">
-              <label>Display name<input class="sidebar-search" name="studentName" type="text" /></label>
-              <label>Campus or program<input class="sidebar-search" name="homeCampus" type="text" /></label>
-              <label>Current priority<input class="sidebar-search" name="priority" type="text" /></label>
+            <div class="settings-field-group">
+              <label>
+                Display name
+                <input name="studentName" type="text" />
+              </label>
+              <label>
+                Campus or program
+                <input name="homeCampus" type="text" />
+              </label>
+              <label>
+                Current priority
+                <input name="priority" type="text" />
+              </label>
             </div>
           </article>
-          <article class="card settings-card">
+
+          <!-- Preferences — name attrs: notifications, conciseMode -->
+          <article class="settings-card card">
             <h3>Preferences</h3>
-            <div style="display:grid; gap:14px; margin-top:16px;">
-              <label><input type="checkbox" name="notifications" /> Enable toast confirmations</label>
-              <label><input type="checkbox" name="conciseMode" /> Prefer concise assistant responses</label>
+            <div class="settings-field-group">
+              <!-- checkbox labels use row layout -->
+              <label style="flex-direction:row;align-items:center;gap:10px;cursor:pointer;">
+                <input type="checkbox" name="notifications" />
+                Enable toast confirmations
+              </label>
+              <label style="flex-direction:row;align-items:center;gap:10px;cursor:pointer;">
+                <input type="checkbox" name="conciseMode" />
+                Prefer concise assistant responses
+              </label>
             </div>
           </article>
-          <article class="card settings-card">
+
+          <!-- Notes + save -->
+          <article class="settings-card card">
             <h3>Workspace notes</h3>
             <p>OmanX stores MVP preferences locally in your browser for immediate usability and zero setup.</p>
-            <button class="btn" style="margin-top:16px;" type="submit">Save settings</button>
+            <button class="btn" style="margin-top:20px;" type="submit">Save settings</button>
           </article>
+
         </form>
-      </section>
+      </div>
+
     </main>
 
+    <!-- Mobile nav preserved -->
     <nav class="mobile-bottom-nav">
       <a data-page-link="home" href="/">Home</a>
       <a data-page-link="chat" href="/workspace">Product</a>
@@ -71,10 +98,16 @@
       <a data-page-link="vision" href="/vision">Roadmap</a>
     </nav>
 
-    <footer class="site-footer">
-      <div class="container footer-row">
-        <div>© <span data-year></span> OmanX settings</div>
-        <div>Personalization without complexity.</div>
+    <footer>
+      <div class="container footer-inner">
+        <div class="footer-logo">Oman<span>X</span></div>
+        <div class="footer-links">
+          <a href="/system">System</a>
+          <a href="/vision">Roadmap</a>
+          <a href="/contact">Contact</a>
+          <a href="mailto:alkindi.ceo@gmail.com">alkindi.ceo@gmail.com</a>
+        </div>
+        <div class="footer-copy">© <span data-year></span> OmanX</div>
       </div>
     </footer>
 

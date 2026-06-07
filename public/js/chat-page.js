@@ -14,14 +14,12 @@ const state = {
   filter: '',
   typing: false,
   settings: loadSettings(),
-  user: null,
 };
 
 initCore({ page: 'chat' });
 ensureActiveChat();
 render();
 bindEvents();
-initAuth();
 
 function ensureActiveChat() {
   const existing = state.chats.find((chat) => chat.id === state.activeChatId);
@@ -68,7 +66,7 @@ function bindEvents() {
     state.typing = true;
     renderMessages();
 
-    const reply = await createAssistantReply(content, getActiveChat());
+    const reply = await createAssistantReply(content);
     appendMessage('assistant', reply);
     state.typing = false;
     render();
@@ -116,85 +114,6 @@ function bindEvents() {
     showToast('Chat deleted.');
   });
 
-  qs('[data-google-signin]')?.addEventListener('click', async () => {
-    const btn = qs('[data-google-signin]');
-    btn.disabled = true;
-    setAuthError('');
-    try {
-      window.location.href = '/api/auth/google';
-    } catch {
-      setAuthError('Could not start Google sign-in. Try again.');
-      btn.disabled = false;
-    }
-  });
-
-  qs('[data-github-signin]')?.addEventListener('click', async () => {
-    const btn = qs('[data-github-signin]');
-    btn.disabled = true;
-    setAuthError('');
-    try {
-      window.location.href = '/api/auth/github';
-    } catch {
-      setAuthError('Could not start GitHub sign-in. Try again.');
-      btn.disabled = false;
-    }
-  });
-
-  qs('[data-auth-form]')?.addEventListener('submit', async (event) => {
-    event.preventDefault();
-    const email = qs('[data-auth-email]').value.trim();
-    if (!email) return;
-    setAuthError('');
-    const btn = qs('.auth-submit');
-    btn.disabled = true;
-    btn.textContent = 'Sending…';
-    try {
-      const res = await fetch('/api/auth/start', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email }),
-      });
-      const payload = await res.json().catch(() => ({}));
-      if (!res.ok) {
-        setAuthError(payload.error || 'Could not send link. Try again.');
-      } else {
-        qs('[data-auth-sent-email]').textContent = email;
-        qs('[data-auth-step="email"]').hidden = true;
-        qs('[data-auth-step="sent"]').hidden = false;
-      }
-    } catch {
-      setAuthError('Network error. Check your connection and try again.');
-    } finally {
-      btn.disabled = false;
-      btn.textContent = 'Send sign-in link';
-    }
-  });
-
-  qs('[data-auth-resend]')?.addEventListener('click', () => {
-    qs('[data-auth-step="sent"]').hidden = true;
-    qs('[data-auth-step="email"]').hidden = false;
-    setAuthError('');
-  });
-
-  // Close button
-  qs('[data-auth-close]')?.addEventListener('click', closeAuthModal);
-
-  // Backdrop click — only close when clicking the overlay itself, not the card
-  qs('[data-auth-overlay]')?.addEventListener('click', (event) => {
-    if (event.target === qs('[data-auth-overlay]')) closeAuthModal();
-  });
-
-  // ESC key
-  document.addEventListener('keydown', (event) => {
-    if (event.key === 'Escape' && !qs('[data-auth-overlay]')?.hidden) closeAuthModal();
-  });
-
-  qs('[data-logout-btn]')?.addEventListener('click', async () => {
-    await fetch('/api/auth/logout', { method: 'POST', credentials: 'include' });
-    state.user = null;
-    renderAuthState(false, null);
-    showToast('Signed out.');
-  });
 }
 
 function render() {
@@ -324,121 +243,16 @@ function getActiveChat() {
   return state.chats.find((chat) => chat.id === state.activeChatId) || state.chats[0];
 }
 
-async function initAuth() {
-  // Handle Google OAuth callback (tokens arrive in the URL hash)
-  const hash = new URLSearchParams(window.location.hash.slice(1));
-  const oauthToken = hash.get('access_token');
-  if (oauthToken) {
-    try {
-      const res = await fetch('/api/auth/exchange', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        credentials: 'include',
-        body: JSON.stringify({ access_token: oauthToken, expires_in: hash.get('expires_in') }),
-      });
-      const payload = await res.json().catch(() => ({}));
-      if (res.ok && payload.user) {
-        state.user = payload.user;
-        window.history.replaceState({}, '', window.location.pathname);
-        renderAuthState(true, payload.user);
-        showToast('Signed in successfully.');
-        return;
-      }
-    } catch { /* fall through to session check */ }
-  }
-
-  // Handle magic link callback
-  const params = new URLSearchParams(window.location.search);
-  const tokenHash = params.get('token_hash');
-  const type = params.get('type');
-  if (tokenHash && type) {
-    try {
-      const res = await fetch('/api/auth/verify', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        credentials: 'include',
-        body: JSON.stringify({ token_hash: tokenHash, type }),
-      });
-      const payload = await res.json().catch(() => ({}));
-      if (res.ok && payload.user) {
-        state.user = payload.user;
-        // Clean URL
-        const url = new URL(window.location.href);
-        url.searchParams.delete('token_hash');
-        url.searchParams.delete('type');
-        window.history.replaceState({}, '', url.pathname + (url.search || ''));
-        renderAuthState(true, payload.user);
-        showToast('Signed in successfully.');
-        return;
-      }
-    } catch { /* fall through to session check */ }
-  }
-
-  // Check existing session
-  try {
-    const res = await fetch('/api/auth/session', { credentials: 'include' });
-    if (res.ok) {
-      const payload = await res.json().catch(() => ({}));
-      state.user = payload.user || null;
-      renderAuthState(true, state.user);
-      return;
-    }
-  } catch { /* fall through */ }
-
-  renderAuthState(false, null);
-}
-
-function renderAuthState(authenticated, user) {
-  const overlay = qs('[data-auth-overlay]');
-  const emailEl = qs('[data-user-email]');
-  const logoutBtn = qs('[data-logout-btn]');
-  const composer = qs('[data-chat-form]');
-  const input = qs('[data-chat-input]');
-
-  overlay.hidden = authenticated;
-
-  if (authenticated && user) {
-    emailEl.textContent = user.email || '';
-    emailEl.hidden = !user.email;
-    logoutBtn.hidden = false;
-    if (composer) composer.removeAttribute('inert');
-    if (input) input.disabled = false;
-  } else {
-    emailEl.hidden = true;
-    logoutBtn.hidden = true;
-    if (composer) composer.setAttribute('inert', '');
-    if (input) input.disabled = true;
-  }
-}
-
-function setAuthError(message) {
-  const el = qs('[data-auth-error]');
-  if (!el) return;
-  el.textContent = message;
-  el.hidden = !message;
-}
-
-function closeAuthModal() {
-  const overlay = qs('[data-auth-overlay]');
-  if (overlay) overlay.hidden = true;
-}
-
-async function createAssistantReply(message, chat) {
+async function createAssistantReply(message) {
   try {
     const response = await fetch('/api/chat', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      credentials: 'include',
       body: JSON.stringify({ message }),
     });
 
     const payload = await response.json().catch(() => ({}));
     if (!response.ok) {
-      if (response.status === 401) {
-        state.user = null;
-        renderAuthState(false, null);
-        return '**Session expired.** Please sign in again to continue.';
-      }
       const errorMsg = payload.error || payload.text || `Server error (HTTP ${response.status})`;
       return `**Error:** ${errorMsg}`;
     }
@@ -448,42 +262,6 @@ async function createAssistantReply(message, chat) {
   }
 }
 
-function buildLocalReply(message, chat, settings) {
-  const lower = message.toLowerCase();
-  const focus = detectFocus(lower);
-  const bullets = {
-    departure: [
-      'Confirm passport, visa packet, I-20/DS-2019, insurance, and scholarship documents in one travel folder.',
-      'Create a 7-day arrival plan covering airport transfer, temporary meals, banking, SIM card, and campus check-in.',
-      'Store emergency numbers, embassy contacts, and your university international office details offline.'
-    ],
-    housing: [
-      'Compare rent, commute time, furnished status, deposits, and lease flexibility before deciding.',
-      'Inspect whether utilities, internet, and renter obligations are included so there are no budget surprises.',
-      'Escalate any contract confusion to your housing office or designated advisor before signing.'
-    ],
-    compliance: [
-      'Separate what is known, what is time-sensitive, and which official office owns the final answer.',
-      'Document your situation in writing so you can explain it clearly to the DSO, embassy, insurer, or scholarship team.',
-      'Do not act on assumptions when the issue touches visa status, health coverage, legal exposure, or enrollment.'
-    ],
-    general: [
-      'Break the problem into immediate next actions, medium-term follow-up, and who should verify each step.',
-      'Use OmanX conversation history to keep one thread per topic so decisions stay auditable.',
-      'Summarize outcomes after each milestone to make future escalations easier.'
-    ]
-  };
-  const selected = bullets[focus];
-  const recentTopics = chat.messages.slice(-3).map((item) => item.content).join(' | ');
-  return `Here is a structured OmanX response for **${settings.studentName}** focused on **${focus}**:\n\n1. ${selected[0]}\n2. ${selected[1]}\n3. ${selected[2]}\n\n**Recommended workflow**\n- Capture your goal in one sentence.\n- Prioritize the next 24-hour actions first.\n- Keep official verification attached to any high-stakes decision.\n\n**Context continuity**\nI also considered your recent conversation context: ${recentTopics || 'This is a fresh session.'}\n\nIf you want, I can turn this into a checklist, decision memo, or first-week action plan.`;
-}
-
-function detectFocus(lower) {
-  if (/(visa|insurance|legal|compliance|immigration|dso|embassy|health)/.test(lower)) return 'compliance';
-  if (/(housing|lease|rent|apartment|dorm)/.test(lower)) return 'housing';
-  if (/(departure|airport|travel|packing|arrival|fly)/.test(lower)) return 'departure';
-  return 'general';
-}
 
 function deriveTitle(chat, role, content) {
   if (chat.title !== 'Untitled session' && chat.title !== 'New guidance session') return chat.title;

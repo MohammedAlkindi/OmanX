@@ -13,9 +13,10 @@
     <link rel="stylesheet" href="/styles.css" />
   </head>
   <body class="error-page">
-    <main class="container error-shell" role="main">
-      <p class="error-code">500</p>
+    <main class="error-shell" role="main">
+      <p class="error-code">500 · Server error</p>
       <h1>We hit a temporary issue.</h1>
+      <!-- data-error-message is read by inline script below — id preserved -->
       <p data-error-message>Something went wrong on our side. Please try again shortly.</p>
       <div class="error-actions">
         <a class="btn" href="/">Go to homepage</a>
@@ -28,9 +29,7 @@
       const message = params.get('message');
       if (message) {
         const target = document.querySelector('[data-error-message]');
-        if (target) {
-          target.textContent = message;
-        }
+        if (target) target.textContent = message;
       }
     </script>
   </body>

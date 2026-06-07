@@ -13,7 +13,7 @@
 | OAuth token exchange | ✅ Working | `POST /api/auth/exchange` handles hash tokens from Supabase redirect |
 | Session persistence | ✅ Working | HttpOnly cookie via `api/auth/session.js` |
 | Logout | ✅ Working | Clears session cookie |
-| AI chat (`/workspace`) | ✅ Working | Requires auth + valid `OPENAI_API_KEY` |
+| AI chat (`/workspace`) | ✅ Working | Requires auth + valid `ANTHROPIC_API_KEY` |
 | Knowledge base retrieval | ✅ Working | Compliance-triggered KB search in `data/knowledge.json` |
 | Chat history (local storage) | ✅ Working | Persists across page refreshes, no server required |
 | Local Express dev server | ✅ Fixed | `server.js` imports updated to new `api/auth/` paths |
@@ -25,7 +25,7 @@
 
 | Feature | Status | Notes |
 |---------|--------|-------|
-| Chat responses without OpenAI key | ⚠️ Graceful error | Returns a "not configured" message if `OPENAI_API_KEY` is missing; no hard crash |
+| Chat responses without Anthropic key | ⚠️ Graceful error | Returns a "not configured" message if `ANTHROPIC_API_KEY` is missing; no hard crash |
 | Metrics endpoint (`/api/metrics`) | ⚠️ Basic | Returns process uptime/memory; not connected to any dashboard |
 | Settings page persistence | ⚠️ localStorage only | Settings (student name, etc.) are stored client-side; no server-side profile |
 | Collaboration page | ⚠️ Static | Content is static/informational; no live collaboration feature |
@@ -44,10 +44,10 @@ Set these in the Vercel project dashboard before deploying:
 | `SUPABASE_URL` | Yes | Your Supabase project URL (e.g. `https://abc.supabase.co`) |
 | `SUPABASE_ANON_KEY` | Yes | Supabase anon/public key |
 | `SUPABASE_SERVICE_ROLE_KEY` | Yes | Supabase service role key (for admin operations) |
-| `OPENAI_API_KEY` | Yes | OpenAI API key |
+| `ANTHROPIC_API_KEY` | Yes | Anthropic API key |
 | `APP_BASE_URL` | Yes | Production base URL (e.g. `https://www.omanx.org`) |
 | `AUTH_REDIRECT_URL` | Yes | OAuth redirect URL (e.g. `https://www.omanx.org/workspace`) |
-| `OPENAI_MODEL` | No | Defaults to `gpt-4o-mini` |
+| `ANTHROPIC_MODEL` | No | Defaults to `claude-sonnet-4-6` |
 | `NODE_ENV` | No | Set to `production` for secure cookie flags |
 
 ### Supabase OAuth Configuration
@@ -73,7 +73,7 @@ In your Google Cloud project:
 |------|----------|-----------|
 | Supabase redirect URL mismatch | High | Ensure `AUTH_REDIRECT_URL` in Vercel matches exactly what's in Supabase's allowed redirect URLs list |
 | `www` vs apex domain inconsistency | Medium | Register both domains in Vercel; set Supabase redirect URL to whichever is canonical |
-| OpenAI rate limits during demo | Medium | `gpt-4o-mini` has generous limits; cache is in-memory for identical queries |
+| Anthropic rate limits during demo | Medium | `claude-sonnet-4-6` has generous limits; cache is in-memory for identical queries |
 | Session cookie `Secure` flag requires HTTPS | Low | Already conditional on `NODE_ENV=production`; always true on Vercel |
 | In-memory response cache resets on cold starts | Low | Cache is per-function-instance; acceptable for demo |
 

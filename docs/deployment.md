@@ -17,7 +17,7 @@ OmanX uses:
 
 Request Flow:
 
-User → Vercel Edge → /api/chat → Express App → OpenAI → Response → Client
+User → Vercel Edge → /api/chat → Express App → Anthropic → Response → Client
 
 Static assets are served directly by Vercel.
 
@@ -29,8 +29,8 @@ The following environment variables must be configured in Vercel:
 
 Required:
 
-OPENAI_API_KEY  
-OPENAI_MODEL (default: gpt-4o-mini)  
+ANTHROPIC_API_KEY  
+ANTHROPIC_MODEL (default: claude-sonnet-4-6)  
 NODE_ENV=production  
 
 Optional:
@@ -175,7 +175,7 @@ Future hardening:
 
 Common Issues:
 
-- Missing OPENAI_API_KEY → 500 error
+- Missing ANTHROPIC_API_KEY → 500 error
 - Incorrect ESM import syntax
 - Serverless timeout
 - Excessive token usage

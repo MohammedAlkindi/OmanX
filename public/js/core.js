@@ -100,6 +100,15 @@ function initNav(page) {
   const toggle = qs('[data-mobile-toggle]');
   const panel = qs('[data-mobile-panel]');
   if (toggle && panel) {
-    toggle.addEventListener('click', () => panel.classList.toggle('open'));
+    toggle.addEventListener('click', () => {
+      const open = panel.classList.toggle('open');
+      toggle.setAttribute('aria-expanded', String(open));
+    });
+    document.addEventListener('click', (e) => {
+      if (!toggle.contains(e.target) && !panel.contains(e.target)) {
+        panel.classList.remove('open');
+        toggle.setAttribute('aria-expanded', 'false');
+      }
+    });
   }
 }

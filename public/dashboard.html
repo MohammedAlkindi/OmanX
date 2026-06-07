@@ -1,0 +1,293 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="icon" type="image/x-icon" href="/assets/favicon.ico" />
+    <link rel="icon" type="image/png" sizes="32x32" href="/assets/favicon-32x32.png" />
+    <link rel="icon" type="image/png" sizes="16x16" href="/assets/favicon-16x16.png" />
+    <link rel="icon" type="image/svg+xml" href="/assets/icon.svg" />
+    <link rel="manifest" href="/assets/site.webmanifest" />
+    <title>OmanX — Ministry Dashboard</title>
+    <meta name="description" content="Ministry of Higher Education oversight dashboard for Omani scholars abroad." />
+    <link rel="stylesheet" href="/styles.css" />
+  </head>
+  <body class="dashboard-body">
+
+    <header class="site-header">
+      <div class="container navbar">
+        <a class="brandmark" href="/">OmanX</a>
+        <nav class="nav-links" aria-label="Primary">
+          <a class="nav-link" data-page-link="system" href="/system">System</a>
+          <a class="nav-link" data-page-link="method" href="/method">Method</a>
+          <a class="nav-link" data-page-link="vision" href="/vision">Vision</a>
+          <a class="nav-link" data-page-link="contact" href="/contact">Contact</a>
+        </nav>
+        <div class="nav-actions">
+          <span class="ministry-badge">Ministry of Higher Education</span>
+          <a class="btn" href="/workspace">Scholar workspace</a>
+        </div>
+      </div>
+    </header>
+
+    <main class="dashboard-main">
+      <div class="container">
+
+        <!-- ── Dashboard header ───────────────────────────── -->
+        <div class="dash-header">
+          <div>
+            <div class="dash-breadcrumb">Oversight</div>
+            <h1 class="dash-title">Scholar Cohort Dashboard</h1>
+            <p class="dash-subtitle">Academic Year 2024–2025 · United States · Last updated <span id="dash-updated">just now</span></p>
+          </div>
+          <div class="dash-header-actions">
+            <button class="btn-secondary" id="btn-export-report">Export report</button>
+            <div class="dash-live-indicator">
+              <span class="live-dot"></span>
+              Live
+            </div>
+          </div>
+        </div>
+
+        <!-- ── KPI row ────────────────────────────────────── -->
+        <div class="kpi-row">
+          <div class="kpi-card">
+            <div class="kpi-label">Total sponsored scholars</div>
+            <div class="kpi-value">2,418</div>
+            <div class="kpi-delta kpi-neutral">United States</div>
+          </div>
+          <div class="kpi-card kpi-success">
+            <div class="kpi-label">Fully compliant</div>
+            <div class="kpi-value">1,931</div>
+            <div class="kpi-delta kpi-positive">↑ 79.9%  of cohort</div>
+          </div>
+          <div class="kpi-card kpi-warning">
+            <div class="kpi-label">Needs attention</div>
+            <div class="kpi-value">341</div>
+            <div class="kpi-delta kpi-warn">14.1% · action recommended</div>
+          </div>
+          <div class="kpi-card kpi-danger">
+            <div class="kpi-label">At-risk / critical</div>
+            <div class="kpi-value">146</div>
+            <div class="kpi-delta kpi-neg">6.0% · immediate action</div>
+          </div>
+        </div>
+
+        <!-- ── Main content ───────────────────────────────── -->
+        <div class="dash-grid">
+
+          <!-- Left: Alerts feed -->
+          <section class="dash-panel dash-panel-wide">
+            <div class="panel-header">
+              <h3 class="panel-title">Active compliance alerts</h3>
+              <div class="panel-meta">146 critical · 341 advisory</div>
+            </div>
+
+            <div class="alert-tabs">
+              <button class="alert-tab active" data-tab="critical">Critical (146)</button>
+              <button class="alert-tab" data-tab="advisory">Advisory (341)</button>
+              <button class="alert-tab" data-tab="resolved">Resolved (89)</button>
+            </div>
+
+            <div class="alert-list" id="alert-list">
+              <!-- Rendered by JS -->
+            </div>
+          </section>
+
+          <!-- Right: Stats panels -->
+          <div class="dash-side">
+
+            <!-- Compliance breakdown -->
+            <section class="dash-panel">
+              <div class="panel-header">
+                <h3 class="panel-title">Compliance breakdown</h3>
+              </div>
+              <div class="breakdown-list">
+                <div class="breakdown-item">
+                  <div class="breakdown-label">
+                    <span class="breakdown-dot dot-success"></span>
+                    Visa & SEVIS
+                  </div>
+                  <div class="breakdown-bar-wrap">
+                    <div class="breakdown-bar" style="width:88%"></div>
+                  </div>
+                  <div class="breakdown-pct">88%</div>
+                </div>
+                <div class="breakdown-item">
+                  <div class="breakdown-label">
+                    <span class="breakdown-dot dot-success"></span>
+                    Academic standing
+                  </div>
+                  <div class="breakdown-bar-wrap">
+                    <div class="breakdown-bar" style="width:84%"></div>
+                  </div>
+                  <div class="breakdown-pct">84%</div>
+                </div>
+                <div class="breakdown-item">
+                  <div class="breakdown-label">
+                    <span class="breakdown-dot dot-warning"></span>
+                    Scholarship obligations
+                  </div>
+                  <div class="breakdown-bar-wrap">
+                    <div class="breakdown-bar breakdown-bar-warn" style="width:76%"></div>
+                  </div>
+                  <div class="breakdown-pct">76%</div>
+                </div>
+                <div class="breakdown-item">
+                  <div class="breakdown-label">
+                    <span class="breakdown-dot dot-warning"></span>
+                    Health insurance
+                  </div>
+                  <div class="breakdown-bar-wrap">
+                    <div class="breakdown-bar breakdown-bar-warn" style="width:79%"></div>
+                  </div>
+                  <div class="breakdown-pct">79%</div>
+                </div>
+                <div class="breakdown-item">
+                  <div class="breakdown-label">
+                    <span class="breakdown-dot dot-danger"></span>
+                    Employment authorization
+                  </div>
+                  <div class="breakdown-bar-wrap">
+                    <div class="breakdown-bar breakdown-bar-danger" style="width:61%"></div>
+                  </div>
+                  <div class="breakdown-pct">61%</div>
+                </div>
+              </div>
+            </section>
+
+            <!-- University distribution -->
+            <section class="dash-panel">
+              <div class="panel-header">
+                <h3 class="panel-title">Top universities by cohort size</h3>
+              </div>
+              <div class="uni-list">
+                <div class="uni-row">
+                  <div class="uni-name">University of Illinois</div>
+                  <div class="uni-bar-wrap">
+                    <div class="uni-bar" style="width:72%"></div>
+                  </div>
+                  <div class="uni-count">214</div>
+                </div>
+                <div class="uni-row">
+                  <div class="uni-name">Arizona State University</div>
+                  <div class="uni-bar-wrap">
+                    <div class="uni-bar" style="width:64%"></div>
+                  </div>
+                  <div class="uni-count">189</div>
+                </div>
+                <div class="uni-row">
+                  <div class="uni-name">University of Missouri</div>
+                  <div class="uni-bar-wrap">
+                    <div class="uni-bar" style="width:55%"></div>
+                  </div>
+                  <div class="uni-count">162</div>
+                </div>
+                <div class="uni-row">
+                  <div class="uni-name">Texas A&amp;M University</div>
+                  <div class="uni-bar-wrap">
+                    <div class="uni-bar" style="width:48%"></div>
+                  </div>
+                  <div class="uni-count">141</div>
+                </div>
+                <div class="uni-row">
+                  <div class="uni-name">Michigan State University</div>
+                  <div class="uni-bar-wrap">
+                    <div class="uni-bar" style="width:38%"></div>
+                  </div>
+                  <div class="uni-count">113</div>
+                </div>
+                <div class="uni-row">
+                  <div class="uni-name">Others (47 universities)</div>
+                  <div class="uni-bar-wrap">
+                    <div class="uni-bar" style="width:100%"></div>
+                  </div>
+                  <div class="uni-count">1,599</div>
+                </div>
+              </div>
+            </section>
+
+          </div>
+        </div>
+
+        <!-- ── Decision activity log ──────────────────────── -->
+        <section class="dash-panel dash-panel-full">
+          <div class="panel-header">
+            <h3 class="panel-title">Recent decision activity</h3>
+            <div class="panel-meta">Last 7 days · anonymised scholar IDs</div>
+          </div>
+          <div class="activity-table-wrap">
+            <table class="activity-table">
+              <thead>
+                <tr>
+                  <th>Scholar ID</th>
+                  <th>University</th>
+                  <th>Decision type</th>
+                  <th>Risk level</th>
+                  <th>Outcome / next step</th>
+                  <th>Date</th>
+                </tr>
+              </thead>
+              <tbody id="activity-tbody">
+                <!-- Rendered by JS -->
+              </tbody>
+            </table>
+          </div>
+        </section>
+
+        <!-- ── Scholarship investment summary ────────────── -->
+        <section class="dash-panel dash-panel-full">
+          <div class="panel-header">
+            <h3 class="panel-title">Scholarship investment at risk</h3>
+            <div class="panel-meta">Estimated value of non-compliant cohort</div>
+          </div>
+          <div class="investment-grid">
+            <div class="investment-card">
+              <div class="investment-label">Average annual scholarship value</div>
+              <div class="investment-value">OMR 6,400</div>
+              <div class="investment-sub">Per scholar, per year</div>
+            </div>
+            <div class="investment-card investment-warn">
+              <div class="investment-label">Investment at risk (advisory)</div>
+              <div class="investment-value">OMR 2.18M</div>
+              <div class="investment-sub">341 scholars × OMR 6,400</div>
+            </div>
+            <div class="investment-card investment-danger">
+              <div class="investment-label">Investment at risk (critical)</div>
+              <div class="investment-value">OMR 934K</div>
+              <div class="investment-sub">146 scholars × OMR 6,400</div>
+            </div>
+            <div class="investment-card investment-total">
+              <div class="investment-label">Total preventable exposure</div>
+              <div class="investment-value">OMR 3.11M</div>
+              <div class="investment-sub">Without proactive intervention</div>
+            </div>
+          </div>
+        </section>
+
+      </div>
+    </main>
+
+    <!-- Scholar detail modal -->
+    <div id="scholar-modal" class="modal-backdrop" hidden>
+      <div class="modal" role="dialog" aria-labelledby="modal-title">
+        <div class="modal-header">
+          <h3 id="modal-title">Scholar detail</h3>
+          <button class="modal-close" id="modal-close" aria-label="Close">✕</button>
+        </div>
+        <div id="modal-body" class="modal-body">
+          <!-- filled by JS -->
+        </div>
+      </div>
+    </div>
+
+    <footer class="footer">
+      <div class="container footer-row">
+        <div>© <span data-year></span> OmanX</div>
+        <div>Ministry of Higher Education — Restricted access</div>
+      </div>
+    </footer>
+
+    <script type="module" src="/js/dashboard-page.js"></script>
+  </body>
+</html>

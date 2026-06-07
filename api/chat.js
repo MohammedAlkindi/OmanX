@@ -1,11 +1,10 @@
 // api/chat.js - API route for OmanX chatbot
 
-import OpenAI from "openai";
+import Anthropic from "@anthropic-ai/sdk";
 import fs from "fs/promises";
 import path from "path";
 import { fileURLToPath } from "url";
 import crypto from "crypto";
-import { requireAuth } from "./auth/_auth.js";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
@@ -15,7 +14,7 @@ const KNOWLEDGE_PATHS = [
   path.join(__dirname, "../../data/knowledge.json"),
 ];
 
-const MODEL = process.env.OPENAI_MODEL || "gpt-4o-mini";
+const MODEL = process.env.ANTHROPIC_MODEL || "claude-sonnet-4-6";
 
 let _kb = null;
 let _kbMtime = 0;
@@ -139,11 +138,11 @@ function cacheSet(key, value) {
 let _client = null;
 function getClient() {
   if (_client) return _client;
-  if (!process.env.OPENAI_API_KEY) {
-    console.error("[OmanX] Missing OPENAI_API_KEY environment variable");
+  if (!process.env.ANTHROPIC_API_KEY) {
+    console.error("[OmanX] Missing ANTHROPIC_API_KEY environment variable");
     return null;
   }
-  _client = new OpenAI({ apiKey: process.env.OPENAI_API_KEY, timeout: 60_000, maxRetries: 2 });
+  _client = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY, timeout: 60_000, maxRetries: 2 });
   return _client;
 }
 
@@ -158,10 +157,6 @@ export default async function handler(req, res) {
 
   if (req.method === "OPTIONS") return res.status(200).end();
   if (req.method !== "POST") return res.status(405).json({ error: "Method not allowed" });
-
-  const auth = await requireAuth(req);
-  if (!auth.ok) return res.status(auth.status).json({ error: auth.error });
-
 
   const { message } = req.body || {};
 
@@ -183,7 +178,7 @@ export default async function handler(req, res) {
   if (!client) {
     return res.status(500).json({
       text: "OmanX is not configured. Please contact the administrator.",
-      error: "OpenAI client not configured",
+      error: "Anthropic client not configured",
     });
   }
 
@@ -205,28 +200,23 @@ export default async function handler(req, res) {
   const systemPrompt = buildSystemPrompt(kbResults);
 
   try {
-    console.log("[OmanX] /api/chat request", {
-      userId: auth.user.id,
-      email: auth.user.email,
-      compliance,
-      chars: sanitizedMessage.length,
-    });
+    console.log("[OmanX] /api/chat request", { compliance, chars: sanitizedMessage.length });
 
-    const response = await client.chat.completions.create({
+    const response = await client.messages.create({
       model: MODEL,
-      messages: [
-        { role: "system", content: systemPrompt },
-        { role: "user", content: sanitizedMessage },
-      ],
       max_tokens: 1024,
       temperature: 0.4,
+      system: systemPrompt,
+      messages: [
+        { role: "user", content: sanitizedMessage },
+      ],
     });
 
-    const text = response.choices?.[0]?.message?.content?.trim() || "No response generated.";
+    const text = response.content?.[0]?.text?.trim() || "No response generated.";
     cacheSet(cacheKey, text);
     return res.json({ text, cached: false, compliance });
   } catch (err) {
-    console.error("[OmanX] OpenAI error:", err?.message, err?.stack);
+    console.error("[OmanX] Anthropic error:", err?.message, err?.stack);
     if (err?.status === 429) {
       return res.status(429).json({
         error: "Rate limit reached. Please wait a moment and try again.",

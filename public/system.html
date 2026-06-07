@@ -8,64 +8,79 @@
     <link rel="icon" type="image/png" sizes="16x16" href="/assets/favicon-16x16.png" />
     <link rel="icon" type="image/svg+xml" href="/assets/icon.svg" />
     <link rel="manifest" href="/assets/site.webmanifest" />
-    <title>OmanX System</title>
+    <title>OmanX — System</title>
     <meta name="description" content="System overview for OmanX decision intelligence." />
     <link rel="stylesheet" href="/styles.css" />
   </head>
   <body>
-    <header class="site-header">
-      <div class="container navbar">
-        <a class="brandmark" href="/">OmanX</a>
-        <nav class="nav-links" aria-label="Primary">
-          <a class="nav-link" data-page-link="system" href="/system">System</a>
-          <a class="nav-link" data-page-link="method" href="/method">Method</a>
-          <a class="nav-link" data-page-link="vision" href="/vision">Vision</a>
-          <a class="nav-link" data-page-link="contact" href="/contact">Contact</a>
-        </nav>
-        <div class="nav-actions"><a class="btn" href="/workspace">Start</a></div>
+    <nav>
+      <a class="nav-logo" href="/">Oman<span>X</span></a>
+      <div class="nav-right">
+        <a class="nav-cta" href="/workspace">Open workspace</a>
+        <button class="nav-hamburger" data-mobile-toggle aria-label="Open menu" aria-expanded="false">
+          <span></span><span></span><span></span>
+        </button>
       </div>
-    </header>
+      <div class="nav-drawer" data-mobile-panel>
+        <a href="/">Home</a>
+        <a href="/workspace">Product</a>
+        <a href="/system">System</a>
+        <a href="/vision">Roadmap</a>
+        <a href="/contact">Contact</a>
+      </div>
+    </nav>
 
     <main>
+
       <section class="page-hero">
-        <div class="container-narrow">
+        <div class="container">
+          <div class="eyebrow">System documentation</div>
           <h1>System</h1>
-          <p>
-            OmanX is a decision infrastructure layer for Omani scholars managing institutional constraints
-            across admissions, sponsorship, compliance, and academic progression.
-          </p>
+          <p>OmanX is a decision infrastructure layer for Omani scholars managing institutional constraints across admissions, sponsorship, compliance, and academic progression.</p>
         </div>
       </section>
 
       <section class="section-tight">
-        <div class="container-narrow content-stack">
-          <article class="card content-section">
-            <h3>University pathway guidance</h3>
-            <p>Transforms fragmented application and enrollment questions into ordered decision sequences, deadlines, and escalation points.</p>
-          </article>
-          <article class="card content-section">
-            <h3>Sponsorship and scholarship constraints</h3>
-            <p>Maps scholarship terms, sponsor requirements, and academic obligations into explicit constraints so recommendations remain policy-aligned.</p>
-          </article>
-          <article class="card content-section">
-            <h3>Visa and compliance context</h3>
-            <p>Flags compliance-sensitive topics and outputs conservative guidance with verification boundaries and accountable offices.</p>
-          </article>
-          <article class="card content-section">
-            <h3>Structured decision outputs</h3>
-            <p>Every response is organized into a decision artifact with constraints, interpretation, recommended next step, and stated assumptions.</p>
-            <p><a href="/examples">See example artifacts →</a></p>
-          </article>
+        <div class="container-narrow">
+          <div class="section-label">Capabilities</div>
+          <!-- content-stack renders as 1px-gap stacked cards -->
+          <div class="content-stack">
+            <article class="card content-section">
+              <h3>University pathway guidance</h3>
+              <p>Transforms fragmented application and enrollment questions into ordered decision sequences, deadlines, and escalation points.</p>
+            </article>
+            <article class="card content-section">
+              <h3>Sponsorship and scholarship constraints</h3>
+              <p>Maps scholarship terms, sponsor requirements, and academic obligations into explicit constraints so recommendations remain policy-aligned.</p>
+            </article>
+            <article class="card content-section">
+              <h3>Visa and compliance context</h3>
+              <p>Flags compliance-sensitive topics and outputs conservative guidance with verification boundaries and accountable offices.</p>
+            </article>
+            <article class="card content-section">
+              <h3>Structured decision outputs</h3>
+              <p>Every response is organized into a decision artifact with constraints, interpretation, recommended next step, and stated assumptions.</p>
+              <p><a href="/examples">See example artifacts →</a></p>
+            </article>
+          </div>
         </div>
       </section>
+
     </main>
 
-    <footer class="footer">
-      <div class="container footer-row">
-        <div>© <span data-year></span> OmanX</div>
-        <div>System documentation for decision quality.</div>
+    <footer>
+      <div class="container footer-inner">
+        <div class="footer-logo">Oman<span>X</span></div>
+        <div class="footer-links">
+          <a href="/system">System</a>
+          <a href="/vision">Roadmap</a>
+          <a href="/contact">Contact</a>
+          <a href="mailto:alkindi.ceo@gmail.com">alkindi.ceo@gmail.com</a>
+        </div>
+        <div class="footer-copy">© <span data-year></span> OmanX</div>
       </div>
     </footer>
+
     <script type="module" src="/js/system-page.js"></script>
   </body>
 </html>
