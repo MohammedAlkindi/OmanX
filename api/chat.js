@@ -4,6 +4,7 @@ import Anthropic from "@anthropic-ai/sdk";
 import fs from "fs/promises";
 import path from "path";
 import { fileURLToPath } from "url";
+import crypto from "crypto";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
@@ -14,7 +15,6 @@ const KNOWLEDGE_PATHS = [
 ];
 
 const MODEL = process.env.ANTHROPIC_MODEL || "claude-sonnet-4-6";
-const ALLOWED_MODELS = ["claude-haiku-4-5-20251001", "claude-sonnet-4-6"];
 
 let _kb = null;
 let _kbMtime = 0;
@@ -112,16 +112,27 @@ Always:
 - For any compliance question, end your response with a clear reminder to verify with their Designated School Official (DSO) before taking action
 - Never fabricate contact information, deadlines, or policy details`;
 
-function buildSystemPrompt(kbResults, userContext) {
-  let system = BASE_SYSTEM;
-  if (userContext && typeof userContext === "string" && userContext.trim()) {
-    system += `\n\n## Student context\n${userContext.trim()}`;
-  }
-  if (!kbResults || kbResults.length === 0) return system;
+function buildSystemPrompt(kbResults) {
+  if (!kbResults || kbResults.length === 0) return BASE_SYSTEM;
   const kbSection = kbResults
     .map((r, i) => `### KB Entry ${i + 1} — ID: ${r.id}\n${JSON.stringify(r.doc, null, 2)}`)
     .join("\n\n");
-  return `${system}\n\n---\n\n## Relevant Knowledge Base Entries\nUse ONLY these entries for compliance guidance. Cite the entry ID when referencing them.\n\n${kbSection}`;
+  return `${BASE_SYSTEM}\n\n---\n\n## Relevant Knowledge Base Entries\nUse ONLY these entries for compliance guidance. Cite the entry ID when referencing them.\n\n${kbSection}`;
+}
+
+const _cache = new Map();
+const CACHE_TTL = 10 * 60 * 1000;
+
+function cacheGet(key) {
+  const entry = _cache.get(key);
+  if (!entry) return null;
+  if (Date.now() - entry.ts > CACHE_TTL) { _cache.delete(key); return null; }
+  return entry.value;
+}
+
+function cacheSet(key, value) {
+  if (_cache.size > 500) _cache.delete(_cache.keys().next().value);
+  _cache.set(key, { ts: Date.now(), value });
 }
 
 let _client = null;
@@ -147,7 +158,7 @@ export default async function handler(req, res) {
   if (req.method === "OPTIONS") return res.status(200).end();
   if (req.method !== "POST") return res.status(405).json({ error: "Method not allowed" });
 
-  const { message, history, model, userContext } = req.body || {};
+  const { message } = req.body || {};
 
   if (!message || typeof message !== "string") {
     return res.status(400).json({ error: "Missing 'message' string." });
@@ -171,15 +182,13 @@ export default async function handler(req, res) {
     });
   }
 
-  const resolvedModel = ALLOWED_MODELS.includes(model) ? model : MODEL;
+  const cacheKey = crypto
+    .createHash("sha256")
+    .update(`${MODEL}::${sanitizedMessage}`)
+    .digest("hex");
 
-  const validHistory = Array.isArray(history)
-    ? history
-        .filter((m) => (m.role === "user" || m.role === "assistant") && typeof m.content === "string")
-        .map((m) => ({ role: m.role, content: sanitizeMessage(m.content) }))
-    : [];
-
-  const messages = [...validHistory, { role: "user", content: sanitizedMessage }];
+  const cached = cacheGet(cacheKey);
+  if (cached) return res.json({ text: cached, cached: true });
 
   const compliance = isCompliance(sanitizedMessage);
   let kbResults = [];
@@ -188,22 +197,24 @@ export default async function handler(req, res) {
     if (kb) kbResults = searchKB(kb, sanitizedMessage);
   }
 
-  const sanitizedUserContext = typeof userContext === "string" ? userContext.slice(0, 2000) : "";
-  const systemPrompt = buildSystemPrompt(kbResults, sanitizedUserContext);
+  const systemPrompt = buildSystemPrompt(kbResults);
 
-  // Initiate the stream BEFORE setting SSE headers so rate-limit/auth errors return clean JSON
-  let stream;
   try {
-    console.log("[OmanX] /api/chat stream", { compliance, chars: sanitizedMessage.length, model: resolvedModel, historyTurns: validHistory.length });
+    console.log("[OmanX] /api/chat request", { compliance, chars: sanitizedMessage.length });
 
-    stream = await client.messages.create({
-      model: resolvedModel,
+    const response = await client.messages.create({
+      model: MODEL,
       max_tokens: 1024,
       temperature: 0.4,
       system: systemPrompt,
-      messages,
-      stream: true,
+      messages: [
+        { role: "user", content: sanitizedMessage },
+      ],
     });
+
+    const text = response.content?.[0]?.text?.trim() || "No response generated.";
+    cacheSet(cacheKey, text);
+    return res.json({ text, cached: false, compliance });
   } catch (err) {
     console.error("[OmanX] Anthropic error:", err?.message, err?.stack);
     if (err?.status === 429) {
@@ -224,27 +235,5 @@ export default async function handler(req, res) {
         : "I couldn't process your request. Please try again.",
       error: err?.message || "Unknown error",
     });
-  }
-
-  // Stream created successfully — switch to SSE mode
-  res.setHeader("Content-Type", "text/event-stream");
-  res.setHeader("Cache-Control", "no-cache");
-  res.setHeader("Connection", "keep-alive");
-  if (res.socket) res.socket.setNoDelay(true);
-  res.flushHeaders();
-
-  try {
-    for await (const event of stream) {
-      if (event.type === "content_block_delta" && event.delta?.type === "text_delta") {
-        res.write(`data: ${JSON.stringify({ delta: event.delta.text })}\n\n`);
-      }
-    }
-    res.write("data: [DONE]\n\n");
-    res.end();
-  } catch (err) {
-    console.error("[OmanX] Mid-stream error:", err?.message);
-    res.write(`data: ${JSON.stringify({ error: "Stream interrupted. Please try again." })}\n\n`);
-    res.write("data: [DONE]\n\n");
-    res.end();
   }
 }
