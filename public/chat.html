@@ -11,6 +11,7 @@
     <title>OmanX Workspace</title>
     <meta name="description" content="Structured workspace for policy-aware decision guidance." />
     <link rel="stylesheet" href="/styles.css" />
+    <script defer src="/_vercel/insights/script.js"></script>
   </head>
   <body>
     <!-- Navigation — sticky, frosted -->
@@ -47,26 +48,34 @@
           <label class="muted" for="chat-search">Search</label>
           <input id="chat-search" class="sidebar-search" data-chat-search type="search" placeholder="Search conversations" />
 
-          <div class="row-between">
-            <span class="muted">Local continuity</span>
-            <span class="muted">Structured outputs</span>
-          </div>
-
           <div class="chat-list" data-chat-list></div>
         </aside>
 
         <!-- Main chat area -->
         <section class="assistant-shell" aria-label="Decision workspace">
           <header class="chat-header">
-            <div>
-              <h1 data-chat-title>Decision workspace</h1>
-              <p data-chat-subtitle>Structured outputs with policy-aware framing.</p>
+            <div class="chat-header-top">
+              <button class="btn-ghost sidebar-toggle-btn" data-sidebar-toggle type="button">≡ Conversations</button>
+              <div class="chat-header-title">
+                <h1 data-chat-title>Decision workspace</h1>
+                <input class="chat-title-input" data-chat-title-input type="text" hidden />
+                <p data-chat-subtitle>Structured outputs with policy-aware framing.</p>
+              </div>
+              <div class="chat-actions-wrap">
+                <button class="icon-btn" data-chat-menu-toggle type="button" title="Chat options" aria-haspopup="true" aria-expanded="false">···</button>
+                <div class="chat-menu-dropdown" data-chat-menu hidden>
+                  <button type="button" data-copy-last>Copy last reply</button>
+                  <button type="button" data-export-chat>Export chat</button>
+                  <hr class="menu-divider" />
+                  <button type="button" data-rename-chat>Rename</button>
+                  <button type="button" data-delete-chat class="danger">Delete</button>
+                </div>
+              </div>
             </div>
-            <div class="chat-actions-wrap">
-              <button class="btn-secondary" data-copy-last type="button" style="height:32px;padding:0 12px;font-size:0.8125rem;">Copy last</button>
-              <button class="btn-secondary" data-export-chat type="button" style="height:32px;padding:0 12px;font-size:0.8125rem;">Export</button>
-              <button class="btn-secondary" data-rename-chat type="button" style="height:32px;padding:0 12px;font-size:0.8125rem;">Rename</button>
-              <button class="btn-secondary" data-delete-chat type="button" style="height:32px;padding:0 12px;font-size:0.8125rem;">Delete</button>
+            <div class="chat-confirm-bar" data-confirm-delete hidden>
+              <span>Delete this chat?</span>
+              <button type="button" class="confirm-delete-btn" data-confirm-yes>Delete</button>
+              <button type="button" class="confirm-cancel-btn" data-confirm-no>Cancel</button>
             </div>
           </header>
 
@@ -74,12 +83,11 @@
 
           <form class="composer" data-chat-form>
             <div class="composer-box card">
-              <label class="muted" for="chat-input">Your decision question</label>
               <textarea id="chat-input" data-chat-input placeholder="Describe your decision context, constraints, and timeline."></textarea>
               <div class="composer-footer">
-                <div class="status-inline"><i></i><span>Local save enabled. API used when available.</span></div>
+                <div class="status-inline"><i data-status-dot></i><span data-status-text>Ready</span></div>
                 <div>Press <span class="kbd">Enter</span> to send</div>
-                <button class="btn" type="submit" style="height:34px;padding:0 20px;font-size:0.8125rem;">Send</button>
+                <button class="btn" type="submit" data-send-btn style="height:34px;padding:0 20px;font-size:0.8125rem;">Send</button>
               </div>
             </div>
           </form>

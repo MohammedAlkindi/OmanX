@@ -8,16 +8,28 @@
     <link rel="icon" type="image/png" sizes="16x16" href="/assets/favicon-16x16.png" />
     <link rel="icon" type="image/svg+xml" href="/assets/icon.svg" />
     <link rel="manifest" href="/assets/site.webmanifest" />
-    <title>OmanX</title>
+    <title>OmanX — Guidance for Omani Scholars in the US</title>
     <meta name="description" content="Policy-aware decision intelligence for Omani scholars navigating applications, sponsorship, visas, and academic pathways." />
+    <meta property="og:title" content="OmanX — Guidance for Omani Scholars in the US" />
+    <meta property="og:description" content="When your scholarship rules and university policies conflict, the wrong call costs you your funding. OmanX gives you structured guidance before you make the move." />
+    <meta property="og:type" content="website" />
+    <meta name="twitter:card" content="summary" />
+    <meta name="twitter:title" content="OmanX — Guidance for Omani Scholars in the US" />
+    <meta name="twitter:description" content="When your scholarship rules and university policies conflict, the wrong call costs you your funding." />
     <link rel="stylesheet" href="/styles.css" />
+    <script defer src="/_vercel/insights/script.js"></script>
   </head>
   <body>
     <!-- Navigation -->
     <nav>
       <a class="nav-logo" href="/">Oman<span>X</span></a>
+      <div class="nav-links">
+        <a class="nav-link" href="/system">System</a>
+        <a class="nav-link" href="/vision">Roadmap</a>
+        <a class="nav-link" href="/contact">Contact</a>
+      </div>
       <div class="nav-right">
-        <a class="nav-cta" href="/workspace">Open workspace</a>
+        <a class="nav-cta" href="/workspace">Open</a>
         <button class="nav-hamburger" data-mobile-toggle aria-label="Open menu" aria-expanded="false">
           <span></span><span></span><span></span>
         </button>
@@ -40,13 +52,33 @@
           <h1 class="display">Your scholarship has rules.<br>Your university has different ones.</h1>
           <p>When they conflict — on enrollment, visa status, or sponsor obligations — the wrong call costs you your funding. OmanX gives you structured guidance before you make the move.</p>
           <div class="hero-actions">
-            <a class="btn" href="/workspace">Start</a>
+            <a class="btn-gold" href="/workspace">Get guidance</a>
             <a class="btn-secondary" href="/system">How it works</a>
           </div>
         </div>
       </section>
 
-      <!-- Decision artifact preview — moved above fold -->
+      <!-- Trust strip -->
+      <div class="trust-band">
+        <div class="trust-item">
+          <div class="label" style="margin-bottom:6px;">Coverage</div>
+          F-1 &amp; J-1 Visas
+        </div>
+        <div class="trust-item">
+          <div class="label" style="margin-bottom:6px;">Coverage</div>
+          OPT / CPT &amp; STEM OPT
+        </div>
+        <div class="trust-item">
+          <div class="label" style="margin-bottom:6px;">Coverage</div>
+          Scholarship &amp; Funding Policy
+        </div>
+        <div class="trust-item">
+          <div class="label" style="margin-bottom:6px;">Coverage</div>
+          Academic Standing &amp; Compliance
+        </div>
+      </div>
+
+      <!-- Decision artifact preview -->
       <section class="section-tight">
         <div class="container">
           <div class="section-label">What a decision looks like</div>
@@ -70,6 +102,43 @@
               </div>
             </dl>
           </article>
+        </div>
+      </section>
+
+      <!-- How it works -->
+      <section class="section">
+        <div class="container">
+          <div class="section-label">How it works</div>
+          <div class="feature-grid compact-grid-3">
+            <div class="feature-card">
+              <div class="label" style="color:var(--gold);margin-bottom:16px;">01</div>
+              <h3>Describe your situation</h3>
+              <p>Share your question, constraints, and timeline in plain language — no forms or bureaucratic structure required.</p>
+            </div>
+            <div class="feature-card">
+              <div class="label" style="color:var(--gold);margin-bottom:16px;">02</div>
+              <h3>Constraints detected</h3>
+              <p>OmanX identifies which scholarship rules, visa obligations, and institutional deadlines apply to your specific case.</p>
+            </div>
+            <div class="feature-card">
+              <div class="label" style="color:var(--gold);margin-bottom:16px;">03</div>
+              <h3>Guidance delivered</h3>
+              <p>Get a structured, actionable response with a clear next step — and a reminder to verify with your DSO before acting.</p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- CTA band -->
+      <section class="cta-band">
+        <div class="container">
+          <div class="eyebrow">Ready when you are</div>
+          <h2>Start your first guidance session.</h2>
+          <p>Ask your first compliance or planning question — no account needed.</p>
+          <div class="hero-actions">
+            <a class="btn-gold" href="/workspace">Get guidance</a>
+            <a class="btn-ghost cta-band-ghost" href="/system">How it works →</a>
+          </div>
         </div>
       </section>
 

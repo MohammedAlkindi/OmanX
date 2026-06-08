@@ -158,7 +158,7 @@ export default async function handler(req, res) {
   if (req.method === "OPTIONS") return res.status(200).end();
   if (req.method !== "POST") return res.status(405).json({ error: "Method not allowed" });
 
-  const { message } = req.body || {};
+  const { message, history } = req.body || {};
 
   if (!message || typeof message !== "string") {
     return res.status(400).json({ error: "Missing 'message' string." });
@@ -174,6 +174,18 @@ export default async function handler(req, res) {
     return res.status(400).json({ error: "Message too long (max 10,000 chars)." });
   }
 
+  // build conversation turns: up to 20 prior messages + current
+  const hasHistory = Array.isArray(history) && history.length > 0;
+  const conversationMessages = [];
+  if (hasHistory) {
+    for (const turn of history.slice(-20)) {
+      if (turn.role !== "user" && turn.role !== "assistant") continue;
+      const sanitized = sanitizeMessage(String(turn.content || ""));
+      if (sanitized) conversationMessages.push({ role: turn.role, content: sanitized });
+    }
+  }
+  conversationMessages.push({ role: "user", content: sanitizedMessage });
+
   const client = getClient();
   if (!client) {
     return res.status(500).json({
@@ -182,12 +194,12 @@ export default async function handler(req, res) {
     });
   }
 
-  const cacheKey = crypto
-    .createHash("sha256")
-    .update(`${MODEL}::${sanitizedMessage}`)
-    .digest("hex");
+  // only cache single-turn requests (no prior history)
+  const cacheKey = !hasHistory
+    ? crypto.createHash("sha256").update(`${MODEL}::${sanitizedMessage}`).digest("hex")
+    : null;
 
-  const cached = cacheGet(cacheKey);
+  const cached = cacheKey ? cacheGet(cacheKey) : null;
   if (cached) return res.json({ text: cached, cached: true });
 
   const compliance = isCompliance(sanitizedMessage);
@@ -207,13 +219,11 @@ export default async function handler(req, res) {
       max_tokens: 1024,
       temperature: 0.4,
       system: systemPrompt,
-      messages: [
-        { role: "user", content: sanitizedMessage },
-      ],
+      messages: conversationMessages,
     });
 
     const text = response.content?.[0]?.text?.trim() || "No response generated.";
-    cacheSet(cacheKey, text);
+    if (cacheKey) cacheSet(cacheKey, text);
     return res.json({ text, cached: false, compliance });
   } catch (err) {
     console.error("[OmanX] Anthropic error:", err?.message, err?.stack);

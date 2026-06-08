@@ -21,6 +21,10 @@ ensureActiveChat();
 render();
 bindEvents();
 
+// init composer height
+const _initTextarea = qs('[data-chat-input]');
+if (_initTextarea) autoGrow(_initTextarea);
+
 function ensureActiveChat() {
   const existing = state.chats.find((chat) => chat.id === state.activeChatId);
   if (existing) return;
@@ -39,7 +43,113 @@ function persist() {
   setActiveChatId(state.activeChatId);
 }
 
+function setTyping(value) {
+  state.typing = value;
+  const btn = qs('[data-send-btn]');
+  const statusText = qs('[data-status-text]');
+  if (btn) btn.disabled = value;
+  if (statusText) statusText.textContent = value ? 'Thinking…' : 'Ready';
+}
+
+function closeMenu() {
+  const menu = qs('[data-chat-menu]');
+  if (menu) menu.hidden = true;
+  qs('[data-chat-menu-toggle]')?.setAttribute('aria-expanded', 'false');
+}
+
+function commitRename() {
+  const input = qs('[data-chat-title-input]');
+  if (!input || input.hidden) return;
+  const titleEl = qs('[data-chat-title]');
+  const newTitle = input.value.trim();
+  if (newTitle) {
+    mutateChat(getActiveChat().id, (current) => ({ ...current, title: newTitle, updatedAt: new Date().toISOString() }));
+    renderSidebar();
+  }
+  input.hidden = true;
+  titleEl.hidden = false;
+  renderHeader();
+}
+
+function cancelRename() {
+  const input = qs('[data-chat-title-input]');
+  if (!input || input.hidden) return;
+  input.hidden = true;
+  qs('[data-chat-title]').hidden = false;
+}
+
 function bindEvents() {
+  // — sidebar toggle (mobile) —
+  qs('[data-sidebar-toggle]')?.addEventListener('click', () => {
+    qs('[data-chat-sidebar]').classList.toggle('open');
+  });
+
+  // — overflow menu toggle —
+  qs('[data-chat-menu-toggle]')?.addEventListener('click', (event) => {
+    event.stopPropagation();
+    const menu = qs('[data-chat-menu]');
+    const isOpen = !menu.hidden;
+    menu.hidden = isOpen;
+    qs('[data-chat-menu-toggle]').setAttribute('aria-expanded', String(!isOpen));
+  });
+
+  // — close menu and sidebar on outside click —
+  document.addEventListener('click', (event) => {
+    const menu = qs('[data-chat-menu]');
+    if (menu && !menu.hidden) menu.hidden = true;
+
+    const sidebar = qs('[data-chat-sidebar]');
+    if (
+      sidebar?.classList.contains('open') &&
+      !sidebar.contains(event.target) &&
+      !event.target.closest('[data-sidebar-toggle]')
+    ) {
+      sidebar.classList.remove('open');
+    }
+  });
+
+  // — rename (inline) —
+  qs('[data-rename-chat]')?.addEventListener('click', () => {
+    closeMenu();
+    const chat = getActiveChat();
+    const input = qs('[data-chat-title-input]');
+    const titleEl = qs('[data-chat-title]');
+    input.value = chat.title;
+    titleEl.hidden = true;
+    input.hidden = false;
+    input.select();
+    input.focus();
+  });
+
+  qs('[data-chat-title-input]')?.addEventListener('keydown', (event) => {
+    if (event.key === 'Enter') { event.preventDefault(); commitRename(); }
+    else if (event.key === 'Escape') { cancelRename(); }
+  });
+
+  qs('[data-chat-title-input]')?.addEventListener('blur', commitRename);
+
+  // — delete (inline confirm) —
+  qs('[data-delete-chat]')?.addEventListener('click', () => {
+    closeMenu();
+    qs('[data-confirm-delete]').hidden = false;
+  });
+
+  qs('[data-confirm-yes]')?.addEventListener('click', () => {
+    qs('[data-confirm-delete]').hidden = true;
+    const chat = getActiveChat();
+    state.chats = deleteChat(state.chats, chat.id);
+    if (!state.chats.length) state.chats = [createChat()];
+    state.activeChatId = state.chats[0].id;
+    persist();
+    render();
+    showToast('Chat deleted.');
+  });
+
+  qs('[data-confirm-no]')?.addEventListener('click', () => {
+    qs('[data-confirm-delete]').hidden = true;
+  });
+
+  // — new chat —
   qs('[data-new-chat]')?.addEventListener('click', () => {
     const chat = createChat({ title: 'Untitled session' });
     state.chats.unshift(chat);
@@ -49,11 +159,13 @@ function bindEvents() {
     showToast('New chat created.');
   });
 
+  // — search —
   qs('[data-chat-search]')?.addEventListener('input', (event) => {
     state.filter = event.target.value.trim().toLowerCase();
     renderSidebar();
   });
 
+  // — submit —
   qs('[data-chat-form]')?.addEventListener('submit', async (event) => {
     event.preventDefault();
     const textarea = qs('[data-chat-input]');
@@ -63,12 +175,12 @@ function bindEvents() {
     appendMessage('user', content);
     textarea.value = '';
     autoGrow(textarea);
-    state.typing = true;
+    setTyping(true);
     renderMessages();
 
     const reply = await createAssistantReply(content);
     appendMessage('assistant', reply);
-    state.typing = false;
+    setTyping(false);
     render();
   });
 
@@ -81,39 +193,23 @@ function bindEvents() {
 
   qs('[data-chat-input]')?.addEventListener('input', (event) => autoGrow(event.target));
 
+  // — export —
   qs('[data-export-chat]')?.addEventListener('click', () => {
+    closeMenu();
     const chat = getActiveChat();
     const content = chat.messages.map((message) => `[${message.role}] ${message.content}`).join('\n\n');
     downloadFile(`${slugify(chat.title)}.txt`, content);
     showToast('Conversation exported.');
   });
 
+  // — copy last —
   qs('[data-copy-last]')?.addEventListener('click', async () => {
+    closeMenu();
     const chat = getActiveChat();
     const message = [...chat.messages].reverse().find((item) => item.role === 'assistant');
     if (!message) return showToast('No assistant message to copy yet.');
     await copyText(message.content, 'Last assistant message copied.');
   });
-
-  qs('[data-rename-chat]')?.addEventListener('click', () => {
-    const chat = getActiveChat();
-    const title = window.prompt('Rename this chat', chat.title);
-    if (!title) return;
-    mutateChat(chat.id, (current) => ({ ...current, title: title.trim() || current.title, updatedAt: new Date().toISOString() }));
-    render();
-  });
-
-  qs('[data-delete-chat]')?.addEventListener('click', () => {
-    const chat = getActiveChat();
-    if (!chat || !window.confirm(`Delete "${chat.title}"?`)) return;
-    state.chats = deleteChat(state.chats, chat.id);
-    if (!state.chats.length) state.chats = [createChat()];
-    state.activeChatId = state.chats[0].id;
-    persist();
-    render();
-    showToast('Chat deleted.');
-  });
-
 }
 
 function render() {
@@ -195,7 +291,7 @@ function renderMessages() {
 
   container.innerHTML = chat.messages.map((message) => `
     <article class="message ${message.role}">
-      <div class="message-bubble">${renderRichText(message.content)}</div>
+      <div class="message-bubble">${message.role === 'assistant' ? renderRichText(message.content) : renderUserText(message.content)}</div>
       <div class="message-meta">
         <span>${message.role === 'assistant' ? 'OmanX' : state.settings.studentName}</span>
         <span>${formatDateTime(message.createdAt)}</span>
@@ -244,11 +340,17 @@ function getActiveChat() {
 }
 
 async function createAssistantReply(message) {
+  // pass all prior messages as history (current user message was just appended, exclude it)
+  const chat = getActiveChat();
+  const history = chat.messages
+    .slice(0, -1)
+    .map(({ role, content }) => ({ role, content }));
+
   try {
     const response = await fetch('/api/chat', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ message }),
+      body: JSON.stringify({ message, history }),
     });
 
     const payload = await response.json().catch(() => ({}));
@@ -298,9 +400,51 @@ function escapeHtml(value) {
   return String(value ?? '').replace(/[&<>"']/g, (char) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[char]));
 }
 
-function renderRichText(content) {
-  return escapeHtml(content)
+function applyInline(text) {
+  return text
     .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
-    .replace(/`([^`]+)`/g, '<span class="code-inline">$1</span>')
-    .replace(/\n/g, '<br>');
+    .replace(/`([^`]+)`/g, '<span class="code-inline">$1</span>');
+}
+
+function renderRichText(content) {
+  const lines = escapeHtml(content).split('\n');
+  const out = [];
+  let listType = null;
+
+  function closeList() {
+    if (listType) { out.push(`</${listType}>`); listType = null; }
+  }
+
+  for (const raw of lines) {
+    if (/^\s*$/.test(raw)) {
+      closeList();
+      out.push('<br>');
+      continue;
+    }
+    if (/^#{2,}\s+/.test(raw)) {
+      closeList();
+      out.push(`<h4>${applyInline(raw.replace(/^#+\s+/, ''))}</h4>`);
+    } else if (/^#\s+/.test(raw)) {
+      closeList();
+      out.push(`<h3>${applyInline(raw.replace(/^#\s+/, ''))}</h3>`);
+    } else if (/^[-*]\s+/.test(raw)) {
+      if (listType !== 'ul') { closeList(); out.push('<ul>'); listType = 'ul'; }
+      out.push(`<li>${applyInline(raw.replace(/^[-*]\s+/, ''))}</li>`);
+    } else if (/^\d+\.\s+/.test(raw)) {
+      if (listType !== 'ol') { closeList(); out.push('<ol>'); listType = 'ol'; }
+      out.push(`<li>${applyInline(raw.replace(/^\d+\.\s+/, ''))}</li>`);
+    } else if (/^&gt;\s+/.test(raw)) {
+      closeList();
+      out.push(`<blockquote>${applyInline(raw.replace(/^&gt;\s+/, ''))}</blockquote>`);
+    } else {
+      closeList();
+      out.push(`<p>${applyInline(raw)}</p>`);
+    }
+  }
+  closeList();
+  return out.join('');
+}
+
+function renderUserText(content) {
+  return escapeHtml(content).replace(/\n/g, '<br>');
 }
