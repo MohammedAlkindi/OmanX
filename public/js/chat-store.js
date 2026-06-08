@@ -16,7 +16,14 @@ export function loadChats() {
     const raw = localStorage.getItem(CHATS_KEY);
     if (!raw) return [createChat({ seed: true })];
     const chats = JSON.parse(raw);
-    return Array.isArray(chats) && chats.length ? chats : [createChat({ seed: true })];
+    if (!Array.isArray(chats) || !chats.length) return [createChat({ seed: true })];
+    return chats.map((chat) => ({
+      ...chat,
+      messages: (chat.messages || []).map((msg) => ({
+        ...msg,
+        content: typeof msg.content === 'string' ? msg.content : String(msg.content ?? ''),
+      })),
+    }));
   } catch {
     return [createChat({ seed: true })];
   }
