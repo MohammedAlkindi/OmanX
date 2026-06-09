@@ -1,5 +1,5 @@
-import { initCore, qs, qsa, formatDateTime, formatRelative, showToast, uid, downloadFile, copyText } from './core.js';
-import { loadChats, saveChats, getActiveChatId, setActiveChatId, createChat, updateChat, deleteChat, loadSettings } from './chat-store.js';
+import { initCore, qs, qsa, formatDateTime, formatRelative, showToast, uid, downloadFile, copyText, setTheme, getTheme } from './core.js';
+import { loadChats, saveChats, getActiveChatId, setActiveChatId, createChat, updateChat, deleteChat, loadSettings, saveSettings } from './chat-store.js';
 
 const prompts = [
   'Build me a pre-departure checklist for the 14 days before flying to the U.S.',
@@ -8,12 +8,19 @@ const prompts = [
   'What should I escalate immediately if I have a visa or insurance concern?'
 ];
 
+function pinIcon(pinned) {
+  const fill = pinned ? 'var(--gold)' : 'none';
+  const stroke = pinned ? 'var(--gold)' : 'currentColor';
+  return `<svg width="11" height="11" viewBox="0 0 24 24" fill="${fill}" stroke="${stroke}" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"/></svg>`;
+}
+
 const state = {
   chats: loadChats(),
   activeChatId: getActiveChatId(),
   filter: '',
   typing: false,
   settings: loadSettings(),
+  confirmDeleteId: null,
 };
 
 initCore({ page: 'chat' });
@@ -51,31 +58,12 @@ function setTyping(value) {
   if (statusText) statusText.textContent = value ? 'Thinking…' : 'Ready';
 }
 
-function closeMenu() {
-  const menu = qs('[data-chat-menu]');
-  if (menu) menu.hidden = true;
-  qs('[data-chat-menu-toggle]')?.setAttribute('aria-expanded', 'false');
-}
-
-function commitRename() {
-  const input = qs('[data-chat-title-input]');
-  if (!input || input.hidden) return;
-  const titleEl = qs('[data-chat-title]');
-  const newTitle = input.value.trim();
+function doRename(chatId, value) {
+  const newTitle = value.trim();
   if (newTitle) {
-    mutateChat(getActiveChat().id, (current) => ({ ...current, title: newTitle, updatedAt: new Date().toISOString() }));
-    renderSidebar();
+    mutateChat(chatId, (current) => ({ ...current, title: newTitle, updatedAt: new Date().toISOString() }));
   }
-  input.hidden = true;
-  titleEl.hidden = false;
-  renderHeader();
-}
-
-function cancelRename() {
-  const input = qs('[data-chat-title-input]');
-  if (!input || input.hidden) return;
-  input.hidden = true;
-  qs('[data-chat-title]').hidden = false;
+  renderSidebar();
 }
 
 function bindEvents() {
@@ -97,19 +85,11 @@ function bindEvents() {
     qs('[data-chat-sidebar]').classList.toggle('open');
   });
 
-  // — overflow menu toggle —
-  qs('[data-chat-menu-toggle]')?.addEventListener('click', (event) => {
-    event.stopPropagation();
-    const menu = qs('[data-chat-menu]');
-    const isOpen = !menu.hidden;
-    menu.hidden = isOpen;
-    qs('[data-chat-menu-toggle]').setAttribute('aria-expanded', String(!isOpen));
-  });
-
-  // — close menu and sidebar on outside click —
+  // — close item menus and sidebar on outside click —
   document.addEventListener('click', (event) => {
-    const menu = qs('[data-chat-menu]');
-    if (menu && !menu.hidden) menu.hidden = true;
+    if (!event.target.closest('[data-item-menu-toggle]') && !event.target.closest('[data-item-menu]')) {
+      qsa('[data-item-menu]').forEach((menu) => (menu.hidden = true));
+    }
 
     const sidebar = qs('[data-chat-sidebar]');
     if (
@@ -121,50 +101,9 @@ function bindEvents() {
     }
   });
 
-  // — rename (inline) —
-  qs('[data-rename-chat]')?.addEventListener('click', () => {
-    closeMenu();
-    const chat = getActiveChat();
-    const input = qs('[data-chat-title-input]');
-    const titleEl = qs('[data-chat-title]');
-    input.value = chat.title;
-    titleEl.hidden = true;
-    input.hidden = false;
-    input.select();
-    input.focus();
-  });
-
-  qs('[data-chat-title-input]')?.addEventListener('keydown', (event) => {
-    if (event.key === 'Enter') { event.preventDefault(); commitRename(); }
-    else if (event.key === 'Escape') { cancelRename(); }
-  });
-
-  qs('[data-chat-title-input]')?.addEventListener('blur', commitRename);
-
-  // — delete (inline confirm) —
-  qs('[data-delete-chat]')?.addEventListener('click', () => {
-    closeMenu();
-    qs('[data-confirm-delete]').hidden = false;
-  });
-
-  qs('[data-confirm-yes]')?.addEventListener('click', () => {
-    qs('[data-confirm-delete]').hidden = true;
-    const chat = getActiveChat();
-    state.chats = deleteChat(state.chats, chat.id);
-    if (!state.chats.length) state.chats = [createChat()];
-    state.activeChatId = state.chats[0].id;
-    persist();
-    render();
-    showToast('Chat deleted.');
-  });
-
-  qs('[data-confirm-no]')?.addEventListener('click', () => {
-    qs('[data-confirm-delete]').hidden = true;
-  });
-
   // — new chat —
   qs('[data-new-chat]')?.addEventListener('click', () => {
-    const chat = createChat({ title: 'Untitled session' });
+    const chat = createChat({ title: 'New chat' });
     state.chats.unshift(chat);
     state.activeChatId = chat.id;
     persist();
@@ -207,28 +146,79 @@ function bindEvents() {
 
   qs('[data-chat-input]')?.addEventListener('input', (event) => autoGrow(event.target));
 
-  // — export —
-  qs('[data-export-chat]')?.addEventListener('click', () => {
-    closeMenu();
-    const chat = getActiveChat();
-    const content = chat.messages.map((message) => `[${message.role}] ${message.content}`).join('\n\n');
-    downloadFile(`${slugify(chat.title)}.txt`, content);
-    showToast('Conversation exported.');
+  // — settings panel —
+  populateSettingsPanel();
+
+  qs('[data-settings-toggle]')?.addEventListener('click', () => {
+    qs('[data-settings-panel]').classList.add('open');
   });
 
-  // — copy last —
-  qs('[data-copy-last]')?.addEventListener('click', async () => {
-    closeMenu();
-    const chat = getActiveChat();
-    const message = [...chat.messages].reverse().find((item) => item.role === 'assistant');
-    if (!message) return showToast('No assistant message to copy yet.');
-    await copyText(message.content, 'Last assistant message copied.');
+  qs('[data-settings-close]')?.addEventListener('click', () => {
+    qs('[data-settings-panel]').classList.remove('open');
+  });
+
+  // theme picker
+  qsa('[data-set-theme]').forEach((btn) => {
+    btn.addEventListener('click', () => {
+      const theme = btn.dataset.setTheme;
+      setTheme(theme);
+      updateThemePicker(theme);
+      showToast(`Theme set to ${theme}.`);
+    });
+  });
+
+  // name
+  qs('[data-setting-name]')?.addEventListener('change', (e) => {
+    state.settings.studentName = e.target.value.trim() || 'Student';
+    saveSettings(state.settings);
+  });
+
+  // context
+  qs('[data-setting-context]')?.addEventListener('change', (e) => {
+    state.settings.userContext = e.target.value.trim();
+    saveSettings(state.settings);
+  });
+
+  // concise mode
+  qs('[data-setting-concise]')?.addEventListener('change', (e) => {
+    state.settings.conciseMode = e.target.checked;
+    saveSettings(state.settings);
+  });
+
+  // model
+  qs('[data-setting-model]')?.addEventListener('change', (e) => {
+    state.settings.model = e.target.value;
+    saveSettings(state.settings);
+    showToast('Model updated.');
+  });
+}
+
+function populateSettingsPanel() {
+  const { studentName, userContext, conciseMode, model } = state.settings;
+
+  const nameEl = qs('[data-setting-name]');
+  if (nameEl) nameEl.value = studentName === 'Student' ? '' : studentName;
+
+  const ctxEl = qs('[data-setting-context]');
+  if (ctxEl) ctxEl.value = userContext || '';
+
+  const conciseEl = qs('[data-setting-concise]');
+  if (conciseEl) conciseEl.checked = !!conciseMode;
+
+  const modelEl = qs('[data-setting-model]');
+  if (modelEl) modelEl.value = model;
+
+  updateThemePicker(getTheme());
+}
+
+function updateThemePicker(active) {
+  qsa('[data-set-theme]').forEach((btn) => {
+    btn.classList.toggle('active', btn.dataset.setTheme === active);
   });
 }
 
 function render() {
   renderSidebar();
-  renderHeader();
   renderMessages();
 }
 
@@ -241,50 +231,128 @@ function renderSidebar() {
       return `${chat.title} ${chat.category} ${chat.messages.map((m) => m.content).join(' ')}`.toLowerCase().includes(state.filter);
     });
 
-  list.innerHTML = filtered.map((chat) => `
-    <article class="chat-item ${chat.id === state.activeChatId ? 'active' : ''}" data-chat-id="${chat.id}">
-      <div class="chat-item-header">
-        <div>
-          <div class="chat-item-title">${escapeHtml(chat.title)}</div>
-          <div class="muted">${escapeHtml(chat.category)}</div>
+  list.innerHTML = filtered.map((chat) => {
+    const isActive = chat.id === state.activeChatId;
+    const isConfirm = chat.id === state.confirmDeleteId;
+
+    if (isConfirm) {
+      return `
+        <article class="chat-item ${isActive ? 'active' : ''}" data-chat-id="${chat.id}">
+          <div class="chat-item-confirm">
+            <span>Delete this chat?</span>
+            <button type="button" class="confirm-item-delete-btn" data-confirm-yes-item>Delete</button>
+            <button type="button" class="confirm-item-cancel-btn" data-confirm-no-item>Cancel</button>
+          </div>
+        </article>
+      `;
+    }
+
+    return `
+      <article class="chat-item ${isActive ? 'active' : ''}" data-chat-id="${chat.id}">
+        <div class="chat-item-header">
+          <div class="chat-item-title" data-item-title>${escapeHtml(chat.title)}</div>
+          <div class="chat-item-actions">
+            <div class="item-menu-wrap">
+              <button type="button" class="icon-btn item-menu-btn" data-item-menu-toggle title="Options" aria-haspopup="true">···</button>
+              <div class="chat-item-dropdown" data-item-menu hidden>
+                <button type="button" data-pin-chat>${chat.pinned ? 'Unpin' : 'Pin'}</button>
+                <button type="button" data-copy-last-item>Copy last reply</button>
+                <button type="button" data-export-item>Export</button>
+                <hr class="menu-divider" />
+                <button type="button" data-rename-item>Rename</button>
+                <button type="button" data-delete-item class="danger">Delete</button>
+              </div>
+            </div>
+          </div>
         </div>
-        <div class="chat-actions">
-          <button type="button" data-pin-chat title="Pin chat">${chat.pinned ? '★' : '☆'}</button>
-        </div>
-      </div>
-      <div class="chat-item-snippet">${escapeHtml(getSnippet(chat))}</div>
-      <div class="chat-item-footer">
-        <span class="pill">${chat.messages.length} messages</span>
-        <span class="muted">${formatRelative(chat.updatedAt)}</span>
-      </div>
-    </article>
-  `).join('') || '<div class="message-empty">No chats match your search.</div>';
+      </article>
+    `;
+  }).join('') || '<div class="message-empty">No chats match your search.</div>';
 
   qsa('[data-chat-id]', list).forEach((item) => {
+    const chatId = item.dataset.chatId;
+    const menu = item.querySelector('[data-item-menu]');
+
+    // open chat on click (ignore buttons and inputs)
     item.addEventListener('click', (event) => {
-      const chatId = event.currentTarget.dataset.chatId;
-      if (event.target.closest('[data-pin-chat]')) return;
+      if (event.target.closest('button') || event.target.closest('input')) return;
       state.activeChatId = chatId;
       persist();
       render();
       qs('[data-chat-sidebar]').classList.remove('open');
     });
-  });
 
-  qsa('[data-pin-chat]', list).forEach((button) => {
-    button.addEventListener('click', (event) => {
-      const chatId = event.currentTarget.closest('[data-chat-id]').dataset.chatId;
+    // confirm delete
+    item.querySelector('[data-confirm-yes-item]')?.addEventListener('click', (event) => {
       event.stopPropagation();
-      mutateChat(chatId, (chat) => ({ ...chat, pinned: !chat.pinned, updatedAt: new Date().toISOString() }));
+      state.confirmDeleteId = null;
+      state.chats = deleteChat(state.chats, chatId);
+      if (!state.chats.length) state.chats = [createChat()];
+      state.activeChatId = state.chats[0].id;
+      persist();
+      render();
+      showToast('Chat deleted.');
+    });
+
+    item.querySelector('[data-confirm-no-item]')?.addEventListener('click', (event) => {
+      event.stopPropagation();
+      state.confirmDeleteId = null;
       renderSidebar();
     });
-  });
-}
 
-function renderHeader() {
-  const chat = getActiveChat();
-  qs('[data-chat-title]').textContent = chat.title;
-  qs('[data-chat-subtitle]').textContent = `Updated ${formatDateTime(chat.updatedAt)} · ${chat.category} workflow`;
+    // pin (now lives inside the dropdown)
+    item.querySelector('[data-pin-chat]')?.addEventListener('click', (event) => {
+      event.stopPropagation();
+      menu.hidden = true;
+      mutateChat(chatId, (c) => ({ ...c, pinned: !c.pinned, updatedAt: new Date().toISOString() }));
+      renderSidebar();
+    });
+
+    // menu toggle
+    item.querySelector('[data-item-menu-toggle]')?.addEventListener('click', (event) => {
+      event.stopPropagation();
+      const isOpen = !menu.hidden;
+      qsa('[data-item-menu]', list).forEach((m) => (m.hidden = true));
+      menu.hidden = isOpen;
+    });
+
+    // rename
+    item.querySelector('[data-rename-item]')?.addEventListener('click', (event) => {
+      event.stopPropagation();
+      menu.hidden = true;
+      const chat = state.chats.find((c) => c.id === chatId);
+      const newTitle = prompt('Rename conversation:', chat?.title ?? '');
+      if (newTitle !== null) doRename(chatId, newTitle);
+    });
+
+    // delete
+    item.querySelector('[data-delete-item]')?.addEventListener('click', (event) => {
+      event.stopPropagation();
+      menu.hidden = true;
+      state.confirmDeleteId = chatId;
+      renderSidebar();
+    });
+
+    // copy last reply
+    item.querySelector('[data-copy-last-item]')?.addEventListener('click', async (event) => {
+      event.stopPropagation();
+      menu.hidden = true;
+      const chat = state.chats.find((c) => c.id === chatId);
+      const message = [...chat.messages].reverse().find((m) => m.role === 'assistant');
+      if (!message) return showToast('No assistant message to copy yet.');
+      await copyText(message.content, 'Last assistant message copied.');
+    });
+
+    // export
+    item.querySelector('[data-export-item]')?.addEventListener('click', (event) => {
+      event.stopPropagation();
+      menu.hidden = true;
+      const chat = state.chats.find((c) => c.id === chatId);
+      const content = chat.messages.map((m) => `[${m.role}] ${m.content}`).join('\n\n');
+      downloadFile(`${slugify(chat.title)}.txt`, content);
+      showToast('Conversation exported.');
+    });
+  });
 }
 
 function renderMessages() {
@@ -382,7 +450,7 @@ async function createAssistantReply(message) {
 }
 
 function deriveTitle(chat, role, content) {
-  if (chat.title !== 'Untitled session' && chat.title !== 'New guidance session') return chat.title;
+  if (chat.title !== 'New chat' && chat.title !== 'Untitled session' && chat.title !== 'New guidance session') return chat.title;
   if (role !== 'user') return chat.title;
   return content.split(/[.!?]/)[0].slice(0, 42) || chat.title;
 }

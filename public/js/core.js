@@ -68,10 +68,17 @@ export function copyText(text, successMessage = 'Copied to clipboard.') {
   return navigator.clipboard.writeText(text).then(() => showToast(successMessage));
 }
 
+export function getTheme() {
+  return localStorage.getItem(THEME_KEY) || 'light';
+}
+
+export function setTheme(theme) {
+  document.documentElement.dataset.theme = theme;
+  localStorage.setItem(THEME_KEY, theme);
+}
+
 function applyStoredTheme() {
-  const root = document.documentElement;
-  const saved = localStorage.getItem(THEME_KEY);
-  root.dataset.theme = saved || 'light';
+  document.documentElement.dataset.theme = getTheme();
 }
 
 function bindThemeToggles() {
@@ -79,8 +86,7 @@ function bindThemeToggles() {
     button.addEventListener('click', () => {
       const root = document.documentElement;
       const next = root.dataset.theme === 'dark' ? 'light' : 'dark';
-      root.dataset.theme = next;
-      localStorage.setItem(THEME_KEY, next);
+      setTheme(next);
       showToast(`Theme switched to ${next} mode.`);
     });
   });

@@ -40,7 +40,7 @@ export function setActiveChatId(id) {
   localStorage.setItem(ACTIVE_KEY, id);
 }
 
-export function createChat({ title = 'New guidance session', category = 'General', seed = false } = {}) {
+export function createChat({ title = 'New chat', category = 'General', seed = false } = {}) {
   const now = new Date().toISOString();
   return {
     id: uid('chat'),

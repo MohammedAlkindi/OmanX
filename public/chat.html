@@ -37,47 +37,89 @@
 
         <!-- Sidebar — conversation history -->
         <aside class="sidebar" data-chat-sidebar>
-          <div class="sidebar-header">
-            <div>
-              <div class="muted">Conversations</div>
-              <h3>Decision history</h3>
+          <div class="sidebar-inner">
+            <div class="sidebar-header">
+              <div>
+                <div class="muted">Conversations</div>
+                <h3>Decision history</h3>
+              </div>
+              <button class="btn" data-new-chat type="button" style="height:32px;padding:0 14px;font-size:0.8125rem;">New</button>
             </div>
-            <button class="btn" data-new-chat type="button" style="height:32px;padding:0 14px;font-size:0.8125rem;">New</button>
+
+            <label class="muted" for="chat-search">Search</label>
+            <input id="chat-search" class="sidebar-search" data-chat-search type="search" placeholder="Search conversations" />
+
+            <div class="chat-list" data-chat-list></div>
           </div>
 
-          <label class="muted" for="chat-search">Search</label>
-          <input id="chat-search" class="sidebar-search" data-chat-search type="search" placeholder="Search conversations" />
+          <div class="sidebar-footer">
+            <button class="settings-trigger" data-settings-toggle type="button">
+              <span class="settings-icon">⚙</span>
+              <span>Settings</span>
+            </button>
+          </div>
 
-          <div class="chat-list" data-chat-list></div>
+          <!-- Settings panel — slides in over the sidebar -->
+          <div class="settings-panel" data-settings-panel>
+            <div class="settings-panel-header">
+              <div>
+                <div class="settings-panel-eyebrow">Workspace</div>
+                <h3>Settings</h3>
+              </div>
+              <button class="settings-panel-close" data-settings-close type="button" aria-label="Close settings">✕</button>
+            </div>
+
+            <div class="settings-panel-body">
+
+              <!-- Appearance -->
+              <div class="settings-section">
+                <div class="settings-section-label">Appearance</div>
+                <div class="theme-picker" role="group" aria-label="Theme">
+                  <button class="theme-btn" data-set-theme="light" type="button">Light</button>
+                  <button class="theme-btn" data-set-theme="dark" type="button">Dark</button>
+                  <button class="theme-btn" data-set-theme="system" type="button">System</button>
+                </div>
+              </div>
+
+              <!-- Profile -->
+              <div class="settings-section">
+                <div class="settings-section-label">Profile</div>
+                <div class="settings-field">
+                  <label for="settings-name">Display name</label>
+                  <input id="settings-name" class="settings-input" type="text" data-setting-name placeholder="Your name" autocomplete="off" />
+                </div>
+              </div>
+
+              <!-- Assistant -->
+              <div class="settings-section">
+                <div class="settings-section-label">Assistant</div>
+                <div class="settings-field">
+                  <label for="settings-context">Custom context</label>
+                  <textarea id="settings-context" class="settings-textarea" data-setting-context rows="3" placeholder="Tell the assistant about your situation, goals, or preferences…"></textarea>
+                </div>
+                <label class="toggle-row">
+                  <input class="toggle-checkbox" type="checkbox" data-setting-concise />
+                  <span class="toggle-track"><span class="toggle-thumb"></span></span>
+                  <span class="toggle-label">Concise replies</span>
+                </label>
+                <div class="settings-field">
+                  <label for="settings-model">Model</label>
+                  <select id="settings-model" class="settings-select" data-setting-model>
+                    <option value="claude-sonnet-4-6">Sonnet 4.6 — Recommended</option>
+                    <option value="claude-haiku-4-5-20251001">Haiku 4.5 — Faster</option>
+                  </select>
+                </div>
+              </div>
+
+            </div>
+          </div>
         </aside>
 
         <!-- Main chat area -->
         <section class="assistant-shell" aria-label="Decision workspace">
-          <header class="chat-header">
-            <div class="chat-header-top">
-              <button class="btn-ghost sidebar-toggle-btn" data-sidebar-toggle type="button">≡ Conversations</button>
-              <div class="chat-header-title">
-                <h1 data-chat-title>Decision workspace</h1>
-                <input class="chat-title-input" data-chat-title-input type="text" hidden />
-                <p data-chat-subtitle>Structured outputs with policy-aware framing.</p>
-              </div>
-              <div class="chat-actions-wrap">
-                <button class="icon-btn" data-chat-menu-toggle type="button" title="Chat options" aria-haspopup="true" aria-expanded="false">···</button>
-                <div class="chat-menu-dropdown" data-chat-menu hidden>
-                  <button type="button" data-copy-last>Copy last reply</button>
-                  <button type="button" data-export-chat>Export chat</button>
-                  <hr class="menu-divider" />
-                  <button type="button" data-rename-chat>Rename</button>
-                  <button type="button" data-delete-chat class="danger">Delete</button>
-                </div>
-              </div>
-            </div>
-            <div class="chat-confirm-bar" data-confirm-delete hidden>
-              <span>Delete this chat?</span>
-              <button type="button" class="confirm-delete-btn" data-confirm-yes>Delete</button>
-              <button type="button" class="confirm-cancel-btn" data-confirm-no>Cancel</button>
-            </div>
-          </header>
+          <div class="mobile-chat-bar">
+            <button class="btn-ghost sidebar-toggle-btn" data-sidebar-toggle type="button">≡ Conversations</button>
+          </div>
 
           <section class="chat-body" data-message-list></section>
 

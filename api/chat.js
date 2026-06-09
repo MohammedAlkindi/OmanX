@@ -17,6 +17,19 @@ const KNOWLEDGE_PATHS = [
 const DEFAULT_MODEL = process.env.ANTHROPIC_MODEL || "claude-sonnet-4-6";
 const ALLOWED_MODELS = new Set(["claude-sonnet-4-6", "claude-haiku-4-5-20251001"]);
 
+// Authoritative domains we trust for live policy lookups
+const TRUSTED_DOMAINS = [
+  "uscis.gov",
+  "ice.gov",
+  "dhs.gov",
+  "studyinthestates.dhs.gov",
+  "state.gov",
+  "travel.state.gov",
+  "studentaid.gov",
+  "irs.gov",
+  "dol.gov",
+];
+
 let _kb = null;
 let _kbMtime = 0;
 let _kbPath = null;
@@ -98,7 +111,43 @@ function searchKB(knowledgeJson, query) {
   return results.sort((a, b) => b.score - a.score).slice(0, 3);
 }
 
-const BASE_SYSTEM = `You are OmanX, a warm and knowledgeable AI assistant built for Omani scholars studying in the United States.
+async function webSearch(query) {
+  const key = process.env.TAVILY_API_KEY;
+  if (!key) return [];
+
+  try {
+    const res = await fetch("https://api.tavily.com/search", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        api_key: key,
+        query,
+        search_depth: "basic",
+        include_answer: false,
+        include_domains: TRUSTED_DOMAINS,
+        max_results: 3,
+      }),
+      signal: AbortSignal.timeout(8000),
+    });
+
+    if (!res.ok) {
+      console.warn("[OmanX] Tavily search failed:", res.status);
+      return [];
+    }
+
+    const data = await res.json();
+    return (data.results || []).map((r) => ({
+      title: r.title || "",
+      url: r.url || "",
+      content: (r.content || "").slice(0, 600),
+    }));
+  } catch (err) {
+    console.warn("[OmanX] Web search error:", err.message);
+    return [];
+  }
+}
+
+const BASE_SYSTEM = `You are OmanX, a warm and knowledgeable AI assistant built for Omani scholars studying in the United States. OmanX was founded by Mohammed Alkindi.
 
 You handle two kinds of questions in one seamless conversation:
 
@@ -106,14 +155,14 @@ You handle two kinds of questions in one seamless conversation:
 Answer conversationally, warmly, and helpfully. Keep it natural and practical.
 
 **Compliance questions** (visa, immigration, work authorization, OPT/CPT, legal matters, taxes, medical insurance, academic standing, government forms, DSO matters, contracts, housing disputes, etc.)
-Use the knowledge base entries provided below when available. Cite which KB entry you're drawing from. Be precise and careful. Never speculate or invent contacts, deadlines, or procedures. If the KB doesn't cover the specific situation, say so clearly and direct the student to their DSO.
+Use the knowledge base entries and live web search results provided below when available. Cite which KB entry or web source URL you're drawing from. Be precise and careful. Never speculate or invent contacts, deadlines, or procedures. If neither source covers the specific situation, say so clearly and direct the student to their DSO.
 
 Always:
 - Be honest when you don't know something — never guess on compliance matters
 - For any compliance question, end your response with a clear reminder to verify with their Designated School Official (DSO) before taking action
 - Never fabricate contact information, deadlines, or policy details`;
 
-function buildSystemPrompt(kbResults, { conciseMode, userContext } = {}) {
+function buildSystemPrompt(kbResults, webResults, { conciseMode, userContext } = {}) {
   let prompt = BASE_SYSTEM;
 
   if (userContext) {
@@ -128,7 +177,14 @@ function buildSystemPrompt(kbResults, { conciseMode, userContext } = {}) {
     const kbSection = kbResults
       .map((r, i) => `### KB Entry ${i + 1} — ID: ${r.id}\n${JSON.stringify(r.doc, null, 2)}`)
       .join("\n\n");
-    prompt += `\n\n---\n\n## Relevant Knowledge Base Entries\nUse ONLY these entries for compliance guidance. Cite the entry ID when referencing them.\n\n${kbSection}`;
+    prompt += `\n\n---\n\n## Relevant Knowledge Base Entries\nUse these entries for compliance guidance. Cite the entry ID when referencing them.\n\n${kbSection}`;
+  }
+
+  if (webResults && webResults.length > 0) {
+    const webSection = webResults
+      .map((r, i) => `### Web Result ${i + 1} — ${r.url}\n**${r.title}**\n${r.content}`)
+      .join("\n\n");
+    prompt += `\n\n---\n\n## Live Web Search Results (official government sources)\nThese results were retrieved in real time. Cite the URL when referencing them. Prioritize these over the knowledge base for current deadlines and policy changes.\n\n${webSection}`;
   }
 
   return prompt;
@@ -159,7 +215,6 @@ function isRateLimited(ip) {
   const entry = _rateLimitMap.get(ip);
   if (!entry || now - entry.windowStart > RATE_LIMIT_WINDOW_MS) {
     _rateLimitMap.set(ip, { count: 1, windowStart: now });
-    // Evict old entries to prevent unbounded growth
     if (_rateLimitMap.size > 5000) {
       for (const [key, val] of _rateLimitMap) {
         if (now - val.windowStart > RATE_LIMIT_WINDOW_MS) _rateLimitMap.delete(key);
@@ -225,7 +280,6 @@ export default async function handler(req, res) {
   const sanitizedUserContext = userContext ? sanitizeMessage(String(userContext)).slice(0, 2000) : "";
   const useConcise = conciseMode === true;
 
-  // build conversation turns: up to 20 prior messages + current
   const hasHistory = Array.isArray(history) && history.length > 0;
   const conversationMessages = [];
   if (hasHistory) {
@@ -245,25 +299,38 @@ export default async function handler(req, res) {
     });
   }
 
-  // only cache single-turn requests (no prior history); key includes all settings that affect output
-  const cacheKey = !hasHistory
+  const compliance = isCompliance(sanitizedMessage);
+
+  // Only cache non-compliance single-turn requests (compliance responses include live search data)
+  const cacheKey = !hasHistory && !compliance
     ? crypto.createHash("sha256").update(`${model}::${useConcise}::${sanitizedUserContext}::${sanitizedMessage}`).digest("hex")
     : null;
 
   const cached = cacheKey ? cacheGet(cacheKey) : null;
   if (cached) return res.json({ text: cached, cached: true });
 
-  const compliance = isCompliance(sanitizedMessage);
+  // Run KB lookup and web search in parallel
   let kbResults = [];
+  let webResults = [];
   if (compliance) {
-    const kb = await getKB();
-    if (kb) kbResults = searchKB(kb, sanitizedMessage);
+    [kbResults, webResults] = await Promise.all([
+      getKB().then((kb) => (kb ? searchKB(kb, sanitizedMessage) : [])),
+      webSearch(sanitizedMessage),
+    ]);
   }
 
-  const systemPrompt = buildSystemPrompt(kbResults, { conciseMode: useConcise, userContext: sanitizedUserContext });
+  const systemPrompt = buildSystemPrompt(kbResults, webResults, { conciseMode: useConcise, userContext: sanitizedUserContext });
 
   try {
-    console.log("[OmanX] /api/chat request", { model, compliance, conciseMode: useConcise, hasUserContext: !!sanitizedUserContext, chars: sanitizedMessage.length });
+    console.log("[OmanX] /api/chat request", {
+      model,
+      compliance,
+      webResults: webResults.length,
+      kbResults: kbResults.length,
+      conciseMode: useConcise,
+      hasUserContext: !!sanitizedUserContext,
+      chars: sanitizedMessage.length,
+    });
 
     const response = await client.messages.create({
       model,
@@ -275,7 +342,7 @@ export default async function handler(req, res) {
 
     const text = response.content?.[0]?.text?.trim() || "No response generated.";
     if (cacheKey) cacheSet(cacheKey, text);
-    return res.json({ text, cached: false, compliance });
+    return res.json({ text, cached: false, compliance, webSearched: webResults.length > 0 });
   } catch (err) {
     console.error("[OmanX] Anthropic error:", err?.message, err?.stack);
     if (err?.status === 429) {
