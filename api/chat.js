@@ -14,7 +14,8 @@ const KNOWLEDGE_PATHS = [
   path.join(__dirname, "../../data/knowledge.json"),
 ];
 
-const MODEL = process.env.ANTHROPIC_MODEL || "claude-sonnet-4-6";
+const DEFAULT_MODEL = process.env.ANTHROPIC_MODEL || "claude-sonnet-4-6";
+const ALLOWED_MODELS = new Set(["claude-sonnet-4-6", "claude-haiku-4-5-20251001"]);
 
 let _kb = null;
 let _kbMtime = 0;
@@ -112,12 +113,25 @@ Always:
 - For any compliance question, end your response with a clear reminder to verify with their Designated School Official (DSO) before taking action
 - Never fabricate contact information, deadlines, or policy details`;
 
-function buildSystemPrompt(kbResults) {
-  if (!kbResults || kbResults.length === 0) return BASE_SYSTEM;
-  const kbSection = kbResults
-    .map((r, i) => `### KB Entry ${i + 1} — ID: ${r.id}\n${JSON.stringify(r.doc, null, 2)}`)
-    .join("\n\n");
-  return `${BASE_SYSTEM}\n\n---\n\n## Relevant Knowledge Base Entries\nUse ONLY these entries for compliance guidance. Cite the entry ID when referencing them.\n\n${kbSection}`;
+function buildSystemPrompt(kbResults, { conciseMode, userContext } = {}) {
+  let prompt = BASE_SYSTEM;
+
+  if (userContext) {
+    prompt += `\n\n---\n\n## Student Context\nThe student has provided the following context about themselves. Use it to personalize your guidance:\n${userContext}`;
+  }
+
+  if (conciseMode) {
+    prompt += "\n\n---\n\nResponse style: Keep answers concise and to the point. Use bullet points over prose where appropriate. Avoid lengthy preamble.";
+  }
+
+  if (kbResults && kbResults.length > 0) {
+    const kbSection = kbResults
+      .map((r, i) => `### KB Entry ${i + 1} — ID: ${r.id}\n${JSON.stringify(r.doc, null, 2)}`)
+      .join("\n\n");
+    prompt += `\n\n---\n\n## Relevant Knowledge Base Entries\nUse ONLY these entries for compliance guidance. Cite the entry ID when referencing them.\n\n${kbSection}`;
+  }
+
+  return prompt;
 }
 
 const _cache = new Map();
@@ -133,6 +147,29 @@ function cacheGet(key) {
 function cacheSet(key, value) {
   if (_cache.size > 500) _cache.delete(_cache.keys().next().value);
   _cache.set(key, { ts: Date.now(), value });
+}
+
+// Per-IP rate limiting: 20 requests per 60-second window
+const _rateLimitMap = new Map();
+const RATE_LIMIT_MAX = 20;
+const RATE_LIMIT_WINDOW_MS = 60_000;
+
+function isRateLimited(ip) {
+  const now = Date.now();
+  const entry = _rateLimitMap.get(ip);
+  if (!entry || now - entry.windowStart > RATE_LIMIT_WINDOW_MS) {
+    _rateLimitMap.set(ip, { count: 1, windowStart: now });
+    // Evict old entries to prevent unbounded growth
+    if (_rateLimitMap.size > 5000) {
+      for (const [key, val] of _rateLimitMap) {
+        if (now - val.windowStart > RATE_LIMIT_WINDOW_MS) _rateLimitMap.delete(key);
+      }
+    }
+    return false;
+  }
+  if (entry.count >= RATE_LIMIT_MAX) return true;
+  entry.count++;
+  return false;
 }
 
 let _client = null;
@@ -151,14 +188,24 @@ function sanitizeMessage(message) {
 }
 
 export default async function handler(req, res) {
-  res.setHeader("Access-Control-Allow-Origin", "*");
+  const allowedOrigin = process.env.ALLOWED_ORIGIN;
+  const requestOrigin = req.headers.origin;
+  if (allowedOrigin && requestOrigin === allowedOrigin) {
+    res.setHeader("Access-Control-Allow-Origin", allowedOrigin);
+    res.setHeader("Vary", "Origin");
+  }
   res.setHeader("Access-Control-Allow-Methods", "POST, OPTIONS");
   res.setHeader("Access-Control-Allow-Headers", "Content-Type, Authorization");
 
   if (req.method === "OPTIONS") return res.status(200).end();
   if (req.method !== "POST") return res.status(405).json({ error: "Method not allowed" });
 
-  const { message, history } = req.body || {};
+  const ip = req.headers["x-forwarded-for"]?.split(",")[0].trim() || req.socket?.remoteAddress || "unknown";
+  if (isRateLimited(ip)) {
+    return res.status(429).json({ error: "Too many requests. Please slow down.", text: "You've sent too many messages too quickly. Please wait a moment before trying again." });
+  }
+
+  const { message, history, model: clientModel, conciseMode, userContext } = req.body || {};
 
   if (!message || typeof message !== "string") {
     return res.status(400).json({ error: "Missing 'message' string." });
@@ -173,6 +220,10 @@ export default async function handler(req, res) {
   if (sanitizedMessage.length > 10_000) {
     return res.status(400).json({ error: "Message too long (max 10,000 chars)." });
   }
+
+  const model = ALLOWED_MODELS.has(clientModel) ? clientModel : DEFAULT_MODEL;
+  const sanitizedUserContext = userContext ? sanitizeMessage(String(userContext)).slice(0, 2000) : "";
+  const useConcise = conciseMode === true;
 
   // build conversation turns: up to 20 prior messages + current
   const hasHistory = Array.isArray(history) && history.length > 0;
@@ -194,9 +245,9 @@ export default async function handler(req, res) {
     });
   }
 
-  // only cache single-turn requests (no prior history)
+  // only cache single-turn requests (no prior history); key includes all settings that affect output
   const cacheKey = !hasHistory
-    ? crypto.createHash("sha256").update(`${MODEL}::${sanitizedMessage}`).digest("hex")
+    ? crypto.createHash("sha256").update(`${model}::${useConcise}::${sanitizedUserContext}::${sanitizedMessage}`).digest("hex")
     : null;
 
   const cached = cacheKey ? cacheGet(cacheKey) : null;
@@ -209,14 +260,14 @@ export default async function handler(req, res) {
     if (kb) kbResults = searchKB(kb, sanitizedMessage);
   }
 
-  const systemPrompt = buildSystemPrompt(kbResults);
+  const systemPrompt = buildSystemPrompt(kbResults, { conciseMode: useConcise, userContext: sanitizedUserContext });
 
   try {
-    console.log("[OmanX] /api/chat request", { compliance, chars: sanitizedMessage.length });
+    console.log("[OmanX] /api/chat request", { model, compliance, conciseMode: useConcise, hasUserContext: !!sanitizedUserContext, chars: sanitizedMessage.length });
 
     const response = await client.messages.create({
-      model: MODEL,
-      max_tokens: 1024,
+      model,
+      max_tokens: 2048,
       temperature: 0.4,
       system: systemPrompt,
       messages: conversationMessages,

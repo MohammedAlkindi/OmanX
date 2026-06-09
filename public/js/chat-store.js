@@ -4,12 +4,11 @@ const CHATS_KEY = 'omanx.mindspace.chats.v1';
 const ACTIVE_KEY = 'omanx.mindspace.active.v1';
 const SETTINGS_KEY = 'omanx.settings.v1';
 
-const starterReply = {
-  id: uid('msg'),
-  role: 'assistant',
-  content: 'Welcome to OmanX. I can help you structure questions about study planning, housing, first-week setup, and safe escalation for high-stakes issues. Start with a question or use one of the guided prompts below.',
-  createdAt: new Date().toISOString(),
-};
+const STARTER_CONTENT = 'Welcome to OmanX. I can help you structure questions about study planning, housing, first-week setup, and safe escalation for high-stakes issues. Start with a question or use one of the guided prompts below.';
+
+function makeStarterReply() {
+  return { id: uid('msg'), role: 'assistant', content: STARTER_CONTENT, createdAt: new Date().toISOString() };
+}
 
 export function loadChats() {
   try {
@@ -50,7 +49,7 @@ export function createChat({ title = 'New guidance session', category = 'General
     pinned: false,
     createdAt: now,
     updatedAt: now,
-    messages: seed ? [starterReply] : [],
+    messages: seed ? [makeStarterReply()] : [],
   };
 }
 

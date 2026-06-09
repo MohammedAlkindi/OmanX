@@ -79,6 +79,19 @@ function cancelRename() {
 }
 
 function bindEvents() {
+  // — scroll to bottom button —
+  const msgList = qs('[data-message-list]');
+  const scrollBtn = qs('[data-scroll-bottom]');
+  if (msgList && scrollBtn) {
+    msgList.addEventListener('scroll', () => {
+      const nearBottom = msgList.scrollHeight - msgList.scrollTop - msgList.clientHeight < 80;
+      scrollBtn.hidden = nearBottom;
+    });
+    scrollBtn.addEventListener('click', () => {
+      msgList.scrollTo({ top: msgList.scrollHeight, behavior: 'smooth' });
+    });
+  }
+
   // — sidebar toggle (mobile) —
   qs('[data-sidebar-toggle]')?.addEventListener('click', () => {
     qs('[data-chat-sidebar]').classList.toggle('open');
@@ -177,6 +190,7 @@ function bindEvents() {
     autoGrow(textarea);
     setTyping(true);
     renderMessages();
+    qs('[data-message-list]').scrollTop = qs('[data-message-list]').scrollHeight;
 
     const reply = await createAssistantReply(content);
     appendMessage('assistant', reply);
@@ -276,6 +290,7 @@ function renderHeader() {
 function renderMessages() {
   const chat = getActiveChat();
   const container = qs('[data-message-list]');
+  const wasNearBottom = container.scrollHeight - container.scrollTop - container.clientHeight < 120;
 
   if (!chat.messages.length) {
     container.innerHTML = emptyStateMarkup();
@@ -317,7 +332,7 @@ function renderMessages() {
     });
   });
 
-  container.scrollTop = container.scrollHeight;
+  if (wasNearBottom) container.scrollTop = container.scrollHeight;
 }
 
 function appendMessage(role, content) {
@@ -340,17 +355,19 @@ function getActiveChat() {
 }
 
 async function createAssistantReply(message) {
-  // pass all prior messages as history (current user message was just appended, exclude it)
   const chat = getActiveChat();
   const history = chat.messages
     .slice(0, -1)
+    .slice(-20)
     .map(({ role, content }) => ({ role, content }));
+
+  const { model, conciseMode, userContext } = state.settings;
 
   try {
     const response = await fetch('/api/chat', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ message, history }),
+      body: JSON.stringify({ message, history, model, conciseMode, userContext }),
     });
 
     const payload = await response.json().catch(() => ({}));

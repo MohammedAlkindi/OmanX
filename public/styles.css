@@ -1218,6 +1218,7 @@ select:focus {
   gap: 16px;
   min-height: 0;
   overflow: hidden;
+  position: relative;
 }
 
 .card.assistant-shell {
@@ -1379,18 +1380,19 @@ select:focus {
   display: flex;
   flex-direction: column;
   gap: 16px;
-  padding: 4px 0;
+  padding: 24px 0 8px;
 }
 
 .message {
-  max-width: 760px;
+  max-width: 720px;
+  width: 100%;
+  align-self: center;
   display: flex;
   flex-direction: column;
   gap: 4px;
 }
 
 .message.user {
-  align-self: flex-end;
   align-items: flex-end;
 }
 
@@ -1469,6 +1471,9 @@ select:focus {
   font-size: 0.875rem;
   font-weight: 300;
   gap: 16px;
+  max-width: 640px;
+  width: 100%;
+  align-self: center;
 }
 
 .message-empty h3 {
@@ -1514,6 +1519,9 @@ select:focus {
   border: 0.5px solid var(--border-strong);
   border-radius: var(--radius);
   padding: 12px;
+  max-width: 720px;
+  width: 100%;
+  margin: 0 auto;
 }
 
 .card.composer-box {
@@ -1614,6 +1622,31 @@ select:focus {
   0%, 100% { opacity: 0.3; transform: translateY(0); }
   50%       { opacity: 1;   transform: translateY(-2px); }
 }
+
+/* scroll-to-bottom button */
+.scroll-bottom-btn {
+  position: absolute;
+  bottom: 88px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: var(--white);
+  border: 0.5px solid var(--border-strong);
+  box-shadow: 0 2px 8px rgba(0,0,0,0.12);
+  color: var(--ink-3);
+  font-size: 14px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: opacity 0.2s, color 0.15s;
+  z-index: 10;
+}
+
+.scroll-bottom-btn:hover { color: var(--ink); box-shadow: 0 4px 12px rgba(0,0,0,0.16); }
+.scroll-bottom-btn[hidden] { display: none; }
 
 
 /* ============================================================
