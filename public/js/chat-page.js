@@ -587,6 +587,9 @@ function renderRichText(content) {
     } else if (/^#\s+/.test(raw)) {
       closeList();
       out.push(`<h3>${applyInline(raw.replace(/^#\s+/, ''))}</h3>`);
+    } else if (/^(\s*[-*_]\s*){3,}$/.test(raw)) {
+      closeList();
+      out.push('<hr>');
     } else if (/^[-*]\s+/.test(raw)) {
       if (listType !== 'ul') { closeList(); out.push('<ul>'); listType = 'ul'; }
       out.push(`<li>${applyInline(raw.replace(/^[-*]\s+/, ''))}</li>`);

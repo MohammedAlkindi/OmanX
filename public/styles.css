@@ -40,8 +40,8 @@
 
   /* — typography — */
   --serif: 'DM Serif Display', Georgia, serif;
-  --sans:  'DM Sans', system-ui, sans-serif;
-  --mono:  'DM Mono', monospace;
+  --sans:  'DM Sans', system-ui, -apple-system, BlinkMacSystemFont, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Noto Color Emoji";
+  --mono:  'DM Mono', "Cascadia Code", Consolas, monospace, "Apple Color Emoji", "Segoe UI Emoji";
 
   /* — layout — */
   --radius:       2px;
@@ -1881,8 +1881,8 @@ select:focus {
 }
 
 /* markdown content inside assistant message bubbles */
-.message-bubble p { margin: 0; }
-.message-bubble p + p { margin-top: 8px; }
+.message-bubble p { margin: 0 0 10px; }
+.message-bubble p:last-child { margin-bottom: 0; }
 .message-bubble h3 {
   font-family: var(--sans);
   font-size: 0.9375rem;
@@ -1902,12 +1902,23 @@ select:focus {
 }
 .message-bubble ul,
 .message-bubble ol {
-  padding-left: 20px;
-  margin: 6px 0;
+  padding-left: 24px;
+  margin: 8px 0;
 }
 .message-bubble ul { list-style: disc; }
 .message-bubble ol { list-style: decimal; }
-.message-bubble li { margin-bottom: 3px; }
+.message-bubble li {
+  margin-bottom: 4px;
+  padding-left: 2px;
+}
+.message-bubble li::marker {
+  color: var(--ink-3);
+}
+.message-bubble hr {
+  border: none;
+  border-top: 0.5px solid var(--border-strong);
+  margin: 16px 0;
+}
 .message-bubble blockquote {
   border-left: 2px solid var(--gold);
   padding-left: 12px;
