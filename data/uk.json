@@ -1,0 +1,680 @@
+{
+  "metadata": {
+    "version": "1.0.0",
+    "lastUpdated": "2026-06-10",
+    "authority": "Official UK Compliance Database",
+    "validityPeriod": "Academic Year 2025-2026",
+    "updateFrequency": "Quarterly",
+    "totalDocuments": 7,
+    "targetAudience": "Omani Scholars in United Kingdom",
+    "sources": [
+      "https://www.gov.uk/student-visa",
+      "https://www.gov.uk/graduate-visa",
+      "https://www.gov.uk/guidance/academic-technology-approval-scheme",
+      "https://www.ukcisa.org.uk"
+    ]
+  },
+  "documents": [
+    {
+      "id": "UK-STUDENT-ROUTE-2026",
+      "title": "UK Student Route Visa — Official Requirements",
+      "effectiveDate": "2025-01-02",
+      "summary": "The Student Route (formerly Tier 4) is the primary visa for international students at UK universities. It requires a Confirmation of Acceptance for Studies (CAS) from a UKVI-licensed sponsor and proof of financial maintenance. From July 2025, visa decisions are issued as a digital eVisa through a UKVI account rather than a physical BRP sticker.",
+      "scope": {
+        "appliesTo": ["Omani students at UK universities", "MoHE-sponsored scholars in UK"],
+        "riskLevel": "Critical",
+        "complianceTier": "Regulatory Mandatory",
+        "geographicScope": "United Kingdom",
+        "failureImpact": "Visa refusal, curtailment of leave, removal from UK, scholarship revocation"
+      },
+      "timeline": {
+        "T-6 months": "Earliest application date before course start",
+        "T-3 weeks": "Typical visa decision timeline",
+        "T0": "Course start date on CAS",
+        "Within 7 days (arrival)": "Police registration if visa requires it; address registration with sponsor"
+      },
+      "rules": [
+        {
+          "rule": "Confirmation of Acceptance for Studies (CAS)",
+          "details": [
+            "You must have a valid CAS reference number from a UKVI-licensed Student sponsor before applying",
+            "CAS contains your course details, tuition fees paid, and sponsor's licence number",
+            "CAS is valid for 6 months — apply within this window",
+            "One CAS per application; changing institution after visa grant requires a new visa in most cases",
+            "Check your sponsor appears on the UKVI Register of Licensed Sponsors with 'track record' status, which affects your work rights"
+          ],
+          "authorizationSources": ["UKVI-licensed Student sponsor", "UK Visas and Immigration"],
+          "commonViolations": [
+            {
+              "text": "Beginning studies before visa is granted",
+              "consequence": "Working or studying without leave — status violation, removal risk"
+            },
+            {
+              "text": "Changing to a different course or institution without a new visa",
+              "consequence": "Breach of visa conditions, curtailment of leave"
+            }
+          ],
+          "controls": [
+            "Confirm CAS reference number before applying",
+            "Verify your sponsor's 'track record' status on the UKVI register (affects work hour limit)",
+            "Apply no earlier than 6 months before your course start date"
+          ]
+        },
+        {
+          "rule": "Financial Maintenance Requirements (2025 Rates)",
+          "details": [
+            "London institutions: £1,483 per month for up to 9 months (maximum £13,347)",
+            "Outside London: £1,136 per month for up to 9 months (maximum £10,224)",
+            "Funds must have been held for at least 28 consecutive days",
+            "The 28-day period must end within 31 days of your visa application date",
+            "If your CAS shows tuition fees already paid, you may not need to show the full amount",
+            "MoHE sponsorship letters are accepted as evidence of financial support"
+          ],
+          "authorizationSources": ["UKVI financial evidence guidance (gov.uk)"],
+          "failureModes": [
+            "Funds held for fewer than 28 days",
+            "28-day period ending more than 31 days before application",
+            "Using joint accounts or funds not in your name without declaration"
+          ],
+          "mitigation": [
+            "Prepare bank statements or official MoHE sponsorship letter well in advance",
+            "Check gov.uk/student-visa/money for the most current monthly figures",
+            "If MoHE covers living costs, obtain an official letter confirming the monthly allowance amount"
+          ]
+        },
+        {
+          "rule": "Digital eVisa (from July 2025)",
+          "details": [
+            "From 15 July 2025, Student Route decisions are issued as a digital eVisa via your UKVI account — not as a physical sticker (vignette) in your passport",
+            "Create a UKVI account and link your eVisa before travel",
+            "Share your eVisa with airlines and employers using the online share code service at gov.uk/view-prove-immigration-status",
+            "Physical BRP cards are no longer issued for Student Route grants"
+          ],
+          "authorizationSources": ["gov.uk/evisa", "UKVI account portal"],
+          "controls": [
+            "Register for a UKVI account immediately after visa grant",
+            "Save your share code before each international trip",
+            "Report any issues with your eVisa to UKVI before travel"
+          ]
+        },
+        {
+          "rule": "Police Registration",
+          "details": [
+            "Some nationalities are required to register with the UK police within 7 days of arriving",
+            "Check your visa conditions — if required, it will be stated on your entry clearance/eVisa",
+            "Registration is done at the Overseas Visitor Records Office (OVRO) at the local police station",
+            "Omani nationals should verify at the time of visa grant whether this condition applies"
+          ],
+          "authorizationSources": ["gov.uk/register-with-the-police"],
+          "mitigation": [
+            "Check your visa conditions immediately upon receipt",
+            "If required, register within 7 days of arrival — do not delay"
+          ]
+        },
+        {
+          "rule": "Course and Attendance Requirements",
+          "details": [
+            "You must study at the institution and on the course specified in your CAS",
+            "Sponsor monitors attendance and must report significant absences to UKVI",
+            "If you withdraw from or are excluded from your course, your sponsor must notify UKVI and your visa may be curtailed to 60 days",
+            "Changing course level downward (e.g., master's to bachelor's) triggers sponsor reporting duties"
+          ],
+          "authorizationSources": ["UKVI Student Sponsor Guidance", "Appendix Student (Immigration Rules)"],
+          "commonViolations": [
+            {
+              "text": "Excessive unauthorized absences",
+              "consequence": "Sponsor reports to UKVI, visa curtailed to 60 days"
+            },
+            {
+              "text": "Withdrawing without notifying sponsor",
+              "consequence": "UKVI notification, leave curtailed, overstay risk"
+            }
+          ]
+        }
+      ],
+      "contacts": {
+        "UKVI_Contact_Centre": {
+          "name": "UK Visas and Immigration",
+          "title": "Student visa enquiries",
+          "website": "https://www.gov.uk/contact-ukvi-inside-outside-uk",
+          "description": "For visa application queries and account issues"
+        },
+        "UKCISA": {
+          "name": "UK Council for International Student Affairs",
+          "title": "Independent advice for international students",
+          "website": "https://www.ukcisa.org.uk",
+          "phone": "+44 (0)20 7788 9214",
+          "hours": "Mon-Fri 13:00-16:00 UK time (advice line)",
+          "description": "Free independent advice on UK immigration rules for students"
+        }
+      },
+      "resources": {
+        "links": [
+          {
+            "title": "Student Visa — GOV.UK",
+            "url": "https://www.gov.uk/student-visa",
+            "description": "Official overview, application, and eligibility"
+          },
+          {
+            "title": "Financial Evidence Guidance — GOV.UK",
+            "url": "https://www.gov.uk/guidance/financial-evidence-for-student-and-child-student-route-applicants",
+            "description": "Detailed rules on acceptable financial evidence"
+          },
+          {
+            "title": "Register of Licensed Student Sponsors",
+            "url": "https://www.gov.uk/government/publications/register-of-licensed-sponsors-students",
+            "description": "Check your university's sponsor status and track record rating"
+          },
+          {
+            "title": "UKCISA — Student Route Eligibility",
+            "url": "https://www.ukcisa.org.uk/student-advice/visas-and-immigration/student-route-eligibility-and-requirements/",
+            "description": "Plain-English guide to Student Route requirements"
+          }
+        ]
+      },
+      "complianceNotes": [
+        "MoHE-sponsored students must obtain MoHE written approval before transferring to a different UK institution",
+        "Any change in enrolment status must be reported to both your sponsor and MoHE",
+        "Financial requirements are reviewed annually — check gov.uk for current figures before applying",
+        "Your sponsor's 'track record' status determines whether you can work 20 hrs/week — verify before accepting employment"
+      ]
+    },
+    {
+      "id": "UK-WORK-RIGHTS-2026",
+      "title": "UK Student Route — Work Rights and Restrictions",
+      "effectiveDate": "2025-01-01",
+      "summary": "Students on the Student Route may work during term time within strict hour limits and without restriction during vacations. Work rights depend on your sponsor's UKVI 'track record' status and your course level. Certain types of work are always prohibited.",
+      "scope": {
+        "appliesTo": ["Omani students on Student Route visa", "MoHE-sponsored scholars in UK"],
+        "riskLevel": "High",
+        "complianceTier": "Regulatory Mandatory",
+        "geographicScope": "United Kingdom",
+        "failureImpact": "Visa curtailment, removal from UK, scholarship revocation, future visa refusals"
+      },
+      "rules": [
+        {
+          "rule": "Term-Time Work Hours",
+          "details": [
+            "Degree level or above (e.g., bachelor's, master's, PhD) at a sponsor with 'track record' status: maximum 20 hours per week during term",
+            "Below degree level (e.g., A-levels, foundation): maximum 10 hours per week during term",
+            "If your sponsor does NOT have 'track record' status: you may have no right to work during term — check your visa conditions",
+            "The week runs Monday to Sunday; any combination of jobs must not exceed your weekly limit",
+            "You may not work before your course start date"
+          ],
+          "authorizationSources": ["Appendix Student, Immigration Rules", "Your CAS conditions"],
+          "commonViolations": [
+            {
+              "text": "Working more than 20 hours/week during term time",
+              "consequence": "Breach of visa conditions, visa curtailment, possible removal"
+            },
+            {
+              "text": "Working before course start date",
+              "consequence": "Working without authorisation, visa breach"
+            },
+            {
+              "text": "Working for a sponsor that does not have track record status when your visa only permits work at a track-record sponsor",
+              "consequence": "Breach of conditions"
+            }
+          ],
+          "mitigation": [
+            "Verify your sponsor's track record status on the UKVI register before accepting any job",
+            "Keep payslips and timesheets to demonstrate compliance if audited",
+            "Consult your International Student Support team before accepting any employment"
+          ]
+        },
+        {
+          "rule": "Vacation Work",
+          "details": [
+            "During official term vacations: no weekly hour limit — you may work full time",
+            "Also applies: before your course starts (from visa grant), and during any study break authorized by your sponsor",
+            "After your course ends: you enter a grace period (see UK-GRACE-PERIOD-2026) — you may still work if permitted by your visa conditions"
+          ],
+          "authorizationSources": ["gov.uk/student-visa/work-during-your-studies"]
+        },
+        {
+          "rule": "Prohibited Types of Work",
+          "details": [
+            "Self-employment and running your own business are not permitted on the Student Route",
+            "Work as a professional sportsperson (including a sports coach) is not permitted",
+            "Work as a professional entertainer is not permitted",
+            "Unpaid internships that constitute work for immigration purposes may still count toward your hours limit",
+            "Volunteering for a charity is generally allowed and does not count toward the hours limit, but do not displace paid workers"
+          ],
+          "authorizationSources": ["Appendix Student, Immigration Rules"],
+          "failureModes": [
+            "Freelancing or contracting through a personal company",
+            "Accepting unpaid internships that exceed your hours allowance"
+          ]
+        },
+        {
+          "rule": "MoHE Employment Obligations",
+          "details": [
+            "MoHE scholarship terms may restrict or prohibit employment — check your scholarship contract",
+            "Any employment income must be reported to MoHE annually",
+            "Obtaining a National Insurance (NI) number is required for employment; apply through the UK government (gov.uk/apply-national-insurance-number)"
+          ],
+          "authorizationSources": ["MoHE Scholarship Agreement", "HMRC (gov.uk)"]
+        }
+      ],
+      "resources": {
+        "links": [
+          {
+            "title": "Working during your Student visa — GOV.UK",
+            "url": "https://www.gov.uk/student-visa/work-during-your-studies",
+            "description": "Official guidance on work rights for students"
+          },
+          {
+            "title": "UKCISA — Student Work",
+            "url": "https://www.ukcisa.org.uk/student-advice/working/student-work/",
+            "description": "Plain-English explanation of work restrictions"
+          },
+          {
+            "title": "Apply for a National Insurance Number",
+            "url": "https://www.gov.uk/apply-national-insurance-number",
+            "description": "Required before starting any paid employment in the UK"
+          }
+        ]
+      }
+    },
+    {
+      "id": "UK-GRADUATE-ROUTE-2026",
+      "title": "UK Graduate Route (Post-Study Work Visa)",
+      "effectiveDate": "2025-01-01",
+      "summary": "The Graduate Route allows eligible graduates of UK universities to remain in the UK to work or look for work after completing their studies. It does not require employer sponsorship. Duration is 2 years for bachelor's and master's graduates (reducing to 18 months from 1 January 2027) and 3 years for PhD graduates.",
+      "scope": {
+        "appliesTo": ["Omani students who have completed a UK degree", "MoHE-sponsored graduates considering post-graduation work"],
+        "riskLevel": "High",
+        "complianceTier": "Regulatory and MoHE Contractual",
+        "geographicScope": "United Kingdom",
+        "failureImpact": "Unable to remain legally in UK; MoHE return obligation triggers if application not planned properly"
+      },
+      "timeline": {
+        "T-0": "Apply before current Student visa expires",
+        "After course completion confirmed": "Sponsor notifies Home Office; application window opens",
+        "Decision": "Usually within 8 weeks",
+        "Grant period (bachelor's/master's)": "2 years (18 months from 1 January 2027)",
+        "Grant period (PhD)": "3 years"
+      },
+      "rules": [
+        {
+          "rule": "Eligibility Requirements",
+          "details": [
+            "Must have completed an eligible UK bachelor's, master's, or doctoral degree at a licensed Student sponsor",
+            "Must apply before your Student Route visa expires",
+            "Your sponsor must have notified the Home Office that you successfully completed your course",
+            "Must be in the UK when you apply",
+            "No minimum salary or job offer required"
+          ],
+          "authorizationSources": ["gov.uk/graduate-visa"]
+        },
+        {
+          "rule": "Duration and MoHE Return Obligation",
+          "details": [
+            "Bachelor's or master's graduates: 2 years (IMPORTANT: reducing to 18 months for applications made on or after 1 January 2027)",
+            "PhD or doctoral graduates: 3 years (unchanged)",
+            "CRITICAL for MoHE scholars: Your scholarship contract requires return to Oman within 60 days of programme completion — applying for the Graduate Route does NOT override this MoHE obligation",
+            "You must obtain prior MoHE written approval before applying for the Graduate Route; failure to return may trigger full repayment obligations"
+          ],
+          "authorizationSources": ["gov.uk/graduate-visa", "MoHE Scholarship Agreement"],
+          "failureModes": [
+            "Applying for Graduate Route without MoHE approval and then being required to repay scholarship funds",
+            "Relying on 2-year grant without awareness of the January 2027 reduction to 18 months"
+          ],
+          "mitigation": [
+            "Contact MoHE Scholarship Office 6 months before graduation to discuss post-completion options",
+            "Get MoHE approval in writing before filing Graduate Route application",
+            "Check gov.uk/graduate-visa for the latest grant duration before applying"
+          ]
+        },
+        {
+          "rule": "Work Rights on Graduate Route",
+          "details": [
+            "Can work in any role, at any skill level — no restriction on occupation",
+            "Can be self-employed or run a business (unlike the Student Route)",
+            "No weekly hour limit",
+            "Can switch to Skilled Worker route if employer offers sponsorship"
+          ],
+          "authorizationSources": ["gov.uk/graduate-visa"]
+        }
+      ],
+      "resources": {
+        "links": [
+          {
+            "title": "Graduate Visa — GOV.UK",
+            "url": "https://www.gov.uk/graduate-visa",
+            "description": "Official eligibility, application, and conditions"
+          },
+          {
+            "title": "UKCISA — Working After Studies",
+            "url": "https://www.ukcisa.org.uk/student-advice/working/working-after-studies/",
+            "description": "Guidance on Graduate Route and other post-study options"
+          }
+        ]
+      },
+      "complianceNotes": [
+        "MoHE approval is required before applying — do not assume the Graduate Route is compatible with your scholarship contract without written MoHE confirmation",
+        "The Graduate Route does not lead directly to settlement (Indefinite Leave to Remain) — further applications are required",
+        "Tax on UK employment income is mandatory; register with HMRC (gov.uk/register-for-self-assessment if self-employed)"
+      ]
+    },
+    {
+      "id": "UK-ATAS-2026",
+      "title": "Academic Technology Approval Scheme (ATAS)",
+      "effectiveDate": "2025-01-08",
+      "summary": "ATAS clearance is required before studying or researching in certain sensitive subject areas at UK universities. It is issued by the Foreign, Commonwealth & Development Office (FCDO) and must be obtained before your visa can be granted and before starting the relevant course. New applicant guidance was released 8 January 2025.",
+      "scope": {
+        "appliesTo": ["Postgraduate research students in sensitive STEM fields", "Some taught master's students in sensitive fields"],
+        "riskLevel": "High",
+        "complianceTier": "Regulatory Mandatory",
+        "geographicScope": "United Kingdom",
+        "failureImpact": "Visa refusal, inability to start course, scholarship interruption"
+      },
+      "rules": [
+        {
+          "rule": "Who Needs ATAS",
+          "details": [
+            "Required for students from non-exempt countries studying certain subjects at postgraduate level — primarily STEM, dual-use, and defence-sensitive fields",
+            "Your university will provide a CAH3 code and confirm whether ATAS is needed for your specific course",
+            "Omani nationals are not on the exempt list (exempt list includes EU nationals and a small number of others) — you must apply if your course requires it",
+            "Need a separate ATAS certificate for each institution and each programme of study"
+          ],
+          "authorizationSources": ["gov.uk/guidance/academic-technology-approval-scheme", "FCDO"]
+        },
+        {
+          "rule": "Application and Validity",
+          "details": [
+            "Apply online via the ATAS portal: academic-technology-approval.service.gov.uk",
+            "Certificate is valid for 6 months from issue date for the purpose of a visa application",
+            "Must apply early — processing can take several weeks; allow at least 4-6 weeks before your visa application",
+            "If you change institution or course, you need a new ATAS certificate"
+          ],
+          "authorizationSources": ["gov.uk/guidance/academic-technology-approval-scheme"],
+          "failureModes": [
+            "Applying too late and missing visa application window",
+            "Changing research topic substantially without obtaining new ATAS clearance"
+          ],
+          "controls": [
+            "Ask your admissions team whether your course requires ATAS before accepting your offer",
+            "Apply for ATAS as soon as you receive your CAH3 code — do not wait for CAS",
+            "Build at least 6 weeks for ATAS processing into your pre-arrival timeline"
+          ]
+        }
+      ],
+      "resources": {
+        "links": [
+          {
+            "title": "ATAS — GOV.UK",
+            "url": "https://www.gov.uk/guidance/academic-technology-approval-scheme",
+            "description": "Official ATAS guidance, subject lists, and application portal"
+          },
+          {
+            "title": "Find out if you need an ATAS certificate — GOV.UK",
+            "url": "https://www.gov.uk/guidance/find-out-if-you-require-an-atas-certificate",
+            "description": "Subject-by-subject checker"
+          }
+        ]
+      }
+    },
+    {
+      "id": "UK-STATUS-MAINTENANCE-2026",
+      "title": "Maintaining Student Route Status — UK",
+      "effectiveDate": "2025-01-01",
+      "summary": "Maintaining valid Student Route immigration status in the UK requires active compliance with course attendance, timely reporting of personal information changes, and understanding grace periods. Failure to maintain status can result in curtailment of leave to 60 days.",
+      "scope": {
+        "appliesTo": ["All Omani students on Student Route visa in UK"],
+        "riskLevel": "High",
+        "complianceTier": "Regulatory Mandatory",
+        "geographicScope": "United Kingdom",
+        "failureImpact": "Leave curtailed to 60 days, removal proceedings, future visa refusal, scholarship termination"
+      },
+      "timeline": {
+        "Within 7 days of arrival": "Register address with sponsor; police registration if required by visa",
+        "Before travel abroad": "Confirm eVisa is accessible; no specific travel signature needed (unlike F-1 I-20)",
+        "60 days before leave expiry": "Apply to extend if course continues beyond current visa",
+        "Post-completion": "60-day grace period to depart, switch status, or apply for Graduate Route"
+      },
+      "rules": [
+        {
+          "rule": "Attendance and Academic Engagement",
+          "details": [
+            "Attend all scheduled lectures, seminars, tutorials, and supervisor meetings as required by your sponsor",
+            "Your sponsor is legally required to monitor your attendance and report significant unauthorized absences to UKVI",
+            "If you withdraw or are excluded, your sponsor must report this to UKVI — your visa may be curtailed to 60 days from the report date",
+            "Postgraduate research students (dissertations, theses) are still monitored throughout their research period"
+          ],
+          "authorizationSources": ["UKVI Student Sponsor Compliance Guidance"],
+          "mitigation": [
+            "Notify your department and International Student Support team of any medical or personal issues before missing contact points",
+            "Keep a record of authorized absences and supervisor correspondence"
+          ]
+        },
+        {
+          "rule": "Address and Personal Information Updates",
+          "details": [
+            "Report your UK address to your sponsor within 7 days of arrival or moving",
+            "Address changes must be updated in your university student record system",
+            "Name or passport changes must be reported to your sponsor and UKVI promptly",
+            "Update your UKVI account with any changes to personal details"
+          ],
+          "authorizationSources": ["UKVI Student Route Guidance"]
+        },
+        {
+          "rule": "Extending Student Route Leave",
+          "details": [
+            "If your course continues beyond your current visa expiry, you must apply to extend before the current visa expires",
+            "Apply online via UKVI; you will need a new CAS from your sponsor",
+            "There is no automatic extension — do not let your leave expire",
+            "MoHE approval may be required for an extension if it extends total program duration beyond the original scholarship term"
+          ],
+          "authorizationSources": ["gov.uk/student-visa/extend-your-visa"],
+          "failureModes": [
+            "Allowing leave to expire before extension is granted — unlawful presence begins",
+            "Applying without a valid CAS — application will be refused"
+          ]
+        },
+        {
+          "rule": "Post-Completion Grace Period",
+          "details": [
+            "Upon successful completion of your course, you have a short period (typically until your visa expiry date, or the period stated on your visa) to remain in the UK",
+            "Use this time to apply for the Graduate Route, switch to another visa, or depart",
+            "Do NOT confuse UK visa expiry with course end date — check your eVisa for your exact leave expiry date"
+          ],
+          "authorizationSources": ["UKVI Student Route Policy"]
+        }
+      ],
+      "contacts": {
+        "International_Student_Support": {
+          "name": "International Student Support Team",
+          "title": "Immigration and compliance advice",
+          "description": "Available at all UKVI-licensed universities — check your university website for contact details"
+        }
+      },
+      "resources": {
+        "links": [
+          {
+            "title": "Protecting your Student status — UKCISA",
+            "url": "https://www.ukcisa.org.uk/student-advice/visas-and-immigration/protecting-your-student-status/",
+            "description": "Practical guide to avoiding status violations"
+          },
+          {
+            "title": "Extend Student Visa — GOV.UK",
+            "url": "https://www.gov.uk/student-visa/extend-your-visa",
+            "description": "Official extension application process"
+          }
+        ]
+      }
+    },
+    {
+      "id": "UK-HEALTH-2026",
+      "title": "Healthcare in the UK — NHS and Immigration Health Surcharge",
+      "effectiveDate": "2025-01-01",
+      "summary": "Most Student Route visa holders access UK healthcare through the National Health Service (NHS) after paying the Immigration Health Surcharge (IHS) as part of their visa application. Unlike the US, you are not required to purchase private insurance — the IHS covers most NHS treatment. Some services carry charges.",
+      "scope": {
+        "appliesTo": ["All Omani students on Student Route visa in UK"],
+        "riskLevel": "Medium",
+        "complianceTier": "Advisory",
+        "geographicScope": "United Kingdom",
+        "failureImpact": "Unexpected medical costs if IHS not paid; visa refusal if IHS payment incomplete"
+      },
+      "rules": [
+        {
+          "rule": "Immigration Health Surcharge (IHS)",
+          "details": [
+            "Paid upfront as part of your visa application — you cannot apply without paying it",
+            "Rate for students is currently lower than the standard rate — check gov.uk/healthcare-immigration-application/pay for the current figure before applying (rates are updated periodically)",
+            "Covers most NHS hospital and GP treatment at the same cost as UK residents",
+            "IHS does not cover: dental treatment (except emergency), optician services, and some specialist treatments",
+            "MoHE-sponsored students should check whether MoHE reimburses IHS costs — obtain written confirmation before applying"
+          ],
+          "authorizationSources": ["gov.uk/healthcare-immigration-application"],
+          "controls": [
+            "Pay IHS in full as part of the visa application — partial payment causes refusal",
+            "Keep your IHS payment receipt — you may need it for NHS registration",
+            "Check gov.uk for the current IHS rate; it changes periodically"
+          ]
+        },
+        {
+          "rule": "Registering with a GP",
+          "details": [
+            "Register with a local GP (General Practitioner) as soon as possible after arrival — this is your primary care doctor",
+            "Use the NHS 'Find a GP' service (nhs.uk/service-search/find-a-gp) to find a surgery accepting new patients near your campus",
+            "Emergency treatment is available at A&E (Accident and Emergency) departments at NHS hospitals — call 999 for life-threatening emergencies",
+            "Call 111 (free) for urgent non-emergency medical advice, 24/7"
+          ],
+          "authorizationSources": ["NHS England (nhs.uk)"]
+        },
+        {
+          "rule": "Mental Health Services",
+          "details": [
+            "Mental health support is available through the NHS — ask your GP for a referral",
+            "Most UK universities provide free, confidential counselling services for students",
+            "Samaritans: 116 123 (free, 24/7, anonymous) — emotional support and crisis listening service",
+            "Crisis text line: Text SHOUT to 85258 (UK, free, 24/7)"
+          ],
+          "authorizationSources": ["NHS England", "University student support services"]
+        }
+      ],
+      "contacts": {
+        "NHS_111": {
+          "name": "NHS 111",
+          "title": "Urgent non-emergency medical advice",
+          "phone": "111",
+          "description": "Free, 24/7. Use for urgent illness or injury that is not life-threatening"
+        },
+        "Emergency_Services": {
+          "name": "Emergency Services",
+          "phone": "999",
+          "description": "Police, fire, ambulance — life-threatening emergencies only"
+        },
+        "Samaritans": {
+          "name": "Samaritans",
+          "title": "Emotional support and crisis listening",
+          "phone": "116 123",
+          "description": "Free, 24/7, anonymous — for anyone struggling or in distress"
+        }
+      },
+      "resources": {
+        "links": [
+          {
+            "title": "Immigration Health Surcharge — GOV.UK",
+            "url": "https://www.gov.uk/healthcare-immigration-application/pay",
+            "description": "Pay IHS and check current rates"
+          },
+          {
+            "title": "Find a GP — NHS",
+            "url": "https://www.nhs.uk/service-search/find-a-gp",
+            "description": "Find a GP surgery near your university"
+          }
+        ]
+      },
+      "complianceNotes": [
+        "Do not confuse NHS (UK) with OSHC (Australia) or US private insurance — the IHS payment replaces the need for private insurance in most cases",
+        "Dental and optical care typically require separate private payment or private insurance — budget accordingly"
+      ]
+    },
+    {
+      "id": "UK-CULTURAL-2026",
+      "title": "Cultural Adaptation and Islamic Accommodations — UK",
+      "effectiveDate": "2025-01-01",
+      "summary": "The UK has a large and established Muslim community. Most UK universities have prayer facilities, halal food options, and student Islamic societies. Understanding UK academic and social norms will support academic success and wellbeing.",
+      "scope": {
+        "appliesTo": ["All Omani students in UK"],
+        "riskLevel": "Low",
+        "complianceTier": "Advisory Support",
+        "failureImpact": "Social isolation, academic difficulties, wellbeing challenges"
+      },
+      "rules": [
+        {
+          "rule": "Islamic Facilities and Halal Food",
+          "details": [
+            "Most UK universities have a multi-faith prayer room or Islamic prayer hall — check your university's Student Union or Faith Centre",
+            "Islamic Societies (IsocS) are active at virtually all UK universities — join early for community and practical support",
+            "Halal-certified food is widely available in UK cities; many university canteens label halal options or have dedicated sections",
+            "Ramadan accommodations (exam rescheduling, iftar events) are available — register with your department early in the semester",
+            "Friday Jumu'ah prayers: many universities allow short breaks around Friday prayer times — check with your department"
+          ],
+          "controls": [
+            "Contact your university's Islamic Society before arriving — most have WhatsApp groups for incoming students",
+            "Register religious observance needs at the start of term, not during exam periods"
+          ]
+        },
+        {
+          "rule": "UK Academic Culture",
+          "details": [
+            "Independent thinking and critical analysis are highly valued — tutors expect you to question and evaluate sources, not just summarize them",
+            "Seminars and tutorials expect active participation — silence is often interpreted as disengagement, not respect",
+            "Office hours (called 'office hours' or 'drop-in sessions') are encouraged — use them; it is not seen as a sign of weakness",
+            "Plagiarism standards are strictly enforced — the UK uses Turnitin and similar tools; always cite sources, including when paraphrasing",
+            "Punctuality is expected for classes and appointments — arriving late without notice is considered disrespectful"
+          ]
+        }
+      ],
+      "contacts": {
+        "ISOC": {
+          "name": "Islamic Society (IsocS)",
+          "title": "Muslim student community",
+          "description": "Available at virtually all UK universities via Student Union — search '[your university] Islamic Society'"
+        },
+        "Oman_Embassy_London": {
+          "name": "Embassy of Oman — London",
+          "title": "Consular services for Omani citizens in UK",
+          "website": "https://www.omanembassylondon.com",
+          "description": "For passport renewal, consular emergencies, and student affairs"
+        }
+      },
+      "resources": {
+        "links": [
+          {
+            "title": "UKCISA — Student Life in the UK",
+            "url": "https://www.ukcisa.org.uk/student-advice/student-life/",
+            "description": "Practical guide to living and studying in the UK"
+          },
+          {
+            "title": "Embassy of Oman — London",
+            "url": "https://www.omanembassylondon.com",
+            "description": "Consular support for Omani students in the UK"
+          }
+        ]
+      }
+    }
+  ],
+  "globalReferences": {
+    "links": [
+      "UK Visas and Immigration: https://www.gov.uk/government/organisations/uk-visas-and-immigration",
+      "Student Visa — GOV.UK: https://www.gov.uk/student-visa",
+      "Graduate Visa — GOV.UK: https://www.gov.uk/graduate-visa",
+      "UKCISA: https://www.ukcisa.org.uk",
+      "NHS: https://www.nhs.uk",
+      "Omani Ministry of Higher Education: https://www.mohe.gov.om",
+      "Embassy of Oman in London: https://www.omanembassylondon.com",
+      "ATAS Portal: https://www.academic-technology-approval.service.gov.uk",
+      "Immigration Rules Appendix Student: https://www.gov.uk/guidance/immigration-rules/immigration-rules-appendix-student"
+    ],
+    "emergencyContacts": [
+      "UK Emergency (police, fire, ambulance): 999",
+      "NHS urgent (non-emergency): 111",
+      "Samaritans (mental health crisis): 116 123",
+      "Shout Crisis Text Line: Text SHOUT to 85258"
+    ]
+  }
+}

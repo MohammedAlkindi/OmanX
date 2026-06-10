@@ -1,0 +1,600 @@
+{
+  "metadata": {
+    "version": "1.0.0",
+    "lastUpdated": "2026-06-10",
+    "authority": "Official Australia Compliance Database",
+    "validityPeriod": "Academic Year 2025-2026",
+    "updateFrequency": "Quarterly",
+    "totalDocuments": 6,
+    "targetAudience": "Omani Scholars in Australia",
+    "sources": [
+      "https://immi.homeaffairs.gov.au/visas/getting-a-visa/visa-listing/student-500",
+      "https://www.studyaustralia.gov.au",
+      "https://www.asqa.gov.au",
+      "https://www.teqsa.gov.au"
+    ]
+  },
+  "documents": [
+    {
+      "id": "AU-STUDENT-VISA-500-2026",
+      "title": "Australian Student Visa — Subclass 500",
+      "effectiveDate": "2024-03-23",
+      "summary": "The Student visa (subclass 500) allows Omani scholars to study full-time in Australia at a CRICOS-registered education provider. Since 23 March 2024, all applicants must satisfy the Genuine Student (GS) requirement. From 1 January 2025, a Confirmation of Enrolment (CoE) is mandatory with every application. Visa fees are AUD $2,000 from 1 July 2025.",
+      "scope": {
+        "appliesTo": ["Omani students at Australian universities", "MoHE-sponsored scholars in Australia"],
+        "riskLevel": "Critical",
+        "complianceTier": "Regulatory Mandatory",
+        "geographicScope": "Australia",
+        "failureImpact": "Visa refusal or cancellation, removal from Australia, scholarship revocation"
+      },
+      "timeline": {
+        "T-6 months": "Typical earliest application window before course start",
+        "T0": "Course commencement date on CoE",
+        "Within 7 days of arrival": "Provide residential address to your education provider",
+        "Within 7 days of arrival": "Arrange or confirm OSHC cover is active"
+      },
+      "rules": [
+        {
+          "rule": "Confirmation of Enrolment (CoE)",
+          "details": [
+            "From 1 January 2025, a CoE is required when submitting every Student visa application — a Letter of Offer alone is no longer sufficient",
+            "Your CoE is issued by your CRICOS-registered education provider through the PRISMS system",
+            "Each CoE covers a specific course at a specific institution — changing provider requires a new CoE and may require a new visa",
+            "Your CoE number is entered directly into your online visa application",
+            "If you have multiple CoEs (e.g., English course then degree), list the primary CoE first"
+          ],
+          "authorizationSources": ["Department of Home Affairs (homeaffairs.gov.au)", "CRICOS provider"],
+          "commonViolations": [
+            {
+              "text": "Applying for visa with Letter of Offer only (no CoE)",
+              "consequence": "Application deemed invalid and rejected from 1 January 2025"
+            },
+            {
+              "text": "Studying at a non-CRICOS-registered provider",
+              "consequence": "Visa breach, cancellation, and removal proceedings"
+            }
+          ],
+          "controls": [
+            "Confirm your education provider is listed on the CRICOS register (cricos.teqsa.gov.au) before accepting an offer",
+            "Request your CoE from your provider as soon as your place is confirmed",
+            "Keep your CoE number accessible throughout your studies"
+          ]
+        },
+        {
+          "rule": "Genuine Student (GS) Requirement",
+          "details": [
+            "Replaced the Genuine Temporary Entrant (GTE) requirement from 23 March 2024",
+            "You must demonstrate that your primary intention is to study — not to use the student visa as a pathway to remain in Australia",
+            "You will be assessed on: your current circumstances in Oman, ties to family, community, employment and economic circumstances; why you chose this course and provider; how the qualification benefits you in Oman",
+            "Strong ties to Oman (family, employment prospects, MoHE sponsorship return obligation) support a genuine student finding",
+            "MoHE scholarship and return service obligation are strong evidence of genuine student intent"
+          ],
+          "authorizationSources": ["immi.homeaffairs.gov.au/visas/getting-a-visa/visa-listing/student-500/genuine-student-requirement"],
+          "mitigation": [
+            "Prepare a clear written statement explaining your study goals and how the qualification will benefit your career in Oman",
+            "Include evidence of MoHE sponsorship and your return service obligation",
+            "Document your ties to Oman (family, property, employment prospects)"
+          ]
+        },
+        {
+          "rule": "Visa Conditions and Obligations",
+          "details": [
+            "Must study full-time at your enrolled CRICOS institution",
+            "Must notify your education provider of your Australian residential address within 7 days of arriving",
+            "Must maintain satisfactory attendance and course progression as per ESOS Act requirements",
+            "Must maintain adequate health insurance (OSHC) for the entire duration of your stay — see AU-OSHC-2026",
+            "Cannot work more than 48 hours per fortnight while your course is in session — see AU-WORK-RIGHTS-2026",
+            "Cannot enrol in another course that would compromise your principal course without provider approval"
+          ],
+          "authorizationSources": ["Migration Act 1958", "ESOS Act 2000", "Student visa conditions (immi.homeaffairs.gov.au)"]
+        },
+        {
+          "rule": "Visa Fees (2025)",
+          "details": [
+            "From 1 July 2025: AUD $2,000 per student visa application",
+            "Fees are non-refundable even if the application is refused",
+            "MoHE sponsorship may cover visa fees — confirm with your scholarship terms before applying",
+            "Family members who accompany you (dependants) must lodge separate visa applications with their own fees"
+          ],
+          "authorizationSources": ["immi.homeaffairs.gov.au/visas/getting-a-visa/fees-for-visas/current-visa-pricing"]
+        }
+      ],
+      "contacts": {
+        "Department_of_Home_Affairs": {
+          "name": "Australian Department of Home Affairs",
+          "title": "Student visa enquiries",
+          "website": "https://immi.homeaffairs.gov.au",
+          "description": "Online ImmiAccount portal for visa applications and tracking"
+        },
+        "CRICOS_Register": {
+          "name": "CRICOS Register",
+          "website": "https://cricos.teqsa.gov.au",
+          "description": "Search for CRICOS-registered providers and courses"
+        }
+      },
+      "resources": {
+        "links": [
+          {
+            "title": "Student Visa Subclass 500 — Home Affairs",
+            "url": "https://immi.homeaffairs.gov.au/visas/getting-a-visa/visa-listing/student-500",
+            "description": "Official eligibility, documents, and how to apply"
+          },
+          {
+            "title": "Genuine Student Requirement — Home Affairs",
+            "url": "https://immi.homeaffairs.gov.au/visas/getting-a-visa/visa-listing/student-500/genuine-student-requirement",
+            "description": "Detailed GS assessment criteria"
+          },
+          {
+            "title": "Student Visa — Study Australia",
+            "url": "https://www.studyaustralia.gov.au/en/plan-your-move/your-guide-to-visas/student-visa-subclass-500",
+            "description": "Student-friendly overview of the visa process"
+          },
+          {
+            "title": "CRICOS Register",
+            "url": "https://cricos.teqsa.gov.au",
+            "description": "Verify that your education provider is CRICOS-registered"
+          }
+        ]
+      },
+      "complianceNotes": [
+        "MoHE sponsorship and return obligation are among the strongest evidence you can provide for the Genuine Student requirement — include documentation in every visa application",
+        "Visa fees are reviewed annually — check the current fee at immi.homeaffairs.gov.au before applying",
+        "Your visa is tied to your CoE; any change in provider or course requires immediate action — contact your provider and Home Affairs"
+      ]
+    },
+    {
+      "id": "AU-WORK-RIGHTS-2026",
+      "title": "Australia Student Visa — Work Rights",
+      "effectiveDate": "2024-07-01",
+      "summary": "Student visa holders (subclass 500) may work up to 48 hours per fortnight while their course is in session. Students enrolled in a master's by research or doctoral degree have no work hour limits. Work restrictions do not apply during official course breaks. Breaching work conditions can result in visa cancellation.",
+      "scope": {
+        "appliesTo": ["All Omani students on subclass 500 student visa in Australia"],
+        "riskLevel": "High",
+        "complianceTier": "Regulatory Mandatory",
+        "geographicScope": "Australia",
+        "failureImpact": "Visa cancellation, removal from Australia, scholarship revocation"
+      },
+      "rules": [
+        {
+          "rule": "48-Hour Fortnight Limit",
+          "details": [
+            "Maximum 48 hours per fortnight (two-week period) while your course of study is in session",
+            "48 hours per fortnight is equivalent to approximately 3 days per week",
+            "A fortnight runs from Monday to the second Sunday — track your hours across the full 14-day period",
+            "All jobs combined must not exceed 48 hours in any fortnight during a study period",
+            "The restriction applies during exam periods as well as regular teaching weeks"
+          ],
+          "authorizationSources": ["immi.homeaffairs.gov.au/visas/getting-a-visa/visa-listing/student-500/temporary-relaxation-of-working-hours-for-student-visa-holders"],
+          "commonViolations": [
+            {
+              "text": "Working more than 48 hours per fortnight during term",
+              "consequence": "Visa breach condition 8105, visa cancellation, removal"
+            },
+            {
+              "text": "Working before commencement of course (where not permitted by visa)",
+              "consequence": "Breach of visa conditions"
+            }
+          ],
+          "mitigation": [
+            "Keep a fortnightly work hours log and share it with your employer if needed",
+            "Notify all employers of your visa work limit; employers may not be aware",
+            "Track hours from Monday to Sunday (second Sunday) — do not reset at month end"
+          ]
+        },
+        {
+          "rule": "Unlimited Work — PhD and Research Master's",
+          "details": [
+            "Students enrolled in a master's degree by research OR a doctoral degree (PhD) have no work hour limits at any time",
+            "This applies throughout the enrolment in the relevant research degree, including during term",
+            "If you change from a research degree to a coursework degree, the 48-hour limit re-applies"
+          ],
+          "authorizationSources": ["immi.homeaffairs.gov.au/visas/getting-a-visa/visa-listing/student-500"]
+        },
+        {
+          "rule": "Work During Course Breaks",
+          "details": [
+            "When your course of study is NOT in session (semester breaks, official holidays): no work hour limit",
+            "You may work full-time during semester breaks",
+            "If you take a supplementary or bridging course during a break (that counts toward your main course under CRICOS), the 48-hour limit applies unless the CRICOS listing explicitly exempts it"
+          ],
+          "authorizationSources": ["immi.homeaffairs.gov.au (work restrictions page)"]
+        },
+        {
+          "rule": "MoHE Employment Obligations",
+          "details": [
+            "MoHE scholarship terms may restrict or prohibit employment — check your scholarship contract",
+            "Any employment income must be reported to MoHE annually and to the Australian Taxation Office (ATO)",
+            "You must have an Australian Tax File Number (TFN) before starting employment — apply at ato.gov.au"
+          ],
+          "authorizationSources": ["MoHE Scholarship Agreement", "Australian Taxation Office (ato.gov.au)"]
+        }
+      ],
+      "resources": {
+        "links": [
+          {
+            "title": "Work restrictions — Home Affairs",
+            "url": "https://immi.homeaffairs.gov.au/visas/getting-a-visa/visa-listing/student-500/temporary-relaxation-of-working-hours-for-student-visa-holders",
+            "description": "Official work conditions for student visa holders"
+          },
+          {
+            "title": "Apply for a Tax File Number — ATO",
+            "url": "https://www.ato.gov.au/Individuals/Tax-file-number/Apply-for-a-TFN",
+            "description": "Required before starting any paid employment in Australia"
+          }
+        ]
+      }
+    },
+    {
+      "id": "AU-OSHC-2026",
+      "title": "Overseas Student Health Cover (OSHC) — Mandatory",
+      "effectiveDate": "2025-01-01",
+      "summary": "All international students on a Student visa in Australia must maintain Overseas Student Health Cover (OSHC) for the entire duration of their stay. OSHC is a private health insurance product regulated by the Australian government. It covers most hospital and medical costs but not all services. Failure to maintain OSHC is a breach of visa conditions.",
+      "scope": {
+        "appliesTo": ["All Omani students on subclass 500 student visa in Australia"],
+        "riskLevel": "High",
+        "complianceTier": "Regulatory Mandatory",
+        "geographicScope": "Australia",
+        "failureImpact": "Visa cancellation, major out-of-pocket medical expenses"
+      },
+      "rules": [
+        {
+          "rule": "OSHC Coverage Requirements",
+          "details": [
+            "Must be held for the full duration of your student visa — from arrival to departure",
+            "Must be purchased from an Australian government-approved OSHC provider",
+            "Approved OSHC providers include: Allianz Care Australia, BUPA Australia, Medibank, nib OSHC, and others — check privatehealth.gov.au for the current approved list",
+            "Many Australian universities have a preferred OSHC provider and may include OSHC in their offer letter — you can purchase through the university or directly",
+            "Covers: hospital treatment, GP visits (Medicare-equivalent), some specialist services, and ambulance in most states",
+            "Does NOT fully cover: dental, optical, physiotherapy — budget separately or take additional cover"
+          ],
+          "authorizationSources": ["Department of Home Affairs OSHC requirements", "Private Health Insurance Act 2007"],
+          "commonViolations": [
+            {
+              "text": "Allowing OSHC to lapse during study period",
+              "consequence": "Visa condition breach, uninsured medical liability"
+            },
+            {
+              "text": "Purchasing OSHC from a non-approved provider",
+              "consequence": "Does not satisfy visa condition — treated as no cover"
+            }
+          ],
+          "controls": [
+            "Set up auto-renewal on your OSHC policy before the first payment lapses",
+            "Keep your OSHC membership card accessible at all times",
+            "Extend OSHC before any visa extension to ensure continuous coverage"
+          ]
+        },
+        {
+          "rule": "Using OSHC",
+          "details": [
+            "Register with a GP (General Practitioner) as soon as possible after arriving — some GPs bulk-bill OSHC, meaning no out-of-pocket cost",
+            "For emergencies: call 000 (ambulance, police, fire) or go to the nearest hospital Emergency Department",
+            "For urgent but non-life-threatening issues: many cities have 24-hour medical clinics",
+            "Present your OSHC membership card at every medical appointment",
+            "Keep all receipts for medical expenses — OSHC claims may require documentation"
+          ],
+          "authorizationSources": ["Your OSHC provider's policy document"]
+        },
+        {
+          "rule": "Mental Health Resources",
+          "details": [
+            "Lifeline: 13 11 14 (free, 24/7) — crisis support and suicide prevention",
+            "Beyond Blue: 1300 22 4636 (free) — mental health support",
+            "Headspace (headspace.org.au) — mental health support for people aged 12-25",
+            "All Australian universities have free student counselling services — use them; there is no stigma"
+          ],
+          "authorizationSources": ["beyondblue.org.au", "lifeline.org.au"]
+        }
+      ],
+      "contacts": {
+        "Emergency_Services": {
+          "name": "Emergency Services",
+          "phone": "000",
+          "description": "Ambulance, police, fire — life-threatening emergencies"
+        },
+        "Lifeline": {
+          "name": "Lifeline",
+          "phone": "13 11 14",
+          "description": "Free, 24/7 crisis support and suicide prevention"
+        },
+        "Beyond_Blue": {
+          "name": "Beyond Blue",
+          "phone": "1300 22 4636",
+          "description": "Mental health support and advice"
+        }
+      },
+      "resources": {
+        "links": [
+          {
+            "title": "OSHC — Study Australia",
+            "url": "https://www.studyaustralia.gov.au/en/plan-your-move/health-insurance-oshc",
+            "description": "Overview of OSHC requirements and approved providers"
+          },
+          {
+            "title": "Private Health Insurance — Australian Government",
+            "url": "https://www.privatehealth.gov.au",
+            "description": "Compare OSHC providers and policies"
+          }
+        ]
+      },
+      "complianceNotes": [
+        "MoHE may cover OSHC costs as part of your scholarship — confirm this in writing before purchasing to avoid paying twice",
+        "OSHC does not give access to Australia's Medicare system (which is for citizens and permanent residents) — OSHC is the separate international student equivalent"
+      ]
+    },
+    {
+      "id": "AU-ESOS-COMPLIANCE-2026",
+      "title": "ESOS Act Compliance and Course Obligations",
+      "effectiveDate": "2025-01-01",
+      "summary": "Under the Education Services for Overseas Students (ESOS) Act 2000, CRICOS-registered providers have specific reporting obligations regarding student attendance and academic progress. Students must maintain satisfactory attendance and academic progression. Providers must report breaches to the Department of Home Affairs, which can trigger visa cancellation.",
+      "scope": {
+        "appliesTo": ["All Omani students enrolled at CRICOS-registered Australian providers"],
+        "riskLevel": "High",
+        "complianceTier": "Regulatory Mandatory",
+        "geographicScope": "Australia",
+        "failureImpact": "Visa cancellation, removal from Australia, scholarship termination"
+      },
+      "rules": [
+        {
+          "rule": "Attendance Requirements",
+          "details": [
+            "Must maintain satisfactory attendance as defined by your CRICOS provider — typically 80% or above",
+            "Your provider monitors attendance and must report to Home Affairs if you fall below required levels",
+            "Home Affairs may cancel your visa if your provider reports unsatisfactory attendance",
+            "Notify your provider if you are unwell or have a personal emergency — document everything to support any exemption claim",
+            "Extended absences require formal leave of absence approval from your provider"
+          ],
+          "authorizationSources": ["ESOS Act 2000 (National Code Standard 8)", "Department of Home Affairs"],
+          "commonViolations": [
+            {
+              "text": "Dropping below 80% attendance without provider approval",
+              "consequence": "Provider reports to Home Affairs, visa cancellation notice issued"
+            },
+            {
+              "text": "Ceasing studies without formal withdrawal",
+              "consequence": "Provider reports CoE cancellation, visa can be cancelled"
+            }
+          ],
+          "mitigation": [
+            "Contact your provider's Student Services immediately if personal circumstances are affecting attendance",
+            "Submit medical certificates or other evidence promptly for any absences",
+            "Know your provider's attendance monitoring policy — it is published in your student handbook"
+          ]
+        },
+        {
+          "rule": "Academic Progress Requirements",
+          "details": [
+            "Must make satisfactory academic progress toward your qualification — as defined by your provider",
+            "If you fail the same unit twice or are at risk of not completing within your CoE timeframe, your provider must intervene and may cancel your CoE",
+            "Changing courses within the same provider generally requires a new CoE and must not delay your overall completion",
+            "MoHE minimum GPA requirements (3.0/4.0 for postgraduate) apply independently — you must satisfy both provider and MoHE standards"
+          ],
+          "authorizationSources": ["ESOS Act 2000 (National Code Standard 10)"],
+          "controls": [
+            "Meet with your academic advisor or course coordinator if you fail any unit",
+            "Apply for Special Consideration if illness or personal circumstances affect assessments — do this before results are released, not after"
+          ]
+        },
+        {
+          "rule": "Provider Transfer Rules",
+          "details": [
+            "Transferring to another CRICOS provider within your first 6 months of your principal course is restricted",
+            "Transfer within 6 months requires your current provider's written release OR evidence that remaining is not in your best interests",
+            "After 6 months: you can transfer, but must obtain a new CoE from the new provider and may need a new visa if your current visa lists your old provider",
+            "MoHE must approve any provider transfer — obtain written approval before initiating transfer"
+          ],
+          "authorizationSources": ["ESOS Act 2000 (National Code Standard 7)", "Department of Home Affairs"],
+          "failureModes": [
+            "Transferring without provider release within 6 months — both CoEs may be cancelled",
+            "Transferring without MoHE approval — scholarship violation"
+          ]
+        },
+        {
+          "rule": "Notification Obligations",
+          "details": [
+            "Must notify your provider of your Australian residential address within 7 days of arriving",
+            "Must notify your provider of any address changes within 7 days of moving",
+            "Must notify your provider if you intend to defer, suspend, or withdraw from your course — do this before stopping attendance",
+            "Providers are required to attempt to contact you before reporting you to Home Affairs"
+          ],
+          "authorizationSources": ["ESOS Act 2000", "Student visa condition 8533"]
+        }
+      ],
+      "resources": {
+        "links": [
+          {
+            "title": "ESOS Act and National Code — TEQSA",
+            "url": "https://www.teqsa.gov.au/international-students/esos-framework",
+            "description": "Framework protecting rights of international students in Australia"
+          },
+          {
+            "title": "Student visa conditions — Home Affairs",
+            "url": "https://immi.homeaffairs.gov.au/visas/already-have-a-visa/check-visa-details-and-conditions/see-your-visa-conditions?product=500",
+            "description": "Full list of conditions attached to the subclass 500 student visa"
+          }
+        ]
+      },
+      "complianceNotes": [
+        "Australia's ESOS framework is the equivalent of SEVIS in the US — your provider is legally required to monitor and report you",
+        "Your rights under the ESOS framework include: access to your provider's complaints process before any CoE cancellation, the right to appeal provider decisions",
+        "The Overseas Students Ombudsman (oso.gov.au) investigates complaints about private providers — use this if your provider is not responsive"
+      ]
+    },
+    {
+      "id": "AU-TEMP-GRADUATE-485-2026",
+      "title": "Temporary Graduate Visa — Subclass 485 (Post-Study Work)",
+      "effectiveDate": "2025-01-01",
+      "summary": "The Temporary Graduate visa (subclass 485) allows recent Australian graduates to live and work in Australia after completing their studies. It provides unlimited work rights. Multiple streams are available depending on your qualification level. CRITICAL for MoHE scholars: this visa does not override your scholarship return obligation — MoHE approval is required before applying.",
+      "scope": {
+        "appliesTo": ["Omani graduates of Australian CRICOS institutions considering post-study work"],
+        "riskLevel": "High",
+        "complianceTier": "Regulatory and MoHE Contractual",
+        "geographicScope": "Australia",
+        "failureImpact": "MoHE scholarship repayment if applied without approval; visa refusal if eligibility criteria not met"
+      },
+      "timeline": {
+        "T-6 months": "Begin planning; consult MoHE about post-graduation options",
+        "At graduation": "Apply before student visa expires; must be applied for while in Australia",
+        "Grant duration (bachelor's)": "2 years",
+        "Grant duration (master's coursework)": "2 years",
+        "Grant duration (master's research / PhD)": "3 years (check current rules at immi.homeaffairs.gov.au)"
+      },
+      "rules": [
+        {
+          "rule": "Eligibility Requirements",
+          "details": [
+            "Must have completed an eligible Australian qualification from a CRICOS-registered provider",
+            "Must meet the Australian Study Requirement: at least 2 years of registered study in Australia while holding an eligible visa",
+            "Must apply within 6 months of your course completion date",
+            "Must be in Australia when you apply",
+            "Must be under 50 years of age (unless applying under certain regional streams)"
+          ],
+          "authorizationSources": ["immi.homeaffairs.gov.au/visas/getting-a-visa/visa-listing/temporary-graduate-485"]
+        },
+        {
+          "rule": "MoHE Return Obligation — CRITICAL",
+          "details": [
+            "Your MoHE scholarship contract requires you to return to Oman within 60 days of completing your program",
+            "Applying for the subclass 485 visa does NOT override this contractual obligation",
+            "If you apply without MoHE written approval, you risk full scholarship repayment plus penalties",
+            "MoHE may grant written approval for a post-study work period — contact the Scholarship Department at least 6 months before graduation"
+          ],
+          "authorizationSources": ["MoHE Scholarship Agreement"],
+          "failureModes": [
+            "Applying for 485 without MoHE approval — scholarship repayment demanded",
+            "Missing the 6-month application window after course completion"
+          ],
+          "mitigation": [
+            "Contact MoHE Scholarship Office (scholarships@mohe.gov.om) 6 months before graduation to discuss post-study options",
+            "Obtain MoHE approval in writing before lodging the 485 application"
+          ]
+        },
+        {
+          "rule": "Work Rights on Subclass 485",
+          "details": [
+            "Unlimited work rights — no hour restrictions",
+            "Can work in any occupation or industry",
+            "Can be employed, self-employed, or run a business",
+            "Can bring family members (dependants) who also receive work rights"
+          ],
+          "authorizationSources": ["immi.homeaffairs.gov.au/visas/getting-a-visa/visa-listing/temporary-graduate-485"]
+        }
+      ],
+      "resources": {
+        "links": [
+          {
+            "title": "Temporary Graduate visa (485) — Home Affairs",
+            "url": "https://immi.homeaffairs.gov.au/visas/getting-a-visa/visa-listing/temporary-graduate-485",
+            "description": "Official eligibility, streams, and how to apply"
+          },
+          {
+            "title": "Post-Study Work stream — Home Affairs",
+            "url": "https://immi.homeaffairs.gov.au/visas/getting-a-visa/visa-listing/temporary-graduate-485/post-study-work",
+            "description": "Specific requirements for the post-study work stream"
+          }
+        ]
+      }
+    },
+    {
+      "id": "AU-CULTURAL-2026",
+      "title": "Cultural Adaptation and Islamic Accommodations — Australia",
+      "effectiveDate": "2025-01-01",
+      "summary": "Australia's major cities are multicultural, with well-established Muslim communities and Islamic facilities at most universities. Understanding Australian academic culture and campus life will support your success. Most Australian universities have dedicated international student support services.",
+      "scope": {
+        "appliesTo": ["All Omani students in Australia"],
+        "riskLevel": "Low",
+        "complianceTier": "Advisory Support",
+        "failureImpact": "Social isolation, academic difficulties, wellbeing challenges"
+      },
+      "rules": [
+        {
+          "rule": "Islamic Facilities and Halal Food",
+          "details": [
+            "Most Australian universities have multi-faith prayer rooms and dedicated Islamic prayer spaces — check your university's campus map or student portal",
+            "Muslim Student Associations (MSAs) are active at all major Australian universities — join for community, halal food tips, and support",
+            "Halal food is widely available in major Australian cities (Sydney, Melbourne, Brisbane, Adelaide, Perth); most universities have nearby halal restaurants and some campus options",
+            "Ramadan accommodation (alternative exam times, iftar events) is available — contact your student services and lecturers at the start of term",
+            "The National Halal Certification Authority (nhca.com.au) maintains a list of certified halal products and restaurants"
+          ],
+          "controls": [
+            "Contact your university's Muslim Student Association before arriving — most have WhatsApp groups for incoming students",
+            "Notify exam coordinators of Ramadan observance at the beginning of semester"
+          ]
+        },
+        {
+          "rule": "Australian Academic Culture",
+          "details": [
+            "Tutors expect students to think critically and form their own arguments — summarizing without analysis is not sufficient at university level",
+            "Class participation and tutorial discussion contribute to learning and sometimes to grades — active engagement is expected",
+            "Academic integrity is strictly enforced via Turnitin and other tools; all sources must be cited, including paraphrased ideas",
+            "Punctuality is expected; notify your tutor in advance if you will miss a class or tutorial",
+            "Australian universities use a 'student-centred' approach — you are expected to seek help proactively, not wait to be asked",
+            "AESG (Academic English Support Groups) and learning advisors are available at all universities for academic writing help"
+          ]
+        },
+        {
+          "rule": "Student Rights and Complaints",
+          "details": [
+            "Under the ESOS framework, you have formal rights including access to your provider's complaints process before any CoE cancellation",
+            "The Overseas Students Ombudsman (oso.gov.au) handles unresolved complaints against registered private education providers",
+            "For public universities (most main campuses), contact the state or territory ombudsman",
+            "Seek help from your Student Association or International Student Office before escalating complaints"
+          ],
+          "authorizationSources": ["ESOS Act 2000", "Overseas Students Ombudsman (oso.gov.au)"]
+        }
+      ],
+      "contacts": {
+        "Oman_Embassy_Canberra": {
+          "name": "Embassy of Oman — Canberra",
+          "title": "Consular services for Omani citizens in Australia",
+          "website": "https://omanembassy.org.au",
+          "description": "For passport renewal, consular emergencies, and student affairs"
+        },
+        "Overseas_Students_Ombudsman": {
+          "name": "Overseas Students Ombudsman",
+          "website": "https://www.oso.gov.au",
+          "description": "Free, independent dispute resolution for international students at private providers"
+        }
+      },
+      "resources": {
+        "links": [
+          {
+            "title": "Study Australia — Student Life",
+            "url": "https://www.studyaustralia.gov.au/en/live-and-work",
+            "description": "Practical guide to living and studying in Australia"
+          },
+          {
+            "title": "Overseas Students Ombudsman",
+            "url": "https://www.oso.gov.au",
+            "description": "Free complaints and dispute resolution service"
+          },
+          {
+            "title": "Embassy of Oman in Canberra",
+            "url": "https://omanembassy.org.au",
+            "description": "Consular and student support services"
+          }
+        ]
+      }
+    }
+  ],
+  "globalReferences": {
+    "links": [
+      "Australian Department of Home Affairs: https://www.homeaffairs.gov.au",
+      "Student visa (subclass 500): https://immi.homeaffairs.gov.au/visas/getting-a-visa/visa-listing/student-500",
+      "Temporary Graduate visa (subclass 485): https://immi.homeaffairs.gov.au/visas/getting-a-visa/visa-listing/temporary-graduate-485",
+      "CRICOS Register: https://cricos.teqsa.gov.au",
+      "TEQSA: https://www.teqsa.gov.au",
+      "Study Australia (official government site): https://www.studyaustralia.gov.au",
+      "Overseas Students Ombudsman: https://www.oso.gov.au",
+      "Australian Taxation Office: https://www.ato.gov.au",
+      "Omani Ministry of Higher Education: https://www.mohe.gov.om",
+      "Embassy of Oman in Canberra: https://omanembassy.org.au"
+    ],
+    "emergencyContacts": [
+      "Australian Emergency (police, fire, ambulance): 000",
+      "Lifeline (crisis support): 13 11 14",
+      "Beyond Blue (mental health): 1300 22 4636",
+      "Headspace (youth mental health): headspace.org.au"
+    ]
+  }
+}

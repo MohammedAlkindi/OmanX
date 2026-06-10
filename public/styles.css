@@ -1157,7 +1157,7 @@ select:focus {
 }
 
 .sidebar-inner {
-  padding: 20px;
+  padding: 20px 14px;
   display: grid;
   align-content: start;
   gap: 12px;
@@ -1456,9 +1456,7 @@ select:focus {
   font-weight: 500;
   color: var(--ink);
   margin-top: 2px;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
+  word-break: break-word;
 }
 
 /* chat list */
@@ -1474,9 +1472,12 @@ select:focus {
 .chat-item {
   border: 0.5px solid transparent;
   border-radius: var(--radius);
-  padding: 7px 10px;
+  padding: 7px 8px 7px 0;
   cursor: pointer;
   transition: background 0.15s, border-color 0.15s;
+  min-width: 0;
+  overflow: hidden;
+  width: 100%;
 }
 
 .chat-item:hover {
@@ -1487,7 +1488,7 @@ select:focus {
   background: var(--gold-dim);
   border-color: var(--gold);
   border-left: 2px solid var(--gold);
-  padding-left: 8px;
+  padding-left: 6px;
 }
 
 .chat-item-header {
@@ -1495,6 +1496,7 @@ select:focus {
   align-items: center;
   gap: 6px;
   min-width: 0;
+  overflow: hidden;
 }
 
 .chat-item-title {
@@ -1514,9 +1516,9 @@ select:focus {
   color: var(--ink-3);
   margin-top: 4px;
   overflow: hidden;
-  display: -webkit-box;
-  -webkit-line-clamp: 1;
-  -webkit-box-orient: vertical;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  min-width: 0;
 }
 
 .chat-item-footer {
@@ -1913,6 +1915,12 @@ select:focus {
   color: var(--ink-3);
   font-style: italic;
 }
+.message-bubble a {
+  color: var(--gold);
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+.message-bubble a:hover { opacity: 0.8; }
 
 .message-meta {
   display: flex;
@@ -1920,7 +1928,7 @@ select:focus {
   font-family: var(--mono);
   font-size: 0.625rem;
   letter-spacing: 0.04em;
-  color: var(--ink-4);
+  color: var(--ink-3);
 }
 
 .message-empty {
@@ -2005,13 +2013,17 @@ select:focus {
   line-height: 1.6;
   caret-color: var(--gold);
   box-shadow: none;
-  padding: 0;
+  padding: 6px 0 0;
 }
 
 .composer-box textarea:focus {
   outline: none;
   border-color: transparent;
   box-shadow: none;
+}
+
+.composer-box textarea::placeholder {
+  color: var(--ink-3);
 }
 
 .composer-footer {
@@ -2022,11 +2034,9 @@ select:focus {
   font-family: var(--mono);
   font-size: 0.625rem;
   letter-spacing: 0.06em;
-  color: var(--ink-4);
+  color: var(--ink-3);
   flex-wrap: wrap;
-  margin-top: 10px;
-  padding-top: 10px;
-  border-top: 0.5px solid var(--border);
+  margin-top: 12px;
 }
 
 .status-inline {

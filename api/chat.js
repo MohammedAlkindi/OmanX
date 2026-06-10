@@ -8,6 +8,31 @@ import crypto from "crypto";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
+const MOHE_PATHS = [
+  path.join(process.cwd(), "data/mohe.json"),
+  path.join(__dirname, "../data/mohe.json"),
+  path.join(__dirname, "../../data/mohe.json"),
+];
+
+const DEST_KB_PATHS = {
+  us: [
+    path.join(process.cwd(), "data/us.json"),
+    path.join(__dirname, "../data/us.json"),
+    path.join(__dirname, "../../data/us.json"),
+  ],
+  uk: [
+    path.join(process.cwd(), "data/uk.json"),
+    path.join(__dirname, "../data/uk.json"),
+    path.join(__dirname, "../../data/uk.json"),
+  ],
+  au: [
+    path.join(process.cwd(), "data/au.json"),
+    path.join(__dirname, "../data/au.json"),
+    path.join(__dirname, "../../data/au.json"),
+  ],
+};
+
+// Legacy fallback if destination files don't exist
 const KNOWLEDGE_PATHS = [
   path.join(process.cwd(), "data/knowledge.json"),
   path.join(__dirname, "../data/knowledge.json"),
@@ -19,51 +44,104 @@ const ALLOWED_MODELS = new Set(["claude-sonnet-4-6", "claude-haiku-4-5-20251001"
 
 // Authoritative domains we trust for live policy lookups
 const TRUSTED_DOMAINS = [
-  "uscis.gov",
-  "ice.gov",
-  "dhs.gov",
-  "studyinthestates.dhs.gov",
-  "state.gov",
-  "travel.state.gov",
-  "studentaid.gov",
-  "irs.gov",
-  "dol.gov",
+  // US
+  "uscis.gov", "ice.gov", "dhs.gov", "studyinthestates.dhs.gov",
+  "state.gov", "travel.state.gov", "studentaid.gov", "irs.gov", "dol.gov",
+  // UK
+  "gov.uk", "ukcisa.org.uk",
+  // AU
+  "homeaffairs.gov.au", "immi.homeaffairs.gov.au", "studyaustralia.gov.au",
+  "teqsa.gov.au", "asqa.gov.au", "oso.gov.au",
 ];
 
-let _kb = null;
-let _kbMtime = 0;
-let _kbPath = null;
+const _destCache = {}; // { us: {kb, mtime, path}, uk: {...}, au: {...} }
+const _moheCache = { kb: null, mtime: 0, path: null };
+let _legacyKbPath = null;
+let _legacyKb = null;
+let _legacyKbMtime = 0;
 
-async function findKnowledgePath() {
-  for (const testPath of KNOWLEDGE_PATHS) {
-    try {
-      await fs.access(testPath);
-      return testPath;
-    } catch {
-      continue;
-    }
+async function findPath(paths) {
+  for (const p of paths) {
+    try { await fs.access(p); return p; } catch { /* continue */ }
   }
   return null;
 }
 
-async function getKB() {
+async function getMoheKb() {
   try {
-    if (!_kbPath) _kbPath = await findKnowledgePath();
-    if (!_kbPath) { console.warn("[OmanX] No knowledge base found"); return null; }
-    const st = await fs.stat(_kbPath);
-    if (_kb && st.mtimeMs <= _kbMtime) return _kb;
-    const raw = await fs.readFile(_kbPath, "utf8");
-    _kb = JSON.parse(raw);
-    _kbMtime = st.mtimeMs;
-    console.log(`[OmanX] Knowledge base loaded from ${_kbPath}`);
+    if (!_moheCache.path) _moheCache.path = await findPath(MOHE_PATHS);
+    if (!_moheCache.path) return null;
+    const st = await fs.stat(_moheCache.path);
+    if (_moheCache.kb && st.mtimeMs <= _moheCache.mtime) return _moheCache.kb;
+    _moheCache.kb = JSON.parse(await fs.readFile(_moheCache.path, "utf8"));
+    _moheCache.mtime = st.mtimeMs;
+  } catch (e) {
+    console.error("[OmanX] Error loading MoHE KB:", e.message);
+    _moheCache.kb = null;
+  }
+  return _moheCache.kb;
+}
+
+function detectDestination(userContext, message) {
+  const text = `${userContext || ""} ${message || ""}`.toLowerCase();
+  if (
+    text.includes("united kingdom") || text.includes(" uk ") || text.includes("uk,") ||
+    text.includes("britain") || text.includes("england") || text.includes("scotland") ||
+    text.includes("wales") || text.includes("student route") || text.includes("ukvi") ||
+    text.includes("graduate route") || text.includes("tier 4") || text.includes("ukcisa") ||
+    text.includes("atas certificate") || text.includes("british")
+  ) return "uk";
+  if (
+    text.includes("australia") || text.includes("subclass 500") || text.includes("subclass 485") ||
+    text.includes("oshc") || text.includes("cricos") || text.includes(" esos") ||
+    text.includes("homeaffairs") || text.includes("genuine student") ||
+    text.includes("temporary graduate")
+  ) return "au";
+  return "us";
+}
+
+async function getKB(destination = "us") {
+  try {
+    const paths = DEST_KB_PATHS[destination] || DEST_KB_PATHS.us;
+    const cache = _destCache[destination] || (_destCache[destination] = { kb: null, mtime: 0, path: null });
+
+    if (!cache.path) cache.path = await findPath(paths);
+
+    // Fall back to legacy knowledge.json if destination file not found
+    if (!cache.path) {
+      if (!_legacyKbPath) _legacyKbPath = await findPath(KNOWLEDGE_PATHS);
+      if (!_legacyKbPath) { console.warn("[OmanX] No knowledge base found"); return null; }
+      const st = await fs.stat(_legacyKbPath);
+      if (_legacyKb && st.mtimeMs <= _legacyKbMtime) return _legacyKb;
+      _legacyKb = JSON.parse(await fs.readFile(_legacyKbPath, "utf8"));
+      _legacyKbMtime = st.mtimeMs;
+      console.log(`[OmanX] Falling back to legacy KB: ${_legacyKbPath}`);
+      return _legacyKb;
+    }
+
+    const [st, moheKb] = await Promise.all([fs.stat(cache.path), getMoheKb()]);
+    if (!cache.kb || st.mtimeMs > cache.mtime) {
+      cache.kb = JSON.parse(await fs.readFile(cache.path, "utf8"));
+      cache.mtime = st.mtimeMs;
+      console.log(`[OmanX] Knowledge base loaded: ${destination} (${cache.path})`);
+    }
+
+    // Compose: destination docs + shared MoHE docs
+    if (moheKb?.documents?.length) {
+      return {
+        ...cache.kb,
+        documents: [...(cache.kb.documents || []), ...(moheKb.documents || [])],
+      };
+    }
+    return cache.kb;
   } catch (error) {
     console.error("[OmanX] Error loading knowledge base:", error.message);
-    _kb = null;
+    return null;
   }
-  return _kb;
 }
 
 const COMPLIANCE_TRIGGERS = [
+  // US immigration
   "visa", "f-1", "f1", "j-1", "j1", "i-20", "i20", "ds-2019", "ds2019",
   "sevis", "immigration", "uscis", "cbp", "customs",
   "opt", "cpt", "stem", "work authorization", "employment", "internship",
@@ -80,6 +158,13 @@ const COMPLIANCE_TRIGGERS = [
   "form", "application", "petition", "document", "embassy", "consulate",
   "deadline", "expire", "expiration", "lease", "contract",
   "rental agreement", "eviction", "landlord",
+  // UK-specific
+  "student route", "tier 4", "ukvi", "cas ", "graduate route", "brp", "evisa",
+  "atas", "ukcisa", "leave to remain", "curtailed", "ihs", "nhs surcharge",
+  "immigration health surcharge", "skilled worker", "police registration",
+  // AU-specific
+  "subclass 500", "subclass 485", "oshc", "cricos", "esos", "coe ", "home affairs",
+  "genuine student", "temporary graduate", "teqsa", "asqa", "fortnight",
 ];
 
 function isCompliance(message) {
@@ -147,7 +232,7 @@ async function webSearch(query) {
   }
 }
 
-const BASE_SYSTEM = `You are OmanX, a warm and knowledgeable AI assistant built for Omani scholars studying in the United States. OmanX was founded by Mohammed Alkindi.
+const BASE_SYSTEM = `You are OmanX, a warm and knowledgeable AI assistant built for Omani scholars studying abroad — in the United States, United Kingdom, or Australia. OmanX was founded by Mohammed Alkindi.
 
 You handle two kinds of questions in one seamless conversation:
 
@@ -300,6 +385,7 @@ export default async function handler(req, res) {
   }
 
   const compliance = isCompliance(sanitizedMessage);
+  const destination = detectDestination(sanitizedUserContext, sanitizedMessage);
 
   // Only cache non-compliance single-turn requests (compliance responses include live search data)
   const cacheKey = !hasHistory && !compliance
@@ -327,7 +413,7 @@ export default async function handler(req, res) {
   let webResults = [];
   if (compliance) {
     [kbResults, webResults] = await Promise.all([
-      getKB().then((kb) => (kb ? searchKB(kb, sanitizedMessage) : [])),
+      getKB(destination).then((kb) => (kb ? searchKB(kb, sanitizedMessage) : [])),
       webSearch(sanitizedMessage),
     ]);
   }
@@ -345,6 +431,7 @@ export default async function handler(req, res) {
   console.log("[OmanX] /api/chat request", {
     model,
     compliance,
+    destination,
     stream: wantsStream,
     webResults: webResults.length,
     kbResults: kbResults.length,

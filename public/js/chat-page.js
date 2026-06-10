@@ -246,7 +246,7 @@ function renderSidebar() {
     }
 
     const lastMsg = [...chat.messages].reverse().find((m) => m.role === 'user' || m.role === 'assistant');
-    const snippet = lastMsg ? escapeHtml(lastMsg.content.slice(0, 120)) : '';
+    const snippet = lastMsg ? escapeHtml(stripMarkdown(lastMsg.content).slice(0, 120)) : '';
 
     return `
       <article class="chat-item ${isActive ? 'active' : ''}" data-chat-id="${chat.id}">
@@ -549,8 +549,21 @@ function escapeHtml(value) {
 
 function applyInline(text) {
   return text
+    .replace(/\[([^\]]+)\]\((https?:\/\/[^)]+)\)/g, '<a href="$2" target="_blank" rel="noopener noreferrer">$1</a>')
     .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
     .replace(/`([^`]+)`/g, '<span class="code-inline">$1</span>');
+}
+
+function stripMarkdown(text) {
+  return text
+    .replace(/\[([^\]]+)\]\([^)]+\)/g, '$1')
+    .replace(/\*\*(.*?)\*\*/g, '$1')
+    .replace(/\*(.*?)\*/g, '$1')
+    .replace(/`([^`]+)`/g, '$1')
+    .replace(/^#+\s+/gm, '')
+    .replace(/^[-*]\s+/gm, '')
+    .replace(/^\d+\.\s+/gm, '')
+    .replace(/^>\s+/gm, '');
 }
 
 function renderRichText(content) {

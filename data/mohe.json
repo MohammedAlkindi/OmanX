@@ -1,0 +1,165 @@
+{
+  "metadata": {
+    "version": "3.0.0",
+    "lastUpdated": "2026-06-10",
+    "authority": "Official MoHE Compliance Database",
+    "validityPeriod": "Academic Year 2025-2026",
+    "updateFrequency": "Quarterly",
+    "totalDocuments": 1,
+    "targetAudience": "Omani Scholars (All Destinations)"
+  },
+  "documents": [
+    {
+      "id": "MOHE-COMPLIANCE-2024",
+      "title": "Ministry of Higher Education Compliance — Official",
+      "effectiveDate": "2024-01-01",
+      "summary": "Omani government scholarship recipients must maintain compliance with both U.S. immigration regulations AND MoHE-specific requirements. Failure to meet MoHE obligations may result in scholarship termination, repayment demands, or restrictions on future government employment.",
+      "scope": {
+        "appliesTo": [
+          "MoHE Scholarship Recipients",
+          "Sponsored Omani students"
+        ],
+        "riskLevel": "Critical",
+        "complianceTier": "Government Contractual",
+        "failureImpact": "Scholarship revocation, financial liability for all funds received, ban from future government employment, potential legal action in Oman"
+      },
+      "corePrinciples": [
+        "Academic Excellence Principle: Maintain minimum GPA requirements",
+        "Program Stability Principle: No unauthorized program changes",
+        "Financial Accountability Principle: All funds used for approved purposes",
+        "Reporting Principle: Timely submission of all required documents",
+        "Return Service Principle: Fulfill post-completion service obligation"
+      ],
+      "rules": [
+        {
+          "rule": "Academic Performance Requirements",
+          "details": [
+            "Minimum GPA: 3.0/4.0 or equivalent (B average) for graduate students; 2.5/4.0 for undergraduate",
+            "Must maintain full-time enrollment each semester (verified by DSO)",
+            "No academic probation beyond one semester without MoHE approval",
+            "All grade reports must be submitted to MoHE through official channels each term"
+          ],
+          "commonViolations": [
+            {
+              "text": "GPA falling below minimum requirement for two consecutive terms",
+              "consequence": "Scholarship suspension, repayment demand"
+            },
+            {
+              "text": "Failure to submit academic reports on time",
+              "consequence": "Monthly stipend suspension"
+            }
+          ],
+          "mitigation": [
+            "Schedule regular academic advising sessions",
+            "Utilize university tutoring and academic support services",
+            "Report academic difficulties to MoHE liaison early"
+          ]
+        },
+        {
+          "rule": "Program Change Restrictions",
+          "details": [
+            "Major/degree program changes require PRIOR written approval from MoHE",
+            "University transfers require 30-day advance notice and justification",
+            "Extension requests must demonstrate compelling academic/medical reasons",
+            "Early graduation must be reported within 10 days of degree conferral"
+          ],
+          "authorizationSources": [
+            "MoHE Scholarship Department",
+            "University MoHE Liaison"
+          ],
+          "failureModes": [
+            "Changing major without MoHE approval",
+            "Transferring universities without proper authorization",
+            "Extending program without documented justification"
+          ],
+          "controls": [
+            "Submit program change requests 60 days in advance",
+            "Maintain communication with MoHE liaison officer",
+            "Document all academic decisions affecting program duration"
+          ]
+        },
+        {
+          "rule": "Post-Completion Service Obligation",
+          "details": [
+            "Mandatory return to Oman within 60 days of program completion",
+            "Minimum 5-year employment in Omani public sector (may vary by specialization)",
+            "Failure to return triggers full scholarship repayment plus 20% penalty",
+            "Extension requests for further study require MoHE approval before current program completion"
+          ],
+          "authorizationSources": [
+            "MoHE Contractual Agreement",
+            "Omani Labor Laws"
+          ],
+          "commonViolations": [
+            {
+              "text": "Remaining in U.S. beyond 60-day return window",
+              "consequence": "Contract violation, financial penalties"
+            },
+            {
+              "text": "Accepting private sector employment in Oman without MoHE approval",
+              "consequence": "Service obligation extension, financial penalties"
+            }
+          ],
+          "mitigation": [
+            "Begin job search in Oman 6 months before graduation",
+            "Coordinate with MoHE placement office for public sector positions",
+            "Document all job applications and interviews"
+          ]
+        }
+      ],
+      "contacts": {
+        "MoHE_Scholarship_Office": {
+          "name": "Oman Ministry of Higher Education",
+          "title": "Scholarship Department",
+          "office": "Al Khuwair, Muscat, Oman",
+          "email": "scholarships@mohe.gov.om",
+          "phone": "+968 24 123456",
+          "hours": "Sunday-Thursday 7:30am-2:30pm (Oman Time)"
+        },
+        "Omani_Cultural_Attache": {
+          "name": "Cultural Attaché Office",
+          "title": "Student Affairs Division",
+          "office": "Washington D.C., USA",
+          "email": "students@omanembassy.org",
+          "phone": "+1 (202) 387-1980"
+        }
+      },
+      "resources": {
+        "links": [
+          {
+            "title": "MoHE Scholarship Portal",
+            "url": "https://scholarships.mohe.gov.om",
+            "description": "Official portal for scholarship management and reporting"
+          },
+          {
+            "title": "Omani Student Affairs - Washington DC",
+            "url": "https://www.omanembassy.org/student-affairs",
+            "description": "Embassy resources for Omani students in USA"
+          }
+        ],
+        "forms": [
+          "MoHE Academic Progress Report Form (Quarterly)",
+          "Program Change Request Form",
+          "Emergency Funding Request Form",
+          "Leave of Absence Request Form",
+          "Post-Graduation Service Commitment Acknowledgment"
+        ],
+        "portal": "https://scholarships.mohe.gov.om/student-portal"
+      },
+      "complianceNotes": [
+        "All MoHE communications must be in Arabic or formal English",
+        "Keep copies of all correspondence for minimum 5 years",
+        "Report any legal or immigration issues to MoHE within 24 hours",
+        "MoHE approval required for: marriage, childbirth, major purchases (>$5,000)",
+        "Annual physical presence verification required during summer breaks"
+      ]
+    }
+  ],
+  "globalReferences": {
+    "links": [
+      "Omani Ministry of Higher Education: https://www.mohe.gov.om",
+      "Embassy of Oman in Washington D.C.: https://www.omanembassy.org",
+      "Omani Student Affairs - Washington DC: https://www.omanembassy.org/student-affairs"
+    ]
+  }
+}
