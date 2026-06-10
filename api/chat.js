@@ -306,8 +306,21 @@ export default async function handler(req, res) {
     ? crypto.createHash("sha256").update(`${model}::${useConcise}::${sanitizedUserContext}::${sanitizedMessage}`).digest("hex")
     : null;
 
+  const wantsStream = req.body?.stream === true;
+
   const cached = cacheKey ? cacheGet(cacheKey) : null;
-  if (cached) return res.json({ text: cached, cached: true });
+  if (cached) {
+    if (wantsStream) {
+      res.setHeader('Content-Type', 'text/event-stream');
+      res.setHeader('Cache-Control', 'no-cache');
+      res.setHeader('Connection', 'keep-alive');
+      res.flushHeaders();
+      res.write(`data: ${JSON.stringify({ t: cached })}\n\n`);
+      res.write(`data: ${JSON.stringify({ done: true, compliance: false, webSearched: false })}\n\n`);
+      return res.end();
+    }
+    return res.json({ text: cached, cached: true });
+  }
 
   // Run KB lookup and web search in parallel
   let kbResults = [];
@@ -321,25 +334,58 @@ export default async function handler(req, res) {
 
   const systemPrompt = buildSystemPrompt(kbResults, webResults, { conciseMode: useConcise, userContext: sanitizedUserContext });
 
+  const requestParams = {
+    model,
+    max_tokens: 2048,
+    temperature: 0.4,
+    system: systemPrompt,
+    messages: conversationMessages,
+  };
+
+  console.log("[OmanX] /api/chat request", {
+    model,
+    compliance,
+    stream: wantsStream,
+    webResults: webResults.length,
+    kbResults: kbResults.length,
+    conciseMode: useConcise,
+    hasUserContext: !!sanitizedUserContext,
+    chars: sanitizedMessage.length,
+  });
+
+  if (wantsStream) {
+    res.setHeader('Content-Type', 'text/event-stream');
+    res.setHeader('Cache-Control', 'no-cache');
+    res.setHeader('Connection', 'keep-alive');
+    res.flushHeaders();
+
+    let fullText = '';
+    try {
+      const stream = client.messages.stream(requestParams);
+      for await (const event of stream) {
+        if (event.type === 'content_block_delta' && event.delta?.type === 'text_delta') {
+          fullText += event.delta.text;
+          res.write(`data: ${JSON.stringify({ t: event.delta.text })}\n\n`);
+        }
+      }
+      if (cacheKey) cacheSet(cacheKey, fullText.trim());
+      res.write(`data: ${JSON.stringify({ done: true, compliance, webSearched: webResults.length > 0 })}\n\n`);
+      res.end();
+    } catch (err) {
+      console.error("[OmanX] Anthropic stream error:", err?.message);
+      const errMsg = err?.status === 429
+        ? "I'm experiencing high demand. Please try again in a moment."
+        : compliance
+          ? "I couldn't process your request. For compliance matters, contact your DSO directly."
+          : "I couldn't process your request. Please try again.";
+      res.write(`data: ${JSON.stringify({ error: errMsg })}\n\n`);
+      res.end();
+    }
+    return;
+  }
+
   try {
-    console.log("[OmanX] /api/chat request", {
-      model,
-      compliance,
-      webResults: webResults.length,
-      kbResults: kbResults.length,
-      conciseMode: useConcise,
-      hasUserContext: !!sanitizedUserContext,
-      chars: sanitizedMessage.length,
-    });
-
-    const response = await client.messages.create({
-      model,
-      max_tokens: 2048,
-      temperature: 0.4,
-      system: systemPrompt,
-      messages: conversationMessages,
-    });
-
+    const response = await client.messages.create(requestParams);
     const text = response.content?.[0]?.text?.trim() || "No response generated.";
     if (cacheKey) cacheSet(cacheKey, text);
     return res.json({ text, cached: false, compliance, webSearched: webResults.length > 0 });

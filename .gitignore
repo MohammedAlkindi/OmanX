@@ -1,3 +1,16 @@
 node_modules
 .env
+.env.local
+.env.*.local
 .claude
+
+# Logs
+*.log
+npm-debug.log*
+
+# Vercel
+.vercel
+
+# OS
+.DS_Store
+Thumbs.db

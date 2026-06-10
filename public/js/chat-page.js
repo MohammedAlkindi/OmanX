@@ -131,9 +131,7 @@ function bindEvents() {
     renderMessages();
     qs('[data-message-list]').scrollTop = qs('[data-message-list]').scrollHeight;
 
-    const reply = await createAssistantReply(content);
-    appendMessage('assistant', reply);
-    setTyping(false);
+    await streamAssistantReply(content);
     render();
   });
 
@@ -247,6 +245,9 @@ function renderSidebar() {
       `;
     }
 
+    const lastMsg = [...chat.messages].reverse().find((m) => m.role === 'user' || m.role === 'assistant');
+    const snippet = lastMsg ? escapeHtml(lastMsg.content.slice(0, 120)) : '';
+
     return `
       <article class="chat-item ${isActive ? 'active' : ''}" data-chat-id="${chat.id}">
         <div class="chat-item-header">
@@ -265,6 +266,7 @@ function renderSidebar() {
             </div>
           </div>
         </div>
+        ${snippet ? `<div class="chat-item-snippet">${snippet}</div>` : ''}
       </article>
     `;
   }).join('') || '<div class="message-empty">No chats match your search.</div>';
@@ -422,7 +424,7 @@ function getActiveChat() {
   return state.chats.find((chat) => chat.id === state.activeChatId) || state.chats[0];
 }
 
-async function createAssistantReply(message) {
+async function streamAssistantReply(message) {
   const chat = getActiveChat();
   const history = chat.messages
     .slice(0, -1)
@@ -431,22 +433,82 @@ async function createAssistantReply(message) {
 
   const { model, conciseMode, userContext } = state.settings;
 
+  let fullText = '';
+  let bubbleEl = null;
+  let rafPending = false;
+
+  function activateBubble() {
+    if (bubbleEl) return bubbleEl;
+    setTyping(false);
+    const container = qs('[data-message-list]');
+    container.querySelector('.message.assistant:last-child .typing')?.closest('article')?.remove();
+    const article = document.createElement('article');
+    article.className = 'message assistant';
+    article.dataset.streamBubble = '1';
+    article.innerHTML = '<div class="message-bubble message-bubble-enter"></div><div class="message-meta"><span>OmanX</span><span>Now</span></div>';
+    container.appendChild(article);
+    bubbleEl = article.querySelector('.message-bubble');
+    return bubbleEl;
+  }
+
+  function scheduleRender() {
+    if (rafPending) return;
+    rafPending = true;
+    requestAnimationFrame(() => {
+      rafPending = false;
+      const el = activateBubble();
+      el.innerHTML = renderRichText(fullText) + '<span class="stream-cursor" aria-hidden="true"></span>';
+      const container = qs('[data-message-list]');
+      if (container.scrollHeight - container.scrollTop - container.clientHeight < 200) {
+        container.scrollTop = container.scrollHeight;
+      }
+    });
+  }
+
   try {
     const response = await fetch('/api/chat', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ message, history, model, conciseMode, userContext }),
+      body: JSON.stringify({ message, history, model, conciseMode, userContext, stream: true }),
     });
 
-    const payload = await response.json().catch(() => ({}));
     if (!response.ok) {
-      const errorMsg = payload.error || payload.text || `Server error (HTTP ${response.status})`;
-      return `**Error:** ${errorMsg}`;
+      const payload = await response.json().catch(() => ({}));
+      fullText = `**Error:** ${payload.error || payload.text || `Server error (HTTP ${response.status})`}`;
+    } else {
+      const reader = response.body.getReader();
+      const decoder = new TextDecoder();
+      let buf = '';
+
+      while (true) {
+        const { done, value } = await reader.read();
+        if (done) break;
+        buf += decoder.decode(value, { stream: true });
+
+        let boundary;
+        while ((boundary = buf.indexOf('\n\n')) !== -1) {
+          const line = buf.slice(0, boundary).trim();
+          buf = buf.slice(boundary + 2);
+          if (!line.startsWith('data: ')) continue;
+          try {
+            const data = JSON.parse(line.slice(6));
+            if (data.error) { fullText = `**Error:** ${data.error}`; break; }
+            if (data.t) {
+              fullText += data.t;
+              scheduleRender();
+            }
+          } catch { /* malformed SSE line */ }
+        }
+      }
     }
-    return payload.text;
   } catch (err) {
-    return `**Network error:** ${err.message || 'Could not reach the server. Check your connection and try again.'}`;
+    fullText = `**Network error:** ${err.message || 'Could not reach the server. Check your connection and try again.'}`;
   }
+
+  // Remove the temporary streaming bubble; render() will re-render from state
+  qs('[data-stream-bubble]')?.remove();
+  appendMessage('assistant', fullText.trim() || 'No response generated.');
+  setTyping(false);
 }
 
 function deriveTitle(chat, role, content) {
