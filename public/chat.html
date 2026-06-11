@@ -66,14 +66,22 @@
           <!-- Settings panel — slides in over the sidebar -->
           <div class="settings-panel" data-settings-panel>
             <div class="settings-panel-header">
-              <div>
-                <div class="settings-panel-eyebrow">Workspace</div>
-                <h3>Settings</h3>
-              </div>
+              <h3>Settings</h3>
               <button class="settings-panel-close" data-settings-close type="button" aria-label="Close settings">✕</button>
             </div>
 
             <div class="settings-panel-body">
+
+              <!-- Profile -->
+              <div class="settings-section">
+                <div class="settings-section-label">Profile</div>
+                <div class="settings-field">
+                  <label for="settings-name">Display name</label>
+                  <input id="settings-name" class="settings-input" type="text" data-setting-name placeholder="Your name" autocomplete="off" />
+                </div>
+              </div>
+
+              <hr class="settings-divider" />
 
               <!-- Appearance -->
               <div class="settings-section">
@@ -85,14 +93,7 @@
                 </div>
               </div>
 
-              <!-- Profile -->
-              <div class="settings-section">
-                <div class="settings-section-label">Profile</div>
-                <div class="settings-field">
-                  <label for="settings-name">Display name</label>
-                  <input id="settings-name" class="settings-input" type="text" data-setting-name placeholder="Your name" autocomplete="off" />
-                </div>
-              </div>
+              <hr class="settings-divider" />
 
               <!-- Assistant -->
               <div class="settings-section">
@@ -146,6 +147,8 @@
                 </div>
               </div>
 
+              <hr class="settings-divider" />
+
               <!-- Data -->
               <div class="settings-section">
                 <div class="settings-section-label">Data</div>
@@ -154,10 +157,7 @@
                   <span class="toggle-track"><span class="toggle-thumb"></span></span>
                   <span class="toggle-label">Help improve OmanX by sharing conversations</span>
                 </label>
-                <div class="settings-field">
-                  <label>Chat history</label>
-                  <button type="button" class="btn-settings-danger" data-delete-all-chats>Delete all conversations</button>
-                </div>
+                <button type="button" class="btn-settings-danger" data-delete-all-chats>Delete all conversations</button>
               </div>
 
             </div>
@@ -177,9 +177,7 @@
           <form class="composer" data-chat-form>
             <div class="composer-box card">
               <textarea id="chat-input" data-chat-input placeholder="Describe your decision context, constraints, and timeline."></textarea>
-              <div class="composer-footer">
-                <div class="status-inline"><i data-status-dot></i><span data-status-text>Ready</span></div>
-                <div>Press <span class="kbd">Enter</span> to send</div>
+              <div class="composer-actions">
                 <button class="btn" type="submit" data-send-btn style="height:34px;padding:0 20px;font-size:0.8125rem;">Send</button>
               </div>
             </div>
