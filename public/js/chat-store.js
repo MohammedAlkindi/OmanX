@@ -71,6 +71,7 @@ const SETTINGS_DEFAULTS = {
   userContext: '',
   language: 'auto',
   dataConsent: false,
+  webSearch: true,
 };
 
 export function loadSettings() {

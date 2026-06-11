@@ -349,7 +349,7 @@ export default async function handler(req, res) {
     return res.status(429).json({ error: "Too many requests. Please slow down.", text: "You've sent too many messages too quickly. Please wait a moment before trying again." });
   }
 
-  const { message, history, model: clientModel, conciseMode, userContext, language } = req.body || {};
+  const { message, history, model: clientModel, conciseMode, userContext, language, webSearch: clientWebSearch } = req.body || {};
 
   if (!message || typeof message !== "string") {
     return res.status(400).json({ error: "Missing 'message' string." });
@@ -416,10 +416,11 @@ export default async function handler(req, res) {
   // Run KB lookup and web search in parallel
   let kbResults = [];
   let webResults = [];
+  const allowWebSearch = clientWebSearch !== false;
   if (compliance) {
     [kbResults, webResults] = await Promise.all([
       getKB(destination).then((kb) => (kb ? searchKB(kb, sanitizedMessage) : [])),
-      webSearch(sanitizedMessage),
+      allowWebSearch ? webSearch(sanitizedMessage) : Promise.resolve([]),
     ]);
   }
 

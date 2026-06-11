@@ -172,6 +172,7 @@ function bindEvents() {
   qs('[data-setting-name]')?.addEventListener('change', (e) => {
     state.settings.studentName = e.target.value.trim() || 'Student';
     saveSettings(state.settings);
+    updateUserChip();
   });
 
   // context
@@ -191,6 +192,12 @@ function bindEvents() {
     state.settings.model = e.target.value;
     saveSettings(state.settings);
     showToast('Model updated.');
+  });
+
+  // web search
+  qs('[data-setting-web-search]')?.addEventListener('change', (e) => {
+    state.settings.webSearch = e.target.checked;
+    saveSettings(state.settings);
   });
 
   // language
@@ -218,7 +225,7 @@ function bindEvents() {
 }
 
 function populateSettingsPanel() {
-  const { studentName, userContext, conciseMode, model, language, dataConsent } = state.settings;
+  const { studentName, userContext, conciseMode, model, language, dataConsent, webSearch } = state.settings;
 
   const nameEl = qs('[data-setting-name]');
   if (nameEl) nameEl.value = studentName === 'Student' ? '' : studentName;
@@ -238,13 +245,26 @@ function populateSettingsPanel() {
   const consentEl = qs('[data-setting-data-consent]');
   if (consentEl) consentEl.checked = !!dataConsent;
 
+  const webSearchEl = qs('[data-setting-web-search]');
+  if (webSearchEl) webSearchEl.checked = webSearch !== false;
+
   updateThemePicker(getTheme());
+  updateUserChip();
 }
 
 function updateThemePicker(active) {
   qsa('[data-set-theme]').forEach((btn) => {
     btn.classList.toggle('active', btn.dataset.setTheme === active);
   });
+}
+
+function updateUserChip() {
+  const name = state.settings.studentName || 'Student';
+  const initials = name.split(/\s+/).filter(Boolean).slice(0, 2).map((w) => w[0].toUpperCase()).join('');
+  const avatarEl = qs('[data-user-avatar]');
+  const nameEl = qs('[data-user-chip-name]');
+  if (avatarEl) avatarEl.textContent = initials || 'S';
+  if (nameEl) nameEl.textContent = name;
 }
 
 function render() {
@@ -466,7 +486,7 @@ async function streamAssistantReply(message) {
     .slice(-20)
     .map(({ role, content }) => ({ role, content }));
 
-  const { model, conciseMode, userContext, language } = state.settings;
+  const { model, conciseMode, userContext, language, webSearch } = state.settings;
 
   let fullText = '';
   let bubbleEl = null;
@@ -504,7 +524,7 @@ async function streamAssistantReply(message) {
     const response = await fetch('/api/chat', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ message, history, model, conciseMode, userContext, language, stream: true }),
+      body: JSON.stringify({ message, history, model, conciseMode, userContext, language, webSearch: webSearch !== false, stream: true }),
     });
 
     if (!response.ok) {
