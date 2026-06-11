@@ -3,6 +3,7 @@ node_modules
 .env.local
 .env.*.local
 .claude
+CLAUDE.md
 
 # Logs
 *.log

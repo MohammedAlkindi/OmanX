@@ -2145,6 +2145,29 @@ select:focus {
   background: var(--sand);
 }
 
+.web-search-badge {
+  font-family: var(--mono);
+  font-size: 0.5625rem;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--ink-4);
+  border: 0.5px solid var(--border-strong);
+  border-radius: 3px;
+  padding: 1px 5px;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.web-search-badge::before {
+  content: '';
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: #22c55e;
+  flex-shrink: 0;
+}
+
 /* typing indicator */
 .typing { display: flex; gap: 4px; align-items: center; padding: 6px 0; }
 

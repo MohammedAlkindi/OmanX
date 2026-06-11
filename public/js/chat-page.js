@@ -434,7 +434,7 @@ function renderMessages() {
       <div class="message-meta">
         <span>${message.role === 'assistant' ? 'OmanX' : state.settings.studentName}</span>
         <span>${formatDateTime(message.createdAt)}</span>
-        ${message.role === 'assistant' ? `<span class="message-tools"><button type="button" data-copy-message="${message.id}">Copy</button></span>` : ''}
+        ${message.role === 'assistant' ? `<span class="message-tools">${message.webSearched ? '<span class="web-search-badge" title="Live web search was used for this response">Web search</span>' : ''}<button type="button" data-copy-message="${message.id}">Copy</button></span>` : ''}
       </div>
     </article>
   `).join('');
@@ -459,8 +459,8 @@ function renderMessages() {
   if (wasNearBottom) container.scrollTop = container.scrollHeight;
 }
 
-function appendMessage(role, content, chatId = state.activeChatId) {
-  const message = { id: uid('msg'), role, content, createdAt: new Date().toISOString() };
+function appendMessage(role, content, chatId = state.activeChatId, meta = {}) {
+  const message = { id: uid('msg'), role, content, createdAt: new Date().toISOString(), ...meta };
   mutateChat(chatId, (chat) => ({
     ...chat,
     title: deriveTitle(chat, role, content),
@@ -489,6 +489,7 @@ async function streamAssistantReply(message) {
   const { model, conciseMode, userContext, language, webSearch } = state.settings;
 
   let fullText = '';
+  let didWebSearch = false;
   let bubbleEl = null;
   let rafPending = false;
 
@@ -548,10 +549,8 @@ async function streamAssistantReply(message) {
           try {
             const data = JSON.parse(line.slice(6));
             if (data.error) { fullText = `**Error:** ${data.error}`; break; }
-            if (data.t) {
-              fullText += data.t;
-              scheduleRender();
-            }
+            if (data.t) { fullText += data.t; scheduleRender(); }
+            if (data.done && data.webSearched) didWebSearch = true;
           } catch { /* malformed SSE line */ }
         }
       }
@@ -566,7 +565,7 @@ async function streamAssistantReply(message) {
   // Use the captured chat.id so the response always saves to the originating chat
   // even if the user switched conversations mid-stream.
   qs('[data-stream-bubble]')?.remove();
-  appendMessage('assistant', fullText.trim() || 'No response generated.', chat.id);
+  appendMessage('assistant', fullText.trim() || 'No response generated.', chat.id, { webSearched: didWebSearch });
   setTyping(false);
 }
 

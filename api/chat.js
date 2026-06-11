@@ -32,12 +32,6 @@ const DEST_KB_PATHS = {
   ],
 };
 
-// Legacy fallback if destination files don't exist
-const KNOWLEDGE_PATHS = [
-  path.join(process.cwd(), "data/knowledge.json"),
-  path.join(__dirname, "../data/knowledge.json"),
-  path.join(__dirname, "../../data/knowledge.json"),
-];
 
 const DEFAULT_MODEL = process.env.ANTHROPIC_MODEL || "claude-sonnet-4-6";
 const ALLOWED_MODELS = new Set(["claude-sonnet-4-6", "claude-haiku-4-5-20251001"]);
@@ -56,9 +50,6 @@ const TRUSTED_DOMAINS = [
 
 const _destCache = {}; // { us: {kb, mtime, path}, uk: {...}, au: {...} }
 const _moheCache = { kb: null, mtime: 0, path: null };
-let _legacyKbPath = null;
-let _legacyKb = null;
-let _legacyKbMtime = 0;
 
 async function findPath(paths) {
   for (const p of paths) {
@@ -106,18 +97,7 @@ async function getKB(destination = "us") {
     const cache = _destCache[destination] || (_destCache[destination] = { kb: null, mtime: 0, path: null });
 
     if (!cache.path) cache.path = await findPath(paths);
-
-    // Fall back to legacy knowledge.json if destination file not found
-    if (!cache.path) {
-      if (!_legacyKbPath) _legacyKbPath = await findPath(KNOWLEDGE_PATHS);
-      if (!_legacyKbPath) { console.warn("[OmanX] No knowledge base found"); return null; }
-      const st = await fs.stat(_legacyKbPath);
-      if (_legacyKb && st.mtimeMs <= _legacyKbMtime) return _legacyKb;
-      _legacyKb = JSON.parse(await fs.readFile(_legacyKbPath, "utf8"));
-      _legacyKbMtime = st.mtimeMs;
-      console.log(`[OmanX] Falling back to legacy KB: ${_legacyKbPath}`);
-      return _legacyKb;
-    }
+    if (!cache.path) { console.warn("[OmanX] No knowledge base found for destination:", destination); return null; }
 
     const [st, moheKb] = await Promise.all([fs.stat(cache.path), getMoheKb()]);
     if (!cache.kb || st.mtimeMs > cache.mtime) {
