@@ -1477,8 +1477,8 @@ select:focus {
   cursor: pointer;
   transition: background 0.15s, border-color 0.15s;
   min-width: 0;
-  overflow: hidden;
   width: 100%;
+  position: relative;
 }
 
 .chat-item:hover {
@@ -1496,7 +1496,6 @@ select:focus {
   align-items: center;
   gap: 6px;
   min-width: 0;
-  overflow: hidden;
 }
 
 .chat-item-title {
