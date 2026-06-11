@@ -247,8 +247,12 @@ Always:
 - For any compliance question, end your response with a clear reminder to verify with their Designated School Official (DSO) before taking action
 - Never fabricate contact information, deadlines, or policy details`;
 
-function buildSystemPrompt(kbResults, webResults, { conciseMode, userContext } = {}) {
+function buildSystemPrompt(kbResults, webResults, { conciseMode, userContext, language } = {}) {
   let prompt = BASE_SYSTEM;
+
+  if (language) {
+    prompt += `\n\n---\n\nLanguage: Always respond in ${language}, regardless of what language the student writes in.`;
+  }
 
   if (userContext) {
     prompt += `\n\n---\n\n## Student Context\nThe student has provided the following context about themselves. Use it to personalize your guidance:\n${userContext}`;
@@ -345,7 +349,7 @@ export default async function handler(req, res) {
     return res.status(429).json({ error: "Too many requests. Please slow down.", text: "You've sent too many messages too quickly. Please wait a moment before trying again." });
   }
 
-  const { message, history, model: clientModel, conciseMode, userContext } = req.body || {};
+  const { message, history, model: clientModel, conciseMode, userContext, language } = req.body || {};
 
   if (!message || typeof message !== "string") {
     return res.status(400).json({ error: "Missing 'message' string." });
@@ -364,6 +368,7 @@ export default async function handler(req, res) {
   const model = ALLOWED_MODELS.has(clientModel) ? clientModel : DEFAULT_MODEL;
   const sanitizedUserContext = userContext ? sanitizeMessage(String(userContext)).slice(0, 2000) : "";
   const useConcise = conciseMode === true;
+  const responseLanguage = (typeof language === 'string' && language !== 'auto') ? language : null;
 
   const hasHistory = Array.isArray(history) && history.length > 0;
   const conversationMessages = [];
@@ -418,7 +423,7 @@ export default async function handler(req, res) {
     ]);
   }
 
-  const systemPrompt = buildSystemPrompt(kbResults, webResults, { conciseMode: useConcise, userContext: sanitizedUserContext });
+  const systemPrompt = buildSystemPrompt(kbResults, webResults, { conciseMode: useConcise, userContext: sanitizedUserContext, language: responseLanguage });
 
   const requestParams = {
     model,

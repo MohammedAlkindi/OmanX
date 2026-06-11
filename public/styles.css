@@ -1368,6 +1368,27 @@ select:focus {
   cursor: pointer;
 }
 
+.btn-settings-danger {
+  display: inline-flex;
+  align-items: center;
+  height: 32px;
+  padding: 0 12px;
+  border-radius: var(--radius);
+  border: 0.5px solid rgba(185, 28, 28, 0.35);
+  background: transparent;
+  color: #b91c1c;
+  font-family: var(--sans);
+  font-size: 0.8125rem;
+  font-weight: 400;
+  cursor: pointer;
+  transition: background 0.15s, border-color 0.15s;
+}
+
+.btn-settings-danger:hover {
+  background: rgba(185, 28, 28, 0.06);
+  border-color: #b91c1c;
+}
+
 /* toggle row */
 .toggle-row {
   display: flex;

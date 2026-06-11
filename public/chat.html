@@ -109,6 +109,46 @@
                     <option value="claude-haiku-4-5-20251001">Haiku 4.5 — Faster</option>
                   </select>
                 </div>
+                <div class="settings-field">
+                  <label for="settings-language">Response language</label>
+                  <select id="settings-language" class="settings-select" data-setting-language>
+                    <option value="auto">Auto — match my language</option>
+                    <option value="English">English</option>
+                    <option value="Arabic">Arabic (العربية)</option>
+                    <option value="French">French (Français)</option>
+                    <option value="Spanish">Spanish (Español)</option>
+                    <option value="German">German (Deutsch)</option>
+                    <option value="Chinese">Chinese (中文)</option>
+                    <option value="Japanese">Japanese (日本語)</option>
+                    <option value="Korean">Korean (한국어)</option>
+                    <option value="Portuguese">Portuguese (Português)</option>
+                    <option value="Russian">Russian (Русский)</option>
+                    <option value="Turkish">Turkish (Türkçe)</option>
+                    <option value="Malay">Malay (Bahasa Melayu)</option>
+                    <option value="Indonesian">Indonesian (Bahasa Indonesia)</option>
+                    <option value="Hindi">Hindi (हिंदी)</option>
+                    <option value="Urdu">Urdu (اردو)</option>
+                    <option value="Persian">Persian (فارسی)</option>
+                    <option value="Italian">Italian (Italiano)</option>
+                    <option value="Dutch">Dutch (Nederlands)</option>
+                    <option value="Polish">Polish (Polski)</option>
+                    <option value="Swahili">Swahili (Kiswahili)</option>
+                  </select>
+                </div>
+              </div>
+
+              <!-- Data -->
+              <div class="settings-section">
+                <div class="settings-section-label">Data</div>
+                <label class="toggle-row">
+                  <input class="toggle-checkbox" type="checkbox" data-setting-data-consent />
+                  <span class="toggle-track"><span class="toggle-thumb"></span></span>
+                  <span class="toggle-label">Help improve OmanX by sharing conversations</span>
+                </label>
+                <div class="settings-field">
+                  <label>Chat history</label>
+                  <button type="button" class="btn-settings-danger" data-delete-all-chats>Delete all conversations</button>
+                </div>
               </div>
 
             </div>

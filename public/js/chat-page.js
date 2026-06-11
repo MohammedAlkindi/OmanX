@@ -192,10 +192,33 @@ function bindEvents() {
     saveSettings(state.settings);
     showToast('Model updated.');
   });
+
+  // language
+  qs('[data-setting-language]')?.addEventListener('change', (e) => {
+    state.settings.language = e.target.value;
+    saveSettings(state.settings);
+  });
+
+  // data consent
+  qs('[data-setting-data-consent]')?.addEventListener('change', (e) => {
+    state.settings.dataConsent = e.target.checked;
+    saveSettings(state.settings);
+  });
+
+  // delete all chats
+  qs('[data-delete-all-chats]')?.addEventListener('click', () => {
+    if (!confirm('Delete all conversations? This cannot be undone.')) return;
+    const fresh = createChat();
+    state.chats = [fresh];
+    state.activeChatId = fresh.id;
+    persist();
+    render();
+    showToast('All conversations deleted.');
+  });
 }
 
 function populateSettingsPanel() {
-  const { studentName, userContext, conciseMode, model } = state.settings;
+  const { studentName, userContext, conciseMode, model, language, dataConsent } = state.settings;
 
   const nameEl = qs('[data-setting-name]');
   if (nameEl) nameEl.value = studentName === 'Student' ? '' : studentName;
@@ -208,6 +231,12 @@ function populateSettingsPanel() {
 
   const modelEl = qs('[data-setting-model]');
   if (modelEl) modelEl.value = model;
+
+  const langEl = qs('[data-setting-language]');
+  if (langEl) langEl.value = language || 'auto';
+
+  const consentEl = qs('[data-setting-data-consent]');
+  if (consentEl) consentEl.checked = !!dataConsent;
 
   updateThemePicker(getTheme());
 }
@@ -437,7 +466,7 @@ async function streamAssistantReply(message) {
     .slice(-20)
     .map(({ role, content }) => ({ role, content }));
 
-  const { model, conciseMode, userContext } = state.settings;
+  const { model, conciseMode, userContext, language } = state.settings;
 
   let fullText = '';
   let bubbleEl = null;
@@ -475,7 +504,7 @@ async function streamAssistantReply(message) {
     const response = await fetch('/api/chat', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ message, history, model, conciseMode, userContext, stream: true }),
+      body: JSON.stringify({ message, history, model, conciseMode, userContext, language, stream: true }),
     });
 
     if (!response.ok) {

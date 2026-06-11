@@ -69,6 +69,8 @@ const SETTINGS_DEFAULTS = {
   conciseMode: false,
   model: 'claude-sonnet-4-6',
   userContext: '',
+  language: 'auto',
+  dataConsent: false,
 };
 
 export function loadSettings() {
