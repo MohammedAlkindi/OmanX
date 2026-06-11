@@ -250,7 +250,7 @@ function renderSidebar() {
       `;
     }
 
-    const lastMsg = [...chat.messages].reverse().find((m) => m.role === 'user' || m.role === 'assistant');
+    const lastMsg = [...chat.messages].reverse().find((m) => m.role === 'user') || [...chat.messages].reverse().find((m) => m.role === 'assistant');
     const snippet = lastMsg ? escapeHtml(stripMarkdown(lastMsg.content).slice(0, 120)) : '';
 
     return `
@@ -527,10 +527,6 @@ function deriveTitle(chat, role, content) {
   return content.split(/[.!?]/)[0].slice(0, 42) || chat.title;
 }
 
-function getSnippet(chat) {
-  const last = [...chat.messages].reverse().find((message) => message.role === 'assistant') || chat.messages.at(-1);
-  return last?.content || 'No messages yet.';
-}
 
 function autoGrow(textarea) {
   textarea.style.height = 'auto';
