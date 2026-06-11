@@ -1486,7 +1486,6 @@ select:focus {
 
 .chat-item.active {
   background: var(--gold-dim);
-  border-color: var(--gold);
   border-left: 2px solid var(--gold);
   padding-left: 6px;
 }

@@ -23,6 +23,9 @@ const state = {
   confirmDeleteId: null,
 };
 
+// Tracks which chatId is actively streaming; null when idle.
+let streamingChatId = null;
+
 initCore({ page: 'chat' });
 ensureActiveChat();
 render();
@@ -217,7 +220,9 @@ function updateThemePicker(active) {
 
 function render() {
   renderSidebar();
-  renderMessages();
+  // Skip message-list rebuild while the stream bubble is live on the active chat.
+  // If the user switched to a different chat, render their messages normally.
+  if (!streamingChatId || streamingChatId !== state.activeChatId) renderMessages();
 }
 
 function renderSidebar() {
@@ -405,9 +410,9 @@ function renderMessages() {
   if (wasNearBottom) container.scrollTop = container.scrollHeight;
 }
 
-function appendMessage(role, content) {
+function appendMessage(role, content, chatId = state.activeChatId) {
   const message = { id: uid('msg'), role, content, createdAt: new Date().toISOString() };
-  mutateChat(state.activeChatId, (chat) => ({
+  mutateChat(chatId, (chat) => ({
     ...chat,
     title: deriveTitle(chat, role, content),
     updatedAt: message.createdAt,
@@ -426,6 +431,7 @@ function getActiveChat() {
 
 async function streamAssistantReply(message) {
   const chat = getActiveChat();
+  streamingChatId = chat.id;
   const history = chat.messages
     .slice(0, -1)
     .slice(-20)
@@ -503,11 +509,15 @@ async function streamAssistantReply(message) {
     }
   } catch (err) {
     fullText = `**Network error:** ${err.message || 'Could not reach the server. Check your connection and try again.'}`;
+  } finally {
+    streamingChatId = null;
   }
 
-  // Remove the temporary streaming bubble; render() will re-render from state
+  // Remove the temporary streaming bubble; render() will re-render from state.
+  // Use the captured chat.id so the response always saves to the originating chat
+  // even if the user switched conversations mid-stream.
   qs('[data-stream-bubble]')?.remove();
-  appendMessage('assistant', fullText.trim() || 'No response generated.');
+  appendMessage('assistant', fullText.trim() || 'No response generated.', chat.id);
   setTyping(false);
 }
 
