@@ -1,11 +1,11 @@
 {
   "metadata": {
-    "version": "3.0.0",
-    "lastUpdated": "2026-06-10",
+    "version": "3.1.0",
+    "lastUpdated": "2026-06-22",
     "authority": "Official MoHE Compliance Database",
     "validityPeriod": "Academic Year 2025-2026",
     "updateFrequency": "Quarterly",
-    "totalDocuments": 1,
+    "totalDocuments": 4,
     "targetAudience": "Omani Scholars (All Destinations)"
   },
   "documents": [
@@ -13,7 +13,7 @@
       "id": "MOHE-COMPLIANCE-2024",
       "title": "Ministry of Higher Education Compliance — Official",
       "effectiveDate": "2024-01-01",
-      "summary": "Omani government scholarship recipients must maintain compliance with both U.S. immigration regulations AND MoHE-specific requirements. Failure to meet MoHE obligations may result in scholarship termination, repayment demands, or restrictions on future government employment.",
+      "summary": "Omani government scholarship recipients must maintain compliance with both their host country's immigration regulations AND MoHE-specific requirements. Failure to meet MoHE obligations may result in scholarship termination, repayment demands, or restrictions on future government employment.",
       "scope": {
         "appliesTo": [
           "MoHE Scholarship Recipients",
@@ -151,6 +151,327 @@
         "Report any legal or immigration issues to MoHE within 24 hours",
         "Contact MoHE directly to confirm which personal decisions require prior approval — requirements vary by scholarship cohort and agreement year.",
         "Annual physical presence verification required during summer breaks"
+      ]
+    },
+    {
+      "id": "MOHE-FINANCIAL-2026",
+      "title": "MoHE Scholarship Financial Entitlements and Management",
+      "effectiveDate": "2025-01-01",
+      "summary": "MoHE scholarships cover tuition, living allowance, and approved incidentals. Specific amounts and entitlements are defined in your individual scholarship agreement and vary by destination country, degree level, and scholarship cohort year. This document covers the standard entitlement categories and procedures for claims, stipend management, and emergency financial assistance.",
+      "scope": {
+        "appliesTo": ["All MoHE scholarship recipients — US, UK, and Australia"],
+        "riskLevel": "Medium",
+        "complianceTier": "Government Contractual",
+        "failureImpact": "Stipend suspension for non-compliance; financial liability for unauthorized expenditure; scholarship termination for financial misconduct"
+      },
+      "rules": [
+        {
+          "rule": "Standard Financial Entitlement Categories",
+          "details": [
+            "Tuition and mandatory fees: paid directly by MoHE to your institution in most cases — do not pay tuition out of pocket; if you are invoiced directly by your institution, contact MoHE Scholarship Department immediately before paying",
+            "Monthly living allowance (stipend): transferred to your designated host-country bank account — the exact amount is specified in your scholarship agreement and varies by destination and degree level; confirm your entitlement in your agreement",
+            "Annual return airfare: economy class round-trip between Oman and your study city, typically once per academic year — the booking and reimbursement process varies; confirm with MoHE before purchasing any tickets",
+            "Health insurance (OSHC/NHS Surcharge/equivalent): typically paid directly by MoHE or reimbursed upon submission of proof — confirm your specific arrangement before purchasing health cover independently to avoid paying twice",
+            "Initial settlement allowance: a one-time payment to cover arrival costs in your first semester — confirm eligibility and amount in your scholarship agreement",
+            "Equipment allowance: a one-time laptop or equipment allowance may be available — confirm eligibility, amount, and pre-approval requirements with MoHE before purchasing"
+          ],
+          "authorizationSources": ["Your individual MoHE Scholarship Agreement"],
+          "controls": [
+            "Never spend money assuming MoHE will reimburse it without written prior authorization — confirm all claims before incurring the expense",
+            "Keep all receipts, invoices, and booking confirmations for any expense you intend to claim from MoHE"
+          ]
+        },
+        {
+          "rule": "Receiving Your Stipend",
+          "details": [
+            "Your stipend is typically paid monthly; timing (advance or arrears) is defined in your scholarship agreement",
+            "You must provide MoHE with your current host-country bank account BSB/sort code/routing number and account number — update this promptly whenever you change banks",
+            "Stipend may be suspended if: your academic report is overdue, you are on academic probation, MoHE cannot verify your enrollment status, or a compliance issue is under investigation",
+            "If your stipend is late or suspended, email MoHE Scholarship Department at scholarships@mohe.gov.om immediately — include your student ID, scholarship year, host country, and the affected payment period",
+            "MoHE does not advance payments against future months — manage your monthly budget accordingly"
+          ],
+          "authorizationSources": ["MoHE Scholarship Agreement"]
+        },
+        {
+          "rule": "Reimbursement Process",
+          "details": [
+            "For approved reimbursable expenses (medical, airfare, equipment), submit claims through the official MoHE portal (mohe.gov.om) or by email to scholarships@mohe.gov.om",
+            "Claims must be submitted within 90 days of incurring the expense unless your agreement specifies a different window",
+            "Required documentation for each claim: original receipts or invoices, your bank account details, your student ID, and a brief written explanation of the expense",
+            "Processing time: allow 4–6 weeks for routine reimbursements; for urgent medical claims, clearly state the urgency in your submission",
+            "Claims submitted without complete documentation are returned without processing — do not discard any receipts related to your scholarship activities"
+          ],
+          "authorizationSources": ["MoHE Scholarship Agreement", "MoHE Reimbursement Claim Form"]
+        },
+        {
+          "rule": "Emergency Financial Assistance",
+          "details": [
+            "For a genuine financial emergency (medical crisis, theft, natural disaster), contact MoHE Scholarship Department by email and phone on the same day",
+            "Submit a written request describing: the nature of the emergency, the amount required, how it will be used, and supporting documentation",
+            "Emergency assistance is assessed case-by-case and may be treated as an advance deductible from future stipend payments",
+            "Also contact the Omani Cultural Attaché or Embassy in your host country immediately — they can provide in-country support and may be able to accelerate the Muscat response"
+          ],
+          "authorizationSources": ["MoHE Emergency Funding Request Form"]
+        },
+        {
+          "rule": "Financial Misconduct",
+          "details": [
+            "All scholarship funds must be used for their approved purpose — using tuition or equipment funds for personal expenses is a scholarship violation",
+            "Working beyond your visa's permitted work hours to supplement income without MoHE authorization is both a visa violation and a scholarship violation",
+            "MoHE may conduct periodic financial audits — maintain records of all significant expenses throughout your studies",
+            "Misrepresentation in financial claims (inflated receipts, false invoices) is grounds for immediate scholarship termination and potential legal action in Oman"
+          ],
+          "authorizationSources": ["MoHE Scholarship Agreement"]
+        }
+      ],
+      "contacts": {
+        "MoHE_Scholarship_Finance": {
+          "name": "Oman Ministry of Higher Education — Scholarship Department",
+          "email": "scholarships@mohe.gov.om",
+          "website": "https://www.mohe.gov.om",
+          "hours": "Sunday–Thursday 7:30am–2:30pm (Oman Time / UTC+4)",
+          "note": "Include your student ID, scholarship year, and host country in all financial correspondence"
+        }
+      },
+      "resources": {
+        "links": [
+          {
+            "title": "Omani Ministry of Higher Education",
+            "url": "https://www.mohe.gov.om",
+            "description": "Official MoHE portal — navigate to Scholarships for financial guidance and forms"
+          }
+        ],
+        "forms": [
+          "Reimbursement Claim Form",
+          "Bank Account Registration / Update Form",
+          "Emergency Funding Request Form"
+        ]
+      },
+      "complianceNotes": [
+        "Your scholarship agreement is the authoritative source for your specific entitlements — the amounts in this document are general guidance only",
+        "Never purchase airfare or equipment expecting reimbursement without written pre-authorization from MoHE",
+        "Report any stipend payment failure immediately — delays compound and are difficult to resolve retrospectively"
+      ]
+    },
+    {
+      "id": "MOHE-REPORTING-LEAVE-2026",
+      "title": "MoHE Reporting Requirements, Leave of Absence, and Study Extensions",
+      "effectiveDate": "2025-01-01",
+      "summary": "MoHE scholarship recipients have mandatory reporting obligations throughout their study period. Failure to submit required reports on time results in immediate stipend suspension. Leaves of absence and study extensions require advance written approval from MoHE — unauthorized extensions receive no financial support and place the scholarship in breach. All changes to your academic program must be disclosed to MoHE before they take effect.",
+      "scope": {
+        "appliesTo": ["All MoHE scholarship recipients — US, UK, and Australia"],
+        "riskLevel": "High",
+        "complianceTier": "Government Contractual",
+        "failureImpact": "Stipend suspension, scholarship termination, repayment demand for unauthorized extension periods"
+      },
+      "rules": [
+        {
+          "rule": "Mandatory Reporting Schedule",
+          "details": [
+            "Academic Progress Report (each semester): submit to MoHE at the end of every semester — must include your official transcript or grade report issued by your institution's registrar",
+            "Enrollment Verification (each term): confirm active full-time enrollment at the start of each academic term — typically a letter from your university's international student office or registrar",
+            "Supervisor / Advisor Report (PhD and research students only): a signed progress report from your primary supervisor is required each semester in addition to transcripts",
+            "Graduation Notification: notify MoHE within 10 days of your degree being conferred — submit your degree certificate and official final transcript; continued stipend payments after graduation must be repaid",
+            "Address and Contact Updates: notify MoHE of any change to your residential address, phone number, or email address within 14 days of the change",
+            "Annual Presence Verification: some scholarship agreements require physical sign-in at your nearest Omani embassy or Cultural Attaché office during the annual summer break — check your specific agreement for this requirement"
+          ],
+          "authorizationSources": ["MoHE Scholarship Agreement"],
+          "commonViolations": [
+            {
+              "text": "Submitting academic progress report more than 30 days after semester end",
+              "consequence": "Stipend suspended until the report is received and reviewed"
+            },
+            {
+              "text": "Failing to notify MoHE of graduation within 10 days",
+              "consequence": "Continued stipend payments that must be repaid; delay in initiating the return-obligation process"
+            }
+          ],
+          "controls": [
+            "Set calendar reminders at the end of each semester to prepare and submit your academic report within the required window",
+            "Request your official transcript from the registrar immediately after grades are released — do not wait",
+            "Keep copies of every submission to MoHE, including email delivery confirmations"
+          ]
+        },
+        {
+          "rule": "Leave of Absence",
+          "details": [
+            "Annual Leave: MoHE grants annual leave entitlement to return to Oman during semester breaks — confirm the duration and scheduling rules in your scholarship agreement; coordinate timing with your university's academic calendar",
+            "Sick Leave: for illness requiring 2 or more consecutive weeks away from your studies, submit a formal sick leave request to MoHE with a medical certificate from a licensed physician; extended sick leave may require specialist assessment documentation",
+            "Emergency Leave: for immediate family emergencies (death of an immediate family member, life-threatening illness of a parent), contact MoHE by email and phone on the same day; submit supporting documentation upon returning to your studies",
+            "Maternity / Paternity Leave: available under most scholarship agreements — contact MoHE Scholarship Department for current duration and documentation requirements; apply at least 30 days before expected leave where possible",
+            "Leave does not automatically extend your scholarship end date — clarify the impact on your program completion timeline in writing at the time of your leave approval",
+            "Your host-country visa may be affected by extended leave — understand the visa implications before departing (see the relevant country KB entry for your destination)"
+          ],
+          "authorizationSources": ["MoHE Scholarship Agreement", "MoHE Scholarship Department"],
+          "controls": [
+            "Always apply for leave in writing and receive written approval before beginning any leave period",
+            "File all leave approvals in a dedicated folder — you may need to reference them at return-obligation processing time"
+          ]
+        },
+        {
+          "rule": "Study Extension",
+          "details": [
+            "Your scholarship covers the standard program duration — extensions require prior written approval from MoHE before your current scholarship end date",
+            "Grounds for extension: academic reasons (course requirements changed, failed subject requiring repeat), medical circumstances with documentation, supervisor departure or change (research students), or force majeure",
+            "How to apply: email scholarships@mohe.gov.om at least 60 days before your current scholarship end date; include — reason for extension, supporting documentation (medical certificate, university letter, supervisor statement), expected new completion date",
+            "MoHE may approve a shorter extension than requested — do not assume the full requested period will be granted",
+            "Your host-country visa must also be extended separately — MoHE approval does not extend your visa; begin the visa extension process before your current visa expires",
+            "Stipend continues during an approved extension period only; remaining enrolled beyond your scholarship end date without approval means no financial support and a scholarship breach"
+          ],
+          "authorizationSources": ["MoHE Scholarship Agreement", "MoHE Study Extension Request Form"],
+          "commonViolations": [
+            {
+              "text": "Remaining enrolled beyond scholarship end date without MoHE approval",
+              "consequence": "No financial support; scholarship in breach; potential repayment demand for the unauthorized period"
+            },
+            {
+              "text": "Applying for extension after the scholarship end date has already passed",
+              "consequence": "Application likely refused; student is already in unauthorized extension status"
+            }
+          ]
+        },
+        {
+          "rule": "Reporting Legal or Immigration Issues",
+          "details": [
+            "Any arrest, formal legal charge, or immigration violation must be reported to MoHE within 24 hours",
+            "Include in your report: a factual description of what occurred, the date and location, the authorities involved, and any immediate consequences or charges",
+            "Contact the Omani Cultural Attaché or Embassy in your host country simultaneously — they can provide consular assistance and communicate with MoHE on your behalf",
+            "Failure to report within 24 hours is treated as a separate scholarship violation, compounding the original issue"
+          ],
+          "authorizationSources": ["MoHE Scholarship Agreement"]
+        }
+      ],
+      "contacts": {
+        "MoHE_Scholarship_Office": {
+          "name": "Oman Ministry of Higher Education — Scholarship Department",
+          "email": "scholarships@mohe.gov.om",
+          "website": "https://www.mohe.gov.om",
+          "hours": "Sunday–Thursday 7:30am–2:30pm (Oman Time / UTC+4)"
+        }
+      },
+      "resources": {
+        "links": [
+          {
+            "title": "Omani Ministry of Higher Education",
+            "url": "https://www.mohe.gov.om",
+            "description": "Official MoHE portal for scholarship forms and reporting submissions"
+          }
+        ],
+        "forms": [
+          "MoHE Academic Progress Report Form (each semester)",
+          "Enrollment Verification Letter (from your university)",
+          "Leave of Absence Request Form",
+          "Study Extension Request Form",
+          "Emergency Leave Notification Form"
+        ]
+      },
+      "complianceNotes": [
+        "A late academic report immediately suspends your stipend — submit early, never late",
+        "Leave periods that extend into a teaching semester must be formally approved; a break that runs longer than expected is not automatically covered by your initial leave approval",
+        "Always obtain written confirmation from MoHE for every leave and extension approval — verbal confirmations or WhatsApp messages are not sufficient for formal scholarship records"
+      ]
+    },
+    {
+      "id": "MOHE-CONTACTS-GLOBAL-2026",
+      "title": "MoHE and Omani Embassy Contacts by Country",
+      "effectiveDate": "2025-01-01",
+      "summary": "Key contact information for Omani government and scholarship support offices across all three study destinations — United States, United Kingdom, and Australia. The Cultural Attaché offices are the primary in-country contact for day-to-day scholarship support. The MoHE Scholarship Department in Muscat is the final authority on all scholarship decisions. In any emergency, contact both simultaneously.",
+      "scope": {
+        "appliesTo": ["All MoHE scholarship recipients in the US, UK, and Australia"],
+        "riskLevel": "Low",
+        "complianceTier": "Reference",
+        "geographicScope": "Global — US, UK, Australia"
+      },
+      "contacts": {
+        "MoHE_Muscat": {
+          "name": "Oman Ministry of Higher Education — Scholarship Department",
+          "office": "Al Khuwair, Muscat, Sultanate of Oman",
+          "email": "scholarships@mohe.gov.om",
+          "website": "https://www.mohe.gov.om",
+          "hours": "Sunday–Thursday 7:30am–2:30pm (Oman Time / UTC+4)",
+          "description": "Primary authority for all scholarship decisions: program changes, extensions, leave, financial entitlements, and post-graduation return obligations"
+        },
+        "Cultural_Attache_US": {
+          "name": "Cultural Attaché Office — Embassy of Oman, Washington D.C.",
+          "title": "Student Affairs Division",
+          "office": "2535 Belmont Road NW, Washington, D.C. 20008, USA",
+          "email": "students@omanembassy.org",
+          "phone": "+1 (202) 387-1980",
+          "website": "https://www.omanembassy.org",
+          "description": "First in-country contact for Omani scholars in the United States — emergency support, consular assistance, and escalation to Muscat"
+        },
+        "Embassy_UK": {
+          "name": "Embassy of Oman — London",
+          "office": "167 Queens Gate, London SW7 5HE, United Kingdom",
+          "website": "https://www.omanembassylondon.org",
+          "phone_note": "Current direct phone and student affairs email not verified. Use the official embassy website or email for current contact details before saving to your phone.",
+          "description": "Omani embassy serving scholars in the United Kingdom — consular services, passport renewal, and student affairs via the educational or cultural attaché section"
+        },
+        "Embassy_Australia": {
+          "name": "Embassy of Oman — Canberra",
+          "website": "https://omanembassy.org.au",
+          "phone_note": "Current direct phone and student affairs email not verified. Use the official embassy website to obtain current contact details before saving to your phone.",
+          "description": "Omani embassy serving scholars in Australia — consular services, passport renewal, and escalation of urgent scholarship matters to MoHE Muscat"
+        }
+      },
+      "rules": [
+        {
+          "rule": "When to Contact the Embassy vs. MoHE Muscat",
+          "details": [
+            "Contact the Cultural Attaché or Embassy in your host country first for: immediate emergencies (arrest, hospitalization, theft, lost passport), consular services (passport renewal, emergency travel document), in-country navigation of local government systems, and urgent escalations that cannot wait for Muscat office hours",
+            "Contact MoHE Muscat (scholarships@mohe.gov.om) for: all formal scholarship decisions (program changes, extensions, leave approvals, financial claims, reimbursements), academic reporting submissions, and return-obligation planning",
+            "In a genuine emergency, contact both simultaneously — do not wait for one to respond before reaching out to the other",
+            "The Cultural Attaché supports and advocates for you but does not have final decision authority over scholarship matters — all formal approvals must come from MoHE Muscat"
+          ]
+        },
+        {
+          "rule": "Emergency Protocol by Country",
+          "details": [
+            "Life-threatening emergency: call local emergency services FIRST (US: 911 / UK: 999 / AU: 000), then notify the Omani embassy",
+            "Arrest or legal issue: do not make any statements to police beyond confirming your identity; contact the Omani embassy immediately and request consular access — embassies can dispatch a consular officer to assist",
+            "Lost or stolen passport: report to local police first to obtain a crime reference number, then contact the Omani embassy to arrange an emergency travel document",
+            "Hospitalization: if you are conscious, contact both the Omani embassy and your university's international student emergency line; if you are not, ensure your emergency contact — provided to MoHE and your university on arrival — can notify both",
+            "In all serious incidents: notify your university's international student office AND the Omani embassy on the same day"
+          ]
+        },
+        {
+          "rule": "Saving Contact Information",
+          "details": [
+            "Save all embassy phone numbers and email addresses to your phone before you travel — do not rely on finding them in an emergency",
+            "Verify current contact details directly on the official embassy websites before saving — contact information changes",
+            "Share your emergency contact details with a trusted person in both Oman and your host country",
+            "Know the address of the Omani embassy in your host city — you may need to visit in person for passport renewal or consular assistance"
+          ]
+        }
+      ],
+      "resources": {
+        "links": [
+          {
+            "title": "Omani Ministry of Higher Education",
+            "url": "https://www.mohe.gov.om",
+            "description": "Official MoHE portal — all scholarship decisions originate here"
+          },
+          {
+            "title": "Embassy of Oman — Washington D.C.",
+            "url": "https://www.omanembassy.org",
+            "description": "Cultural Attaché and student affairs for Omani scholars in the US"
+          },
+          {
+            "title": "Embassy of Oman — London",
+            "url": "https://www.omanembassylondon.org",
+            "description": "Omani embassy in the UK — student affairs via cultural/educational attaché"
+          },
+          {
+            "title": "Embassy of Oman — Canberra",
+            "url": "https://omanembassy.org.au",
+            "description": "Omani embassy in Australia — consular and student support"
+          }
+        ]
+      },
+      "complianceNotes": [
+        "Save emergency contacts before you travel — never rely on finding them at the moment you need them",
+        "Verify all phone numbers and emails on the official embassy websites before storing them; contact details are updated periodically",
+        "Your university's International Student Office is an additional first-responder for non-consular emergencies — know their emergency line as well"
       ]
     }
   ],

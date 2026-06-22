@@ -1,11 +1,11 @@
 {
   "metadata": {
-    "version": "1.0.0",
-    "lastUpdated": "2026-06-10",
+    "version": "2.0.0",
+    "lastUpdated": "2026-06-22",
     "authority": "Official Australia Compliance Database",
     "validityPeriod": "Academic Year 2025-2026",
     "updateFrequency": "Quarterly",
-    "totalDocuments": 6,
+    "totalDocuments": 10,
     "targetAudience": "Omani Scholars in Australia",
     "sources": [
       "https://immi.homeaffairs.gov.au/visas/getting-a-visa/visa-listing/student-500",
@@ -575,6 +575,403 @@
           }
         ]
       }
+    },
+    {
+      "id": "AU-TAX-TFN-2026",
+      "title": "Australian Tax File Number and Taxation",
+      "effectiveDate": "2025-07-01",
+      "summary": "All students working in Australia must have an Australian Tax File Number (TFN). The Australian tax year runs 1 July to 30 June. Students present in Australia for 183 days or more in a tax year are generally treated as Australian tax residents and taxed at resident rates. MoHE scholarship living allowances are generally exempt from Australian income tax. Superannuation contributions made by employers can be reclaimed upon permanently departing Australia.",
+      "scope": {
+        "appliesTo": ["All Omani students working in Australia", "All MoHE scholars in Australia receiving employment income"],
+        "riskLevel": "Medium",
+        "complianceTier": "Regulatory — ATO",
+        "geographicScope": "Australia",
+        "failureImpact": "Employer must withhold tax at highest marginal rate (47%) without TFN; ATO penalties for failing to lodge a tax return"
+      },
+      "rules": [
+        {
+          "rule": "Tax File Number (TFN)",
+          "details": [
+            "A TFN is a unique identifier issued by the Australian Taxation Office (ATO) — you need one before starting paid employment",
+            "Apply online at ato.gov.au/tfn — processing typically takes up to 28 days; apply in your first week after arriving",
+            "Without a TFN your employer is required to withhold tax at the top marginal rate (currently 47%) on all wages — there is no benefit in delaying",
+            "Your TFN is personal and confidential — provide it to employers and banks when required, but never disclose it unnecessarily",
+            "Australian banks may ask for your TFN when opening an account — you are not legally required to provide it, but the bank will withhold tax on interest at the top rate if you do not"
+          ],
+          "authorizationSources": ["ato.gov.au/tfn"],
+          "controls": [
+            "Apply for your TFN within the first week of arriving in Australia",
+            "Store your TFN securely — treat it with the same care as a password"
+          ]
+        },
+        {
+          "rule": "Tax Residency for International Students",
+          "details": [
+            "If you are in Australia for 183 days or more in an income year (1 July–30 June), the ATO will generally treat you as an Australian tax resident",
+            "Australian tax residents access the tax-free threshold (first AUD $18,200 of income is tax-free as of 2025-26) and pay lower marginal rates on subsequent income",
+            "Non-residents do not get the tax-free threshold and are taxed at a flat 32.5% from the first dollar earned",
+            "Most students on a full academic year qualify as residents for tax purposes — confirm with the ATO residency tool at ato.gov.au or a registered tax agent"
+          ],
+          "authorizationSources": ["Australian Taxation Office — ato.gov.au"],
+          "controls": [
+            "Use the ATO's online residency tool before lodging a return",
+            "Seek advice from your university's international student services or a registered tax agent if uncertain"
+          ]
+        },
+        {
+          "rule": "Annual Tax Return",
+          "details": [
+            "The Australian income tax year runs 1 July to 30 June",
+            "If you earned any income in Australia during the year, you must lodge a tax return",
+            "The standard lodgement deadline for individuals is 31 October following the end of the tax year",
+            "Lodge online using myTax via myGov (my.gov.au) — it is free and pre-fills information from employer and bank records",
+            "If you use a registered tax agent, you may have a later deadline",
+            "Refunds are common for students who worked part-time, because employers often withhold more than the final tax liability"
+          ],
+          "authorizationSources": ["ato.gov.au"],
+          "controls": [
+            "Link your myGov account to the ATO at my.gov.au in your first month",
+            "Keep all payslips and bank statements for the full tax year"
+          ]
+        },
+        {
+          "rule": "MoHE Scholarship and Tax",
+          "details": [
+            "Living allowance (stipend) payments from MoHE are generally not assessable income in Australia under s.51-10 of the Income Tax Assessment Act 1997, provided the scholarship is for full-time study",
+            "Tuition and course fee payments made directly by MoHE to your institution are not income to you",
+            "Any employment income from part-time work permitted under your visa is fully taxable",
+            "If you have any doubt about whether a payment is taxable, contact the ATO or a registered tax agent before lodging your return"
+          ],
+          "authorizationSources": ["ITAA 1997 s.51-10", "ato.gov.au/scholarships"]
+        },
+        {
+          "rule": "Superannuation",
+          "details": [
+            "If you work for an Australian employer, they must contribute superannuation at 11.5% of your ordinary time earnings (from 1 July 2024)",
+            "Superannuation is paid into a super fund — you can nominate your preferred fund; if you do not, your employer selects a default",
+            "As a temporary resident departing Australia permanently after your visa ends, you can reclaim your accumulated superannuation via the Departing Australia Superannuation Payment (DASP)",
+            "Apply for DASP online at ato.gov.au/dasp after your visa has ceased and you have left Australia",
+            "A 65% tax is withheld on DASP claims for most temporary residents — DASP is still worth claiming as the remaining amount can be substantial"
+          ],
+          "authorizationSources": ["ato.gov.au/super/departing-australia-superannuation-payment"],
+          "controls": [
+            "Keep your super fund name, member number, and Unique Superannuation Identifier (USI) recorded throughout your stay",
+            "If you change jobs, consolidate super accounts at ato.gov.au to avoid losing track of funds"
+          ]
+        }
+      ],
+      "resources": {
+        "links": [
+          {
+            "title": "Apply for a TFN — ATO",
+            "url": "https://www.ato.gov.au/Individuals/Tax-file-number/Apply-for-a-TFN",
+            "description": "Apply for your Tax File Number online"
+          },
+          {
+            "title": "myGov — Link your ATO account",
+            "url": "https://my.gov.au",
+            "description": "Portal for linking to the ATO and lodging tax returns via myTax"
+          },
+          {
+            "title": "Scholarships and income tax — ATO",
+            "url": "https://www.ato.gov.au/individuals-and-families/income-deductions-offsets-and-records/income-you-must-declare/scholarships-bursaries-and-grants",
+            "description": "ATO guidance on taxability of scholarship and stipend payments"
+          },
+          {
+            "title": "Departing Australia Superannuation Payment — ATO",
+            "url": "https://www.ato.gov.au/individuals-and-families/super-for-individuals-and-families/super/withdrawing-and-using-your-super/departing-australia-superannuation-payment",
+            "description": "How to reclaim your superannuation when permanently leaving Australia"
+          }
+        ]
+      },
+      "complianceNotes": [
+        "Apply for your TFN in your first week — every week without one costs you 47% of any wages earned",
+        "Lodge a tax return even for a short period of work — you are almost always entitled to a refund",
+        "Superannuation is real money you have earned — track it throughout your studies and claim DASP when you depart permanently"
+      ]
+    },
+    {
+      "id": "AU-TRAVEL-REENTRY-2026",
+      "title": "Travel Outside Australia and Re-entry on Student Visa",
+      "effectiveDate": "2024-01-01",
+      "summary": "The Australian Student visa (subclass 500) is a multiple-entry visa — you can leave and return to Australia as many times as needed while your visa is valid. No travel signature or advance provider authorization is required. Your visa exists as an electronic record linked to your passport; there is no physical visa label. Always verify your visa status via VEVO before traveling.",
+      "scope": {
+        "appliesTo": ["All Omani students on subclass 500 student visa"],
+        "riskLevel": "Medium",
+        "complianceTier": "Advisory",
+        "geographicScope": "Australia",
+        "failureImpact": "Denial of re-entry if visa has expired or been cancelled; CoE issues from extended unauthorized absence during semester"
+      },
+      "rules": [
+        {
+          "rule": "Electronic Visa — No Physical Label",
+          "details": [
+            "Australian visas are electronic records linked to your passport — there is no sticker, vignette, or label in your passport",
+            "Your visa is verified electronically at the border by immigration officers and airlines at check-in",
+            "You can check your own visa status at any time using VEVO (Visa Entitlement Verification Online)",
+            "Always verify your visa is active via VEVO before purchasing international travel tickets",
+            "If you get a new passport, your visa remains attached to the old passport number — travel on both passports together, or re-link the visa to your new passport via ImmiAccount before traveling"
+          ],
+          "authorizationSources": ["immi.homeaffairs.gov.au/visas/already-have-a-visa/check-visa-details-and-conditions"],
+          "controls": [
+            "Bookmark VEVO and check your visa status before every international trip",
+            "If you renew your passport, re-link your visa to the new passport via ImmiAccount before your first trip"
+          ]
+        },
+        {
+          "rule": "Multiple Entry and Re-entry",
+          "details": [
+            "The Student visa (subclass 500) is multiple entry — leave and re-enter Australia as many times as you wish while the visa is valid",
+            "No travel endorsement or travel signature from your education provider is required (this is different from the US F-1/I-20 system — no DSO signature needed)",
+            "Re-entry is automatic at the Australian border; you clear immigration as normal",
+            "Airlines verify your visa electronically at check-in — ensure your visa is valid and linked to the passport you are traveling on"
+          ],
+          "authorizationSources": ["immi.homeaffairs.gov.au/visas/getting-a-visa/visa-listing/student-500"]
+        },
+        {
+          "rule": "Visa Expiry and Return Timing",
+          "details": [
+            "Your student visa expiry date is linked to your CoE completion date — typically granted until approximately 2 months after your course end date",
+            "You must re-enter Australia before your visa expires — attempting re-entry after expiry will result in being turned away at the border",
+            "If your course completion date changes (extension or early completion), your CoE and visa expiry must be updated accordingly — contact your provider and Home Affairs",
+            "Plan all international travel around your visa expiry date — do not assume re-entry is possible after expiry even for a brief return"
+          ],
+          "authorizationSources": ["immi.homeaffairs.gov.au"],
+          "controls": [
+            "Set a reminder 3 months before your visa expiry to check whether an extension is required",
+            "Do not remain outside Australia near your visa expiry date without confirming you can still re-enter"
+          ]
+        },
+        {
+          "rule": "Absence During Semester and ESOS Obligations",
+          "details": [
+            "Traveling outside Australia during a teaching period does not automatically violate visa conditions, but your ESOS attendance obligations continue to apply regardless of where you are",
+            "If a planned absence during semester will cause your attendance to fall below 80%, notify your education provider and obtain a formal leave of absence approval before departing",
+            "Traveling during official course breaks is unrestricted — no attendance obligations apply during semester breaks",
+            "Extended absences during semester require formal leave approval from your provider; undisclosed absences may trigger an ESOS report to Home Affairs"
+          ],
+          "authorizationSources": ["ESOS Act 2000 (National Code Standard 8)", "Student visa conditions"]
+        },
+        {
+          "rule": "Omani Passport and Consular Services in Australia",
+          "details": [
+            "You must hold a valid Omani passport throughout your studies — renew through the Embassy of Oman in Canberra before expiry",
+            "The Embassy of Oman in Canberra processes passport renewals and consular services for Omani citizens in Australia — make appointments in advance via omanembassy.org.au",
+            "If your passport is lost or stolen: report to Australian police first (obtain a crime reference number), then contact the Embassy of Oman immediately to arrange an emergency travel document",
+            "MoHE annual leave airfare: MoHE typically provides one round-trip economy airfare per year — confirm the booking and reimbursement process with your scholarship agreement and MoHE Scholarship Department before purchasing tickets"
+          ],
+          "authorizationSources": ["MoHE Scholarship Agreement", "Embassy of Oman in Canberra (omanembassy.org.au)"]
+        }
+      ],
+      "resources": {
+        "links": [
+          {
+            "title": "VEVO — Check visa status",
+            "url": "https://immi.homeaffairs.gov.au/visas/already-have-a-visa/check-visa-details-and-conditions/check-visa-conditions-online",
+            "description": "Verify your visa entitlements and expiry date before any international travel"
+          },
+          {
+            "title": "Student visa (subclass 500) — Home Affairs",
+            "url": "https://immi.homeaffairs.gov.au/visas/getting-a-visa/visa-listing/student-500",
+            "description": "Full details of visa conditions including travel"
+          },
+          {
+            "title": "Embassy of Oman in Canberra",
+            "url": "https://omanembassy.org.au",
+            "description": "Passport renewal and consular services for Omani citizens in Australia"
+          }
+        ]
+      },
+      "complianceNotes": [
+        "Unlike the US F-1 system, there is no travel signature required from your education provider — re-entry to Australia does not require prior authorization from your university",
+        "Your visa is entirely electronic — always verify it is active via VEVO before booking any flight",
+        "If your visa has been cancelled for any reason (e.g., CoE cancellation due to attendance breach), you cannot re-enter Australia — check VEVO immediately if you have had any provider issues before traveling"
+      ]
+    },
+    {
+      "id": "AU-ACADEMIC-INTEGRITY-2026",
+      "title": "Academic Integrity — Australian University Standards",
+      "effectiveDate": "2025-01-01",
+      "summary": "All Australian universities enforce academic integrity rigorously through formal investigation and penalty processes. Academic misconduct — including plagiarism, collusion, contract cheating, and unauthorized AI tool use — can result in grade penalties, course failure, suspension, or expulsion. Expulsion triggers ESOS reporting and visa cancellation proceedings, and must be reported to MoHE immediately.",
+      "scope": {
+        "appliesTo": ["All Omani students enrolled at Australian universities"],
+        "riskLevel": "High",
+        "complianceTier": "Institutional and Regulatory",
+        "geographicScope": "Australia",
+        "failureImpact": "Fail grade, course failure, academic suspension, expulsion, ESOS reporting to Home Affairs, visa cancellation, scholarship termination"
+      },
+      "rules": [
+        {
+          "rule": "Forms of Academic Misconduct",
+          "details": [
+            "Plagiarism: presenting someone else's words, ideas, or work as your own without appropriate citation — includes direct copying, close paraphrasing without attribution, and self-plagiarism (submitting your own prior work in a new course without disclosure)",
+            "Collusion: working with another student on an individually assessed task, or sharing your work in a way that enables copying",
+            "Contract cheating: paying or arranging for another person to complete your assessment — this is illegal in all Australian states and territories under education legislation, not just a policy violation",
+            "Data fabrication: inventing or altering experimental results, data, or references in academic work",
+            "Unauthorized AI use: submitting AI-generated content as your own work where the unit policy prohibits AI — universities are actively updating AI policies; check your unit outline for each assessment task",
+            "Impersonation: sitting an exam or completing an assessment on behalf of another student"
+          ],
+          "authorizationSources": ["Your university's Academic Integrity Policy (published on your university website)"],
+          "commonViolations": [
+            {
+              "text": "Paraphrasing without citation, assuming rewording avoids plagiarism",
+              "consequence": "Plagiarism finding even if Turnitin similarity score is low"
+            },
+            {
+              "text": "Using an AI tool to draft or edit assessed work without checking if it is permitted",
+              "consequence": "Academic misconduct finding under the unit's AI policy"
+            }
+          ]
+        },
+        {
+          "rule": "Turnitin and AI Detection",
+          "details": [
+            "Most Australian universities require submission through Turnitin or a similar text-matching tool",
+            "Turnitin generates a Similarity Report — a high similarity score does not automatically mean misconduct, but will be reviewed; a low score does not protect against plagiarism findings if sources are not cited",
+            "AI detection tools are increasingly used alongside Turnitin — capabilities are improving rapidly",
+            "Paraphrasing without citation is still plagiarism regardless of similarity score"
+          ],
+          "authorizationSources": ["Your unit/course outline for each assessment"]
+        },
+        {
+          "rule": "Investigation and Penalty Process",
+          "details": [
+            "If misconduct is suspected, your lecturer refers the matter to the Academic Integrity Officer or a designated committee",
+            "You will be notified in writing and given an opportunity to respond before any penalty is imposed",
+            "You have the right to bring a support person (e.g., a Student Association representative) to any formal meeting",
+            "Penalties range by severity: educational intervention (first minor offense), assignment resubmission, grade penalty (fail for the assessment), fail for the entire course, academic suspension, or expulsion",
+            "Findings are recorded on your academic file",
+            "You have the right to appeal the outcome through your university's formal appeals process — exercise this right if you believe the finding was incorrect"
+          ],
+          "authorizationSources": ["Your university's Academic Integrity Policy and Student Misconduct Procedure"]
+        },
+        {
+          "rule": "Visa and Scholarship Implications",
+          "details": [
+            "If you are suspended or expelled, your education provider must report this to the Department of Home Affairs under the ESOS Act — this triggers a Notice of Intention to Cancel (NOIC) your student visa",
+            "CoE cancellation following expulsion means you will likely be required to leave Australia",
+            "Report any academic misconduct finding to MoHE within the timeframe in your scholarship agreement — typically within 30 days; failure to report is a separate scholarship violation",
+            "MoHE may suspend your scholarship upon receiving an adverse academic integrity finding pending investigation"
+          ],
+          "authorizationSources": ["ESOS Act 2000", "MoHE Scholarship Agreement"]
+        },
+        {
+          "rule": "Avoiding Academic Misconduct",
+          "details": [
+            "Always cite sources — including paraphrased ideas — using the referencing style specified in your unit outline (APA, Harvard, IEEE, etc.)",
+            "Check your unit outline for the AI tool policy before every assessment task — rules vary by unit and assessment type",
+            "Use your university's Academic Skills or Writing Centre for help with academic writing — this is legitimate support and is not misconduct",
+            "If you are struggling academically, seek help early — tutors, academic advisors, and learning support services are available and confidential",
+            "If unsure whether a specific action constitutes misconduct, ask your lecturer before submitting — the question itself is never penalized"
+          ]
+        }
+      ],
+      "resources": {
+        "links": [
+          {
+            "title": "Academic Integrity — TEQSA",
+            "url": "https://www.teqsa.gov.au/guides-resources/resources/good-practice-note/good-practice-note-academic-integrity",
+            "description": "National framework for academic integrity at Australian higher education providers"
+          }
+        ]
+      },
+      "complianceNotes": [
+        "Contract cheating is illegal — using essay writing services is a criminal offense in Australia, not just a rule violation",
+        "AI policies are changing rapidly — always read the specific unit outline before using any AI tool in an assessment; course-level blanket policies do not override unit-level restrictions",
+        "If a misconduct finding is made, notify MoHE immediately — delayed disclosure is treated more seriously than proactive notification"
+      ]
+    },
+    {
+      "id": "AU-HOUSING-FINANCES-2026",
+      "title": "Housing, Banking, and Financial Essentials — Australia",
+      "effectiveDate": "2025-01-01",
+      "summary": "Practical guidance for Omani students on securing accommodation, understanding Australian tenancy rights, opening a bank account, and managing living costs. On-campus accommodation is limited and competitive; most students rent privately. Australian tenancy legislation protects renters' rights. Opening a bank account should be a first-week priority to receive your MoHE stipend.",
+      "scope": {
+        "appliesTo": ["All Omani students arriving in Australia"],
+        "riskLevel": "Low",
+        "complianceTier": "Advisory Support",
+        "geographicScope": "Australia",
+        "failureImpact": "Housing insecurity, unprotected rental bond, delays to stipend payments"
+      },
+      "rules": [
+        {
+          "rule": "Accommodation Options",
+          "details": [
+            "On-campus accommodation (residential colleges, student halls): limited places, apply early — some providers take applications up to 12 months before course start; expensive but all-inclusive",
+            "Off-campus private rental: the most common option; rental markets in Sydney, Melbourne, and Brisbane are competitive — begin searching 4–8 weeks before arrival and book temporary accommodation for your first 1–2 weeks",
+            "Student share houses: cost-effective and common; check your university's accommodation notice board, UniLodge, or Facebook groups specific to your university",
+            "Homestay: living with an Australian family, arranged through your university or specialist providers — good for first semester if you want a structured environment on arrival",
+            "Never sign a lease or pay a deposit without viewing the property (in person or video call) and receiving a formal written lease agreement",
+            "Do not pay rent or a bond to any landlord before you have a signed lease — advance payments without a lease are unprotected"
+          ],
+          "controls": [
+            "Apply to on-campus housing from the day you accept your offer — do not wait",
+            "Book 1–2 weeks of short-term accommodation (Airbnb, serviced apartment) before securing a long-term lease so you can inspect properties in person"
+          ]
+        },
+        {
+          "rule": "Rental Tenancy Rights and Bond",
+          "details": [
+            "Australian residential tenancies are governed by state and territory legislation — your rights apply regardless of what the lease says; landlords cannot contract out of statutory protections",
+            "Rental bond is typically 4 weeks' rent and must be lodged with the state rental bond authority (not held by the landlord): NSW Fair Trading, RTBA (Victoria), RTA (Queensland), Consumer and Business Services (SA), Consumer Protection WA — confirm for your state",
+            "Complete a Condition Report at the start of your tenancy — document all existing damage in writing and photographs before moving in, and return a signed copy to your landlord within the required period",
+            "Landlord entry: in most states, your landlord must give at least 24 hours' written notice before entering your rental property (except genuine emergencies)",
+            "Repairs: your landlord is legally responsible for urgent repairs — contact them in writing immediately and keep a record; if not resolved, escalate to your state tenancy tribunal",
+            "When vacating: bond is refunded once the property is returned in the same condition as at move-in (normal wear and tear excepted) — photograph the property at move-out as evidence"
+          ],
+          "authorizationSources": ["Your state or territory Residential Tenancies Act — check your state government website for the applicable legislation"]
+        },
+        {
+          "rule": "Opening an Australian Bank Account",
+          "details": [
+            "Open a bank account in your first week — you need one to receive your MoHE stipend and to pay rent",
+            "Major banks: Commonwealth Bank (CBA), ANZ, Westpac, NAB — all offer student accounts with low or no monthly fees",
+            "Most major banks allow you to open an account online before arriving in Australia and verify your identity when you present to a branch upon arrival",
+            "Documents typically required: valid passport, visa confirmation (printout of your VEVO result), proof of enrolment, and an Australian address",
+            "Send your Australian bank account BSB and account number to MoHE as soon as the account is open to avoid delays to your first stipend payment",
+            "Apply for your TFN in parallel with opening your bank account — the bank needs it to avoid withholding tax on any interest"
+          ],
+          "controls": [
+            "Do not use high-fee international money transfer services to receive your stipend — ensure MoHE has your Australian account details promptly",
+            "Enable two-factor authentication on your banking app immediately after setup"
+          ]
+        },
+        {
+          "rule": "Cost of Living — Australia (2025 Estimates)",
+          "details": [
+            "Australia is among the more expensive study destinations — budget carefully from before you arrive",
+            "Rent (shared accommodation): approximately AUD $250–$450 per week for a room in a shared house in Sydney or Melbourne; lower in Brisbane, Adelaide, Perth, and regional cities",
+            "Groceries: approximately AUD $80–$150 per week for one person depending on dietary requirements — Aldi, Coles, and Woolworths are the main supermarkets; halal products are available at IGA and specialty stores in all major cities",
+            "Public transport: approximately AUD $50–$80 per week using city smartcard systems (Opal in Sydney, Myki in Melbourne, Go Card in Brisbane) — student concession fares are available with your university student ID card",
+            "Your MoHE stipend is intended to cover your living costs; if you are finding it insufficient, contact MoHE Scholarship Department promptly about your situation before taking on excessive work hours that could breach your visa"
+          ]
+        }
+      ],
+      "contacts": {
+        "Tenancy_Authorities": {
+          "name": "State Tenancy Authorities",
+          "description": "Each state has a free tenancy authority for bond disputes and advice: NSW Fair Trading (fairtrading.nsw.gov.au), Consumer Affairs Victoria (consumer.vic.gov.au), RTA Queensland (rta.qld.gov.au), Consumer and Business Services SA (cbs.sa.gov.au), Consumer Protection WA (commerce.wa.gov.au)"
+        }
+      },
+      "resources": {
+        "links": [
+          {
+            "title": "Study Australia — Accommodation",
+            "url": "https://www.studyaustralia.gov.au/en/live-and-work/accommodation",
+            "description": "Overview of accommodation options for international students"
+          },
+          {
+            "title": "Study Australia — Cost of Living",
+            "url": "https://www.studyaustralia.gov.au/en/plan-your-move/cost-of-living",
+            "description": "Official cost-of-living estimates for international students in Australia"
+          }
+        ]
+      },
+      "complianceNotes": [
+        "Your rental bond must be lodged with the state rental bond authority — if a landlord insists on holding the bond personally, this is illegal; do not sign the lease under those terms",
+        "Notify MoHE of your Australian residential address immediately upon arrival — this may be required under your scholarship agreement",
+        "Open your bank account and send the BSB and account number to MoHE in week one — stipend payments cannot be processed without a valid Australian account"
+      ]
     }
   ],
   "globalReferences": {
