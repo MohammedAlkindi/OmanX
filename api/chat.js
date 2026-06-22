@@ -153,10 +153,88 @@ function isCompliance(message) {
   return COMPLIANCE_TRIGGERS.some((t) => q.includes(t));
 }
 
+// ── TF-IDF KB Search ─────────────────────────────────────────────────────────
+
+const STOP_WORDS = new Set([
+  "a","an","the","and","or","but","in","on","at","to","for","of","with",
+  "is","are","was","were","be","been","being","have","has","had","do","does",
+  "did","will","would","could","should","may","might","shall","can",
+  "this","that","these","those","it","its","their","they","them","we","our",
+  "you","your","he","she","his","her","if","as","by","from","not","no",
+  "also","all","any","each","than","up","out","so","about","after","before",
+  "between","both","during","per","re","ve","about","into","through","such",
+]);
+
+// Recursively extract human-readable strings from a KB document object,
+// skipping URLs and very short fragments.
+function extractText(obj) {
+  const parts = [];
+  function walk(v) {
+    if (typeof v === "string") {
+      if (v.length > 3 && !v.startsWith("http")) parts.push(v);
+    } else if (Array.isArray(v)) {
+      v.forEach(walk);
+    } else if (v && typeof v === "object") {
+      Object.values(v).forEach(walk);
+    }
+  }
+  walk(obj);
+  return parts.join(" ");
+}
+
+function tokenize(text) {
+  return text.toLowerCase()
+    .replace(/([a-z0-9])-([a-z0-9])/g, "$1$2") // join hyphens: f-1→f1, i-20→i20
+    .replace(/[^a-z0-9]/g, " ")
+    .split(/\s+/)
+    .filter((t) => t.length > 1 && !STOP_WORDS.has(t));
+}
+
+function buildTFIDF(docs) {
+  const docTokens = docs.map((doc) => tokenize(extractText(doc)));
+  const N = docTokens.length;
+
+  // Document frequency → smoothed IDF
+  const df = {};
+  for (const tokens of docTokens) {
+    for (const t of new Set(tokens)) df[t] = (df[t] || 0) + 1;
+  }
+  const idf = {};
+  for (const [t, d] of Object.entries(df)) {
+    idf[t] = Math.log((N + 1) / (d + 1)) + 1;
+  }
+
+  // Per-document TF-IDF vectors
+  const vectors = docTokens.map((tokens) => {
+    const tf = {};
+    for (const t of tokens) tf[t] = (tf[t] || 0) + 1;
+    const len = tokens.length || 1;
+    const vec = {};
+    for (const [t, c] of Object.entries(tf)) vec[t] = (c / len) * (idf[t] || 0);
+    return vec;
+  });
+
+  return { idf, vectors };
+}
+
+function cosineSimilarity(vecA, vecB) {
+  let dot = 0, normA = 0, normB = 0;
+  for (const [t, a] of Object.entries(vecA)) {
+    dot += a * (vecB[t] || 0);
+    normA += a * a;
+  }
+  for (const b of Object.values(vecB)) normB += b * b;
+  if (!normA || !normB) return 0;
+  return dot / (Math.sqrt(normA) * Math.sqrt(normB));
+}
+
+// TF-IDF index cache keyed by document fingerprint (count + boundary IDs).
+// Rebuilt automatically when the KB is hot-reloaded.
+const _tfidfCache = new Map();
+
 function searchKB(knowledgeJson, query) {
   if (!knowledgeJson) return [];
-  const q = query.toLowerCase();
-  const results = [];
+
   const docs = Array.isArray(knowledgeJson.documents)
     ? knowledgeJson.documents
     : Object.entries(knowledgeJson)
@@ -165,15 +243,46 @@ function searchKB(knowledgeJson, query) {
           id: k,
           ...(typeof v === "object" && v !== null ? v : { content: v }),
         }));
-  for (const doc of docs) {
-    if (!doc) continue;
-    const text = JSON.stringify(doc).toLowerCase();
-    const score = COMPLIANCE_TRIGGERS.filter(
-      (t) => q.includes(t) && text.includes(t)
-    ).length;
-    if (score > 0) results.push({ doc, score, id: doc.id || "unknown" });
+
+  if (!docs.length) return [];
+
+  // Phase 1: keyword matching — high-precision path for explicit compliance vocabulary.
+  // Uses COMPLIANCE_TRIGGERS so domain terms always win over incidental token overlap.
+  const qLower = query.toLowerCase();
+  const kwResults = docs
+    .map((doc) => {
+      const text = extractText(doc).toLowerCase();
+      const score = COMPLIANCE_TRIGGERS.filter((t) => qLower.includes(t) && text.includes(t)).length;
+      return { doc, score, id: doc.id || "unknown" };
+    })
+    .filter((r) => r.score > 0)
+    .sort((a, b) => b.score - a.score);
+
+  if (kwResults.length > 0) return kwResults.slice(0, 3);
+
+  // Phase 2: TF-IDF fallback — surfaces relevant documents for paraphrased queries
+  // that contain no explicit compliance trigger words.
+  const cacheKey = `${docs.length}:${docs[0]?.id}:${docs[docs.length - 1]?.id}`;
+  if (!_tfidfCache.has(cacheKey)) {
+    _tfidfCache.set(cacheKey, buildTFIDF(docs));
+    if (_tfidfCache.size > 20) _tfidfCache.delete(_tfidfCache.keys().next().value);
   }
-  return results.sort((a, b) => b.score - a.score).slice(0, 3);
+  const { idf, vectors } = _tfidfCache.get(cacheKey);
+
+  const qTokens = tokenize(query);
+  const qTF = {};
+  for (const t of qTokens) qTF[t] = (qTF[t] || 0) + 1;
+  const qLen = qTokens.length || 1;
+  const qVec = {};
+  for (const [t, c] of Object.entries(qTF)) {
+    if (idf[t]) qVec[t] = (c / qLen) * idf[t];
+  }
+
+  return docs
+    .map((doc, i) => ({ doc, score: cosineSimilarity(qVec, vectors[i]), id: doc.id || "unknown" }))
+    .filter((r) => r.score > 0.01)
+    .sort((a, b) => b.score - a.score)
+    .slice(0, 3);
 }
 
 async function webSearch(query) {
