@@ -896,12 +896,12 @@ select:focus {
 
 /* CTA band — dark strip */
 .cta-band {
-  background: var(--ink);
+  background: var(--black);
   padding: var(--section-pad) 0;
 }
 
 .cta-band h2,
-.cta-band p { color: var(--white); }
+.cta-band p { color: #fafaf8; }
 
 .cta-band p { color: rgba(250,250,248,0.6); margin-top: 12px; }
 
