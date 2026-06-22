@@ -2145,6 +2145,38 @@ select:focus {
   background: var(--sand);
 }
 
+.feedback-buttons {
+  display: inline-flex;
+  gap: 2px;
+  align-items: center;
+}
+
+.feedback-btn {
+  font-family: var(--mono);
+  font-size: 0.6875rem;
+  color: var(--ink-4);
+  padding: 2px 5px;
+  border: 0.5px solid var(--border);
+  border-radius: var(--radius);
+  background: transparent;
+  cursor: pointer;
+  transition: color 0.15s, background 0.15s, border-color 0.15s;
+  line-height: 1;
+}
+
+.feedback-btn:hover:not(:disabled) {
+  color: var(--ink);
+  background: var(--sand);
+}
+
+.feedback-btn.feedback-submitted,
+.feedback-btn:disabled {
+  color: var(--gold);
+  border-color: var(--gold-light);
+  background: var(--gold-dim);
+  cursor: default;
+}
+
 .web-search-badge {
   font-family: var(--mono);
   font-size: 0.5625rem;
@@ -2313,6 +2345,44 @@ footer,
   clip: rect(0,0,0,0);
   white-space: nowrap;
   border: 0;
+}
+
+/* Demo / mock data banner */
+.demo-banner {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  padding: 12px 24px;
+  background: rgba(201, 169, 110, 0.12);
+  border-bottom: 1px solid rgba(201, 169, 110, 0.3);
+  font-family: var(--sans);
+  font-size: 0.8125rem;
+  font-weight: 300;
+  color: var(--ink-2);
+  line-height: 1.5;
+}
+
+.demo-banner-icon {
+  flex-shrink: 0;
+  font-size: 0.9rem;
+  margin-top: 1px;
+  color: var(--gold);
+}
+
+.demo-banner strong {
+  font-weight: 500;
+  color: var(--ink);
+}
+
+.demo-label {
+  font-family: var(--mono);
+  font-size: 0.625rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--ink-4);
+  border: 0.5px solid var(--border-strong);
+  border-radius: 2px;
+  padding: 3px 8px;
 }
 
 /* mobile bottom nav (preserved for legacy pages) */

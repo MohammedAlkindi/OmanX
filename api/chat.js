@@ -329,7 +329,7 @@ export default async function handler(req, res) {
     return res.status(429).json({ error: "Too many requests. Please slow down.", text: "You've sent too many messages too quickly. Please wait a moment before trying again." });
   }
 
-  const { message, history, model: clientModel, conciseMode, userContext, language, webSearch: clientWebSearch } = req.body || {};
+  const { message, history, model: clientModel, conciseMode, userContext, language, webSearch: clientWebSearch, sessionId } = req.body || {};
 
   if (!message || typeof message !== "string") {
     return res.status(400).json({ error: "Missing 'message' string." });
@@ -347,6 +347,7 @@ export default async function handler(req, res) {
 
   const model = ALLOWED_MODELS.has(clientModel) ? clientModel : DEFAULT_MODEL;
   const sanitizedUserContext = userContext ? sanitizeMessage(String(userContext)).slice(0, 2000) : "";
+  const sanitizedSessionId = typeof sessionId === 'string' ? sessionId.slice(0, 64).replace(/[^a-z0-9\-]/g, '') : 'unknown';
   const useConcise = conciseMode === true;
   const responseLanguage = (typeof language === 'string' && language !== 'auto') ? language : null;
 
@@ -424,6 +425,7 @@ export default async function handler(req, res) {
     conciseMode: useConcise,
     hasUserContext: !!sanitizedUserContext,
     chars: sanitizedMessage.length,
+    sessionId: sanitizedSessionId,
   });
 
   if (wantsStream) {

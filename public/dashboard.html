@@ -8,7 +8,7 @@
     <link rel="icon" type="image/png" sizes="16x16" href="/assets/favicon-16x16.png" />
     <link rel="icon" type="image/svg+xml" href="/assets/icon.svg" />
     <link rel="manifest" href="/assets/site.webmanifest" />
-    <title>OmanX — Ministry Dashboard</title>
+    <title>OmanX — Dashboard Prototype (Demo)</title>
     <meta name="description" content="Ministry of Higher Education oversight dashboard for Omani scholars abroad." />
     <link rel="stylesheet" href="/styles.css" />
     <script defer src="/_vercel/insights/script.js"></script>
@@ -25,13 +25,18 @@
           <a class="nav-link" data-page-link="contact" href="/contact">Contact</a>
         </nav>
         <div class="nav-actions">
-          <span class="ministry-badge">Ministry of Higher Education</span>
+          <span class="ministry-badge demo-label">Prototype · Demo data</span>
           <a class="btn" href="/workspace">Scholar workspace</a>
         </div>
       </div>
     </header>
 
     <main class="dashboard-main">
+      <div class="demo-banner" role="alert" aria-live="polite">
+        <span class="demo-banner-icon">⚠</span>
+        <strong>Prototype demo — all data is simulated.</strong>
+        This dashboard displays illustrative mock data only. No real scholar records, compliance status, or financial figures are shown. Not affiliated with the Ministry of Higher Education.
+      </div>
       <div class="container">
 
         <!-- ── Dashboard header ───────────────────────────── -->
@@ -39,7 +44,7 @@
           <div>
             <div class="dash-breadcrumb">Oversight</div>
             <h1 class="dash-title">Scholar Cohort Dashboard</h1>
-            <p class="dash-subtitle">Academic Year 2024–2025 · United States · Last updated <span id="dash-updated">just now</span></p>
+            <p class="dash-subtitle">Academic Year 2024–2025 · United States · <span id="dash-updated">Simulated data</span></p>
           </div>
           <div class="dash-header-actions">
             <button class="btn-secondary" id="btn-export-report">Export report</button>
@@ -285,7 +290,7 @@
     <footer class="footer">
       <div class="container footer-row">
         <div>© <span data-year></span> OmanX</div>
-        <div>Ministry of Higher Education — Restricted access</div>
+        <div>OmanX prototype · Simulated data only</div>
       </div>
     </footer>
 

@@ -9,6 +9,7 @@ import chatHandler from './api/chat.js';
 import healthHandler from './api/health.js';
 import readyHandler from './api/ready.js';
 import metricsHandler from './api/metrics.js';
+import feedbackHandler from './api/feedback.js';
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const PORT = Number(process.env.PORT || 3000);
 
@@ -27,6 +28,7 @@ const ROUTE_METHODS = new Map([
   ['/settings', new Set(['GET'])],
   ['/collaboration', new Set(['GET'])],
   ['/api/chat', new Set(['POST'])],
+  ['/api/feedback', new Set(['POST'])],
   ['/api/health', new Set(['GET'])],
   ['/api/ready', new Set(['GET'])],
   ['/api/metrics', new Set(['GET'])],
@@ -50,6 +52,7 @@ app.use((req, res, next) => {
 
 // API Routes
 app.post('/api/chat', chatHandler);
+app.post('/api/feedback', feedbackHandler);
 app.get('/api/health', healthHandler);
 app.get('/api/ready', readyHandler);
 app.get('/api/metrics', metricsHandler);

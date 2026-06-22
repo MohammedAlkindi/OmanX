@@ -1,5 +1,5 @@
 import { initCore, qs, qsa, formatDateTime, formatRelative, showToast, uid, downloadFile, copyText, setTheme, getTheme } from './core.js';
-import { loadChats, saveChats, getActiveChatId, setActiveChatId, createChat, updateChat, deleteChat, loadSettings, saveSettings } from './chat-store.js';
+import { loadChats, saveChats, getActiveChatId, setActiveChatId, createChat, updateChat, deleteChat, loadSettings, saveSettings, getSessionId } from './chat-store.js';
 
 const prompts = [
   'Build me a pre-departure checklist for the 14 days before flying to the U.S.',
@@ -25,6 +25,8 @@ const state = {
 
 // Tracks which chatId is actively streaming; null when idle.
 let streamingChatId = null;
+
+const feedbackState = new Map(); // messageId -> 'up' | 'down'
 
 initCore({ page: 'chat' });
 ensureActiveChat();
@@ -434,7 +436,20 @@ function renderMessages() {
       <div class="message-meta">
         <span>${message.role === 'assistant' ? 'OmanX' : state.settings.studentName}</span>
         <span>${formatDateTime(message.createdAt)}</span>
-        ${message.role === 'assistant' ? `<span class="message-tools">${message.webSearched ? '<span class="web-search-badge" title="Live web search was used for this response">Web search</span>' : ''}<button type="button" data-copy-message="${message.id}">Copy</button></span>` : ''}
+        ${message.role === 'assistant' ? `
+          <span class="message-tools">
+            ${message.webSearched ? '<span class="web-search-badge" title="Live web search was used for this response">Web search</span>' : ''}
+            <button type="button" data-copy-message="${message.id}">Copy</button>
+            <span class="feedback-buttons" data-feedback-id="${message.id}">
+              <button type="button" class="feedback-btn ${feedbackState.get(message.id) === 'up' ? 'feedback-submitted' : ''}" data-feedback-up="${message.id}" title="Helpful" aria-label="Mark as helpful">
+                ${feedbackState.get(message.id) === 'up' ? '✓' : '↑'}
+              </button>
+              <button type="button" class="feedback-btn ${feedbackState.get(message.id) === 'down' ? 'feedback-submitted' : ''}" data-feedback-down="${message.id}" title="Not helpful" aria-label="Mark as not helpful">
+                ${feedbackState.get(message.id) === 'down' ? '✓' : '↓'}
+              </button>
+            </span>
+          </span>
+        ` : ''}
       </div>
     </article>
   `).join('');
@@ -453,6 +468,48 @@ function renderMessages() {
     button.addEventListener('click', async () => {
       const message = getActiveChat().messages.find((item) => item.id === button.dataset.copyMessage);
       if (message) await copyText(message.content, 'Message copied.');
+    });
+  });
+
+  qsa('[data-feedback-up], [data-feedback-down]', container).forEach((btn) => {
+    const messageId = btn.dataset.feedbackUp || btn.dataset.feedbackDown;
+    const rating = btn.dataset.feedbackUp ? 'up' : 'down';
+
+    if (feedbackState.has(messageId)) {
+      btn.disabled = true;
+      return;
+    }
+
+    btn.addEventListener('click', async () => {
+      if (feedbackState.has(messageId)) return;
+      feedbackState.set(messageId, rating);
+
+      qsa(`[data-feedback-up="${messageId}"], [data-feedback-down="${messageId}"]`, container).forEach((b) => {
+        b.disabled = true;
+        b.textContent = b.dataset[`feedback${rating === 'up' ? 'Up' : 'Down'}`] === messageId ? '✓' : '–';
+      });
+
+      renderMessages();
+
+      const chat = getActiveChat();
+      const message = chat.messages.find((m) => m.id === messageId);
+
+      try {
+        await fetch('/api/feedback', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            messageId,
+            chatId: chat.id,
+            sessionId: getSessionId(),
+            rating,
+            model: state.settings.model,
+            compliance: message?.content?.includes('DSO') || message?.content?.includes('SEVIS') || false,
+          }),
+        });
+      } catch {
+        // Silent — never interrupt the user for a feedback failure
+      }
     });
   });
 
@@ -525,7 +582,7 @@ async function streamAssistantReply(message) {
     const response = await fetch('/api/chat', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ message, history, model, conciseMode, userContext, language, webSearch: webSearch !== false, stream: true }),
+      body: JSON.stringify({ message, history, model, conciseMode, userContext, language, webSearch: webSearch !== false, stream: true, sessionId: getSessionId() }),
     });
 
     if (!response.ok) {

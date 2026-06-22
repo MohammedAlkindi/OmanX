@@ -271,7 +271,7 @@ function bindTabs() {
 
 function bindExport() {
   document.getElementById('btn-export-report')?.addEventListener('click', () => {
-    alert('In production, this generates a PDF report for Ministry officials with full cohort compliance summary.');
+    alert('Export is not implemented in this prototype. In production, this would generate a PDF report with real scholar compliance data.');
   });
 }
 
@@ -287,7 +287,7 @@ function bindModalClose() {
 
 function setUpdatedTime() {
   const el = document.getElementById('dash-updated');
-  if (el) el.textContent = new Date().toLocaleString('en-GB', { dateStyle: 'medium', timeStyle: 'short' });
+  if (el) el.textContent = 'simulated data · not live';
 }
 
 // ── Init ─────────────────────────────────────────────────────────────────────

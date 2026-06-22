@@ -1,6 +1,16 @@
 import { uid } from './core.js';
 
 const CHATS_KEY = 'omanx.mindspace.chats.v1';
+const SESSION_KEY = 'omanx.session.id.v1';
+
+export function getSessionId() {
+  let id = localStorage.getItem(SESSION_KEY);
+  if (!id) {
+    id = `anon-${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 9)}`;
+    localStorage.setItem(SESSION_KEY, id);
+  }
+  return id;
+}
 const ACTIVE_KEY = 'omanx.mindspace.active.v1';
 const SETTINGS_KEY = 'omanx.settings.v1';
 
