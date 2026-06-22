@@ -444,7 +444,15 @@ export default async function handler(req, res) {
         }
       }
       if (cacheKey) cacheSet(cacheKey, fullText.trim());
-      res.write(`data: ${JSON.stringify({ done: true, compliance, webSearched: webResults.length > 0 })}\n\n`);
+      const sources = [
+        ...kbResults.map(r => ({ type: 'kb', id: r.id, title: r.doc.title || r.doc.topic || r.id })),
+        ...webResults.map(r => {
+          let domain = r.url;
+          try { domain = new URL(r.url).hostname.replace(/^www\./, ''); } catch {}
+          return { type: 'web', title: r.title, url: r.url, domain };
+        }),
+      ];
+      res.write(`data: ${JSON.stringify({ done: true, compliance, webSearched: webResults.length > 0, sources })}\n\n`);
       res.end();
     } catch (err) {
       console.error("[OmanX] Anthropic stream error:", err?.message);

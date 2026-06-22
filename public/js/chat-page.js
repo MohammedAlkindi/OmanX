@@ -433,6 +433,7 @@ function renderMessages() {
   container.innerHTML = chat.messages.map((message) => `
     <article class="message ${message.role}">
       <div class="message-bubble">${message.role === 'assistant' ? renderRichText(message.content) : renderUserText(message.content)}</div>
+      ${message.role === 'assistant' ? renderSources(message.sources) : ''}
       <div class="message-meta">
         <span>${message.role === 'assistant' ? 'OmanX' : state.settings.studentName}</span>
         <span>${formatDateTime(message.createdAt)}</span>
@@ -547,6 +548,7 @@ async function streamAssistantReply(message) {
 
   let fullText = '';
   let didWebSearch = false;
+  let didSources = [];
   let bubbleEl = null;
   let rafPending = false;
 
@@ -607,7 +609,7 @@ async function streamAssistantReply(message) {
             const data = JSON.parse(line.slice(6));
             if (data.error) { fullText = `**Error:** ${data.error}`; break; }
             if (data.t) { fullText += data.t; scheduleRender(); }
-            if (data.done && data.webSearched) didWebSearch = true;
+            if (data.done) { if (data.webSearched) didWebSearch = true; if (data.sources) didSources = data.sources; }
           } catch { /* malformed SSE line */ }
         }
       }
@@ -622,7 +624,7 @@ async function streamAssistantReply(message) {
   // Use the captured chat.id so the response always saves to the originating chat
   // even if the user switched conversations mid-stream.
   qs('[data-stream-bubble]')?.remove();
-  appendMessage('assistant', fullText.trim() || 'No response generated.', chat.id, { webSearched: didWebSearch });
+  appendMessage('assistant', fullText.trim() || 'No response generated.', chat.id, { webSearched: didWebSearch, sources: didSources });
   setTyping(false);
 }
 
@@ -721,4 +723,15 @@ function renderRichText(content) {
 
 function renderUserText(content) {
   return escapeHtml(content).replace(/\n/g, '<br>');
+}
+
+function renderSources(sources) {
+  if (!sources?.length) return '';
+  const chips = sources.map(s => {
+    if (s.type === 'kb') {
+      return `<span class="source-chip source-chip-kb" title="${escapeHtml(s.id)}">${escapeHtml(s.title || s.id)}</span>`;
+    }
+    return `<a class="source-chip source-chip-web" href="${escapeHtml(s.url)}" target="_blank" rel="noopener noreferrer" title="${escapeHtml(s.title)}">${escapeHtml(s.domain)}</a>`;
+  }).join('');
+  return `<div class="message-sources"><span class="sources-label">Sources</span>${chips}</div>`;
 }
