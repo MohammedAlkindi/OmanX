@@ -1,178 +1,125 @@
-# OmanX Repository Architecture
+# OmanX Architecture
 
-This document describes the current codebase structure of OmanX.
-
-The architecture follows a lightweight Express + serverless deployment model optimized for Vercel.
+This document describes the system as it actually runs in production today. There is
+no authentication, no database, and no rule engine — those appear in older docs and in
+[enterprise-platform-blueprint.md (removed)](#) as future ideas, not current behavior.
+If a doc in this repo contradicts this file, this file wins.
 
 ---
 
-## Root Directory
+## Summary
 
+OmanX is a single chat endpoint backed by Anthropic's Claude, with an optional Tavily
+web-search assist for compliance-sensitive questions, fronted by a static, no-build
+vanilla-JS site. There is no login, no per-user accounts, and no server-side storage —
+all chat history and settings live in the browser's `localStorage`.
+
+## Directory layout
+
+```
 .
-├── api/  
-├── data/  
-├── docs/  
-├── public/  
-├── node_modules/  
-├── .env  
-├── .gitignore  
-├── app.js  
-├── index.html  
-├── package.json  
-├── package-lock.json  
-├── README.md  
-├── server.js  
-├── styles.css  
-├── vercel.json  
+├── api/
+│   ├── chat.js        # Main chat handler: RAG, Tavily search, SSE streaming, rate limit, cache
+│   ├── health.js       # GET /api/health — liveness
+│   ├── ready.js        # GET /api/ready — readiness
+│   └── metrics.js      # GET /api/metrics — process uptime/memory (no dashboard wired up)
+├── config/
+│   └── env.js          # Loads .env from project root for local dev (server.js only)
+├── data/
+│   ├── us.json          # US compliance knowledge base
+│   ├── uk.json          # UK compliance knowledge base
+│   ├── au.json          # AU compliance knowledge base
+│   └── mohe.json         # Omani MoHE rules, merged into every destination
+├── public/
+│   ├── index.html, chat.html, dashboard.html, system.html, method.html,
+│   │   vision.html, contact.html, examples.html, trust.html, settings.html,
+│   │   collaboration.html, 404.html, 405.html, 500.html
+│   ├── styles.css       # Single global stylesheet (CSS variables in :root)
+│   ├── app.js
+│   └── js/
+│       ├── core.js              # Shared utilities (uid, toast, theme, etc.)
+│       ├── chat-store.js        # localStorage persistence for chats + settings
+│       ├── chat-page.js         # Chat UI — rendering, settings, SSE streaming
+│       └── <page>-page.js       # One controller per static page (landing, settings, trust, ...)
+├── server.js            # Express app — local dev entry point, mirrors vercel.json routing
+├── vercel.json           # Production routing: /api/* → serverless functions, rest → public/
+└── package.json
+```
 
----
+There is no `auth/` directory and no `Supabase` dependency anywhere in this repo —
+`config/env.js` only loads `.env` for local dev.
 
-## /api
+## Request flow
 
-Serverless entrypoints for Vercel deployment.
+**Everyday question** (e.g. "best halal food near campus"):
+`Browser → POST /api/chat → Claude (Sonnet 4.6 or Haiku 4.5) → SSE stream → Browser`
 
-Each file exports a handler function. These routes forward requests to the main Express app.
+**Compliance question** (e.g. "can I work off-campus on OPT"):
+1. `isCompliance()` flags the message from a keyword list (visa, OPT, SEVIS, DSO, tax, ...).
+2. `detectDestination()` picks US/UK/AU from message + stored user context; the matching
+   `data/<dest>.json` is merged with `data/mohe.json` as grounding context.
+3. If `TAVILY_API_KEY` is set, a parallel web search runs restricted to a fixed list of
+   government domains (`uscis.gov`, `gov.uk`, `homeaffairs.gov.au`, etc.); results are cited
+   inline. Without a key, the system silently falls back to the static KB only.
+4. Claude streams the answer back over SSE (`text/event-stream`); responses for compliance
+   queries are not cached (everyday queries use a small in-memory cache, since this is a
+   single-process model — it does not survive a serverless cold start or scale across instances).
 
-api/
-├── chat.js        → Main AI chat endpoint  
-├── health.js      → Liveness check  
-├── metrics.js     → Observability / request metrics  
-└── ready.js       → Readiness probe  
+## API endpoints
 
-Purpose:
-- Enables serverless routing on Vercel
-- Separates infrastructure endpoints from core logic
-- Keeps deployment layer isolated
+| Route | Method | Purpose |
+|---|---|---|
+| `/api/chat` | POST | The only application endpoint. No auth header, no session. |
+| `/api/health` | GET | Liveness probe — static `{ ok: true }`. |
+| `/api/ready` | GET | Readiness probe — static `{ ready: true }`. |
+| `/api/metrics` | GET | Process uptime/memory snapshot. Not wired to any dashboard or alerting. |
 
----
+All page routes (`/`, `/chat`, `/system`, `/method`, `/vision`, `/contact`, `/examples`,
+`/trust`, `/settings`, `/collaboration`, `/dashboard`) serve static HTML from `public/`.
+`/dashboard` is a static informational page — it is not an authenticated admin console.
 
-## /data
+## Request-level controls in `api/chat.js`
 
-Static knowledge layer.
+- **Rate limiting**: in-memory, per-IP, 20 requests / 60s window. Resets on process
+  restart and is not shared across serverless instances.
+- **CORS**: if `ALLOWED_ORIGIN` is set, only that exact origin gets
+  `Access-Control-Allow-Origin`; otherwise the header is omitted. There is no Express
+  `cors` or `helmet` middleware in use.
+- **Input limits**: message capped at 10,000 characters; last 20 turns of history kept;
+  control characters stripped via `sanitizeMessage()`.
+- **Model allowlist**: only `claude-sonnet-4-6` and `claude-haiku-4-5-20251001` are
+  accepted from the client; anything else falls back to `DEFAULT_MODEL`.
 
-data/
-└── knowledge.json
+## Frontend
 
-Purpose:
-- Deterministic knowledge base
-- Used for compliance-grounded responses
-- Allows auditable policy references
+Vanilla JS ES modules, no bundler, no framework — loaded directly by the browser.
+`public/js/chat-store.js` persists chats and the `omanx.settings.v1` settings object
+(`studentName`, `model`, `language`, `conciseMode`, `webSearch`, `dataConsent`) to
+`localStorage`. There is no server-side user record anywhere.
 
-This layer should remain read-only in production.
+## Local development
 
----
+```bash
+npm install
+npm run dev   # node --watch server.js, http://localhost:3000
+```
 
-## /docs
+`server.js` is an Express app that imports the same handlers as the Vercel functions
+(`api/chat.js`, `api/health.js`, `api/ready.js`, `api/metrics.js`) and serves `public/`
+directly, so local dev and production exercise the same handler code.
 
-Project documentation.
+## Deployment
 
-docs/
-└── architecture.md
+Vercel. `vercel.json` routes `/api/*` to the serverless functions in `api/` and
+everything else to static files in `public/`, with explicit rewrites for the clean
+(no-`.html`) page URLs. See [deployment.md](deployment.md) for environment variables
+and the rollout checklist.
 
-Purpose:
-- Technical documentation
-- System reasoning
-- Design decisions
+## Explicitly out of scope (do not reintroduce in docs without shipping the code first)
 
----
+- No authentication of any kind — no Supabase, no OAuth, no magic links, no sessions, no cookies.
+- No database — `localStorage` is the only persistence layer.
+- No deterministic rule/decision engine, no policy versioning, no audit log, no multi-tenancy.
+- No `OpenAI` dependency — the only LLM provider is Anthropic.
 
-## /public
-
-Static assets served to the browser.
-
-public/
-├── favicon-16x16.png  
-├── favicon-32x32.png  
-├── favicon.ico  
-├── icon.svg  
-└── site.webmanifest  
-
-Purpose:
-- Branding assets
-- PWA support
-- Browser metadata
-
----
-
-## Frontend Layer
-
-index.html  
-styles.css  
-app.js  
-
-Purpose:
-- Minimal client-side interface
-- Sends requests to /api/chat
-- Renders AI responses
-- No framework dependency
-
-This is intentionally lightweight for MVP clarity.
-
----
-
-## Backend Layer
-
-server.js  
-
-Purpose:
-- Express server
-- Middleware (security, logging, rate limiting)
-- OpenAI integration
-- Deterministic routing logic
-- Knowledge loading
-- Compliance controls
-
-This is the core application logic.
-
----
-
-## Configuration
-
-.env  
-- API keys  
-- Model selection  
-- Environment flags  
-
-vercel.json  
-- Serverless routing config  
-- Deployment behavior  
-
-package.json  
-- Dependencies  
-- Scripts  
-- Runtime configuration  
-
----
-
-## Architectural Characteristics
-
-- API-first design
-- Serverless-compatible
-- Deterministic knowledge layer
-- Lightweight frontend
-- Single responsibility per directory
-- Clean separation between infrastructure and logic
-
----
-
-## Design Philosophy
-
-The repository prioritizes:
-
-- Auditability
-- Deployment simplicity
-- Minimal surface area
-- Clear boundary between static knowledge and generative logic
-- Infrastructure isolation via /api
-
-The system is intentionally simple to reduce operational fragility during MVP phase.
-
-Future scaling would likely introduce:
-
-- /services layer
-- /lib utilities
-- Database abstraction
-- Structured logging pipeline
-- Typed schemas
-
-But current structure is appropriate for an MVP.
+If any of the above gets built, update this file in the same change.

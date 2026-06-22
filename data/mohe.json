@@ -113,7 +113,7 @@
           "title": "Scholarship Department",
           "office": "Al Khuwair, Muscat, Oman",
           "email": "scholarships@mohe.gov.om",
-          "phone": "+968 24 123456",
+          "phone_note": "Phone number not verified. Use the official MoHE portal or email to reach the Scholarship Department.",
           "hours": "Sunday-Thursday 7:30am-2:30pm (Oman Time)"
         },
         "Omani_Cultural_Attache": {
@@ -127,14 +127,14 @@
       "resources": {
         "links": [
           {
-            "title": "MoHE Scholarship Portal",
-            "url": "https://scholarships.mohe.gov.om",
-            "description": "Official portal for scholarship management and reporting"
+            "title": "Omani Ministry of Higher Education",
+            "url": "https://www.mohe.gov.om",
+            "description": "Official MoHE portal. Navigate to the Scholarships section for student-specific guidance."
           },
           {
-            "title": "Omani Student Affairs - Washington DC",
-            "url": "https://www.omanembassy.org/student-affairs",
-            "description": "Embassy resources for Omani students in USA"
+            "title": "Embassy of Oman in Washington D.C.",
+            "url": "https://www.omanembassy.org",
+            "description": "Contact the Cultural Attaché office for student affairs assistance."
           }
         ],
         "forms": [
@@ -143,14 +143,13 @@
           "Emergency Funding Request Form",
           "Leave of Absence Request Form",
           "Post-Graduation Service Commitment Acknowledgment"
-        ],
-        "portal": "https://scholarships.mohe.gov.om/student-portal"
+        ]
       },
       "complianceNotes": [
         "All MoHE communications must be in Arabic or formal English",
         "Keep copies of all correspondence for minimum 5 years",
         "Report any legal or immigration issues to MoHE within 24 hours",
-        "MoHE approval required for: marriage, childbirth, major purchases (>$5,000)",
+        "Contact MoHE directly to confirm which personal decisions require prior approval — requirements vary by scholarship cohort and agreement year.",
         "Annual physical presence verification required during summer breaks"
       ]
     }

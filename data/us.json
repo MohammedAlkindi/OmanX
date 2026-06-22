@@ -3,7 +3,7 @@
     "version": "3.0.0",
     "lastUpdated": "2026-06-10",
     "authority": "Official Compliance Database v2",
-    "validityPeriod": "Academic Year 2024-2025",
+    "validityPeriod": "Academic Year 2025-2026",
     "updateFrequency": "Quarterly",
     "totalDocuments": 11,
     "targetAudience": "Omani Scholars in United States"
@@ -12,8 +12,8 @@
     {
       "id": "F1-EMP-2024",
       "title": "F-1 Employment Authorization — Official",
-      "effectiveDate": "2024-01-01",
-      "expiryDate": "2024-12-31",
+      "effectiveDate": "2026-01-01",
+      "expiryDate": "2026-12-31",
       "summary": "All employment for F-1 students is prohibited unless explicitly authorized in advance by the DSO and/or USCIS. Unauthorized work is a severe status violation. Different work types have distinct rules, application windows, and limitations.",
       "scope": {
         "appliesTo": [
@@ -230,19 +230,13 @@
         }
       ],
       "contacts": {
-        "primaryDSO": {
-          "name": "International Student Services Office",
-          "title": "Designated School Official",
-          "office": "Student Services Building, Room 301",
-          "email": "isso@university.edu",
-          "phone": "(555) 123-4567",
-          "hours": "M-F 9am-5pm"
+        "DSO": {
+          "name": "Designated School Official (DSO)",
+          "description": "Contact your university's International Student Services Office (ISSO). Search '[your university name] international student office' to find their direct contact page, email, and appointment booking."
         },
-        "employmentOffice": {
+        "Employment_Office": {
           "name": "Student Employment Center",
-          "title": "On-Campus Employment Coordinator",
-          "office": "Career Center, Room 102",
-          "email": "oncampus-jobs@university.edu"
+          "description": "Contact your university's Student Employment Center or Career Services office. Search '[your university name] student employment' or '[your university name] career center' to find their direct contact page."
         }
       },
       "resources": {
@@ -268,8 +262,7 @@
           "University CPT Application Form",
           "On-Campus Employment Authorization Request",
           "I-983 Training Plan for STEM OPT"
-        ],
-        "portal": "https://university.edu/student-employment"
+        ]
       },
       "complianceNotes": [
         "MoHE scholarship recipients must obtain additional approval for any employment",
@@ -468,12 +461,9 @@
         }
       ],
       "contacts": {
-        "DSO_Records": {
-          "name": "SEVIS Records Office",
-          "title": "DSO for I-20 Updates",
-          "office": "International Center, Room 205",
-          "email": "sevis-updates@university.edu",
-          "phone": "(555) 123-4568"
+        "DSO": {
+          "name": "Designated School Official (DSO) — SEVIS Records",
+          "description": "Contact your university's International Student Services Office (ISSO) for I-20 updates and SEVIS record changes. Search '[your university name] international student office' to find their direct contact page, email, and appointment booking."
         }
       },
       "resources": {
@@ -1006,39 +996,21 @@
       "contacts": {
         "University_Health_Center": {
           "name": "Student Health Services",
-          "title": "Medical Services for International Students",
-          "office": "Health Center Building, Room 100",
-          "email": "student-health@university.edu",
-          "phone": "(555) 123-4575",
-          "hours": "M-F 8am-6pm, Sat 9am-1pm"
+          "description": "Contact your university's Student Health Services or Health Center. Search '[your university name] student health services' to find their direct contact page, hours, and appointment booking."
         },
         "Insurance_Office": {
           "name": "International Student Insurance",
-          "title": "Insurance Coordinator",
-          "office": "Student Services, Room 210",
-          "email": "insurance-help@university.edu",
-          "phone": "(555) 123-4576"
+          "description": "Contact your university's International Student Insurance or Benefits office. Search '[your university name] international student insurance' to find their direct contact and claim procedures."
         },
         "Emergency_Mental_Health": {
-          "name": "Crisis Counseling Hotline",
-          "title": "24/7 Mental Health Support",
-          "phone": "(555) 273-TALK (8255)",
-          "description": "Confidential support for mental health emergencies"
+          "name": "Suicide and Crisis Lifeline",
+          "title": "24/7 Mental Health Crisis Support",
+          "phone": "988",
+          "description": "Dial or text 988 — Suicide and Crisis Lifeline. Free, 24/7. Available in English and Spanish."
         }
       },
       "resources": {
-        "links": [
-          {
-            "title": "University Health Services",
-            "url": "https://university.edu/health",
-            "description": "Campus health center services and appointments"
-          },
-          {
-            "title": "Insurance Claim Portal",
-            "url": "https://university.insuranceportal.com",
-            "description": "Submit and track insurance claims online"
-          }
-        ],
+        "links": [],
         "forms": [
           "Insurance Waiver Request Form",
           "Medical Leave of Absence Request",
@@ -1117,10 +1089,8 @@
       ],
       "contacts": {
         "University_Emergency": {
-          "name": "24/7 Emergency Line",
-          "title": "Campus Safety and Security",
-          "phone": "(555) 911-EMER (3637)",
-          "description": "Available 24/7 for all emergencies"
+          "name": "Campus Emergency Line",
+          "description": "Contact your university's campus safety or police department. Search '[your university name] campus police' or '[your university name] campus emergency' to find their 24/7 number."
         },
         "Omani_Embassy_Emergency": {
           "name": "Embassy of Oman - Washington DC",
@@ -1129,10 +1099,8 @@
           "hours": "24/7 for emergencies involving Omani citizens"
         },
         "DSO_Emergency": {
-          "name": "DSO Emergency Contact",
-          "title": "After-Hours Immigration Emergency",
-          "phone": "(555) 123-4599",
-          "description": "For status emergencies outside business hours"
+          "name": "DSO After-Hours Emergency",
+          "description": "Contact your university's International Student Services Office for their after-hours emergency line. Search '[your university name] international student office emergency' or check their website for an after-hours number."
         }
       }
     },
@@ -1213,31 +1181,15 @@
       "contacts": {
         "Academic_Integrity_Office": {
           "name": "Office of Academic Integrity",
-          "title": "Honor Code Administration",
-          "office": "Administration Building, Room 150",
-          "email": "integrity@university.edu",
-          "phone": "(555) 123-4580"
+          "description": "Contact your university's Office of Academic Integrity or Dean of Students. Search '[your university name] academic integrity office' to find their direct contact page, reporting procedures, and appointment booking."
         },
         "Writing_Center": {
           "name": "University Writing Center",
-          "title": "Citation and Research Help",
-          "office": "Library, Room 220",
-          "email": "writinghelp@university.edu"
+          "description": "Contact your university's Writing Center or Academic Support office. Search '[your university name] writing center' to find their hours, location, and appointment booking for citation and research help."
         }
       },
       "resources": {
-        "links": [
-          {
-            "title": "University Honor Code",
-            "url": "https://university.edu/honorcode",
-            "description": "Complete academic integrity policies"
-          },
-          {
-            "title": "Citation Style Guides",
-            "url": "https://university.edu/citation",
-            "description": "APA, MLA, Chicago style guides"
-          }
-        ]
+        "links": []
       },
       "complianceNotes": [
         "MoHE requires reporting of any academic integrity violations",
@@ -1320,21 +1272,16 @@
       ],
       "contacts": {
         "Omani_Student_Association": {
-          "name": "OSA President",
-          "title": "Omani Student Association",
-          "email": "osa@university.edu",
-          "phone": "(555) 123-4585"
+          "name": "Omani Student Association (OSA)",
+          "description": "Contact your campus Omani Student Association or International Students Association. Ask the International Student Services office for current OSA contact information."
         },
         "International_Student_Life": {
           "name": "International Student Programs",
-          "title": "Cultural Adjustment Support",
-          "office": "Student Center, Room 410",
-          "email": "isl@university.edu"
+          "description": "Contact your university's International Student Life or International Student Programs office. Search '[your university name] international student life' to find cultural adjustment support and events."
         },
         "Muslim_Student_Association": {
-          "name": "MSA President",
-          "title": "Prayer Space and Halal Food Information",
-          "email": "msa@university.edu"
+          "name": "Muslim Student Association (MSA)",
+          "description": "Contact your campus Muslim Student Association for prayer space and halal food information. Search '[your university name] Muslim Student Association' or ask the International Student Services office."
         }
       },
       "resources": {
@@ -1343,16 +1290,6 @@
             "title": "Omani Cultural Attaché Student Support",
             "url": "https://students.omanembassy.org",
             "description": "Resources specifically for Omani students in US"
-          },
-          {
-            "title": "University Counseling Services",
-            "url": "https://university.edu/counseling",
-            "description": "Free confidential counseling for students"
-          },
-          {
-            "title": "Cultural Adjustment Workshops",
-            "url": "https://university.edu/culture",
-            "description": "Monthly workshops on cultural adaptation"
           }
         ]
       },
