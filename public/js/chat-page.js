@@ -434,6 +434,7 @@ function renderMessages() {
     <article class="message ${message.role}">
       <div class="message-bubble">${message.role === 'assistant' ? renderRichText(message.content) : renderUserText(message.content)}</div>
       ${message.role === 'assistant' ? renderSources(message.sources) : ''}
+      ${message.role === 'assistant' ? renderEscalationCard(message.escalation) : ''}
       <div class="message-meta">
         <span>${message.role === 'assistant' ? 'OmanX' : state.settings.studentName}</span>
         <span>${formatDateTime(message.createdAt)}</span>
@@ -549,6 +550,7 @@ async function streamAssistantReply(message) {
   let fullText = '';
   let didWebSearch = false;
   let didSources = [];
+  let didEscalation = null;
   let bubbleEl = null;
   let rafPending = false;
 
@@ -609,7 +611,7 @@ async function streamAssistantReply(message) {
             const data = JSON.parse(line.slice(6));
             if (data.error) { fullText = `**Error:** ${data.error}`; break; }
             if (data.t) { fullText += data.t; scheduleRender(); }
-            if (data.done) { if (data.webSearched) didWebSearch = true; if (data.sources) didSources = data.sources; }
+            if (data.done) { if (data.webSearched) didWebSearch = true; if (data.sources) didSources = data.sources; if (data.escalation) didEscalation = data.escalation; }
           } catch { /* malformed SSE line */ }
         }
       }
@@ -624,7 +626,7 @@ async function streamAssistantReply(message) {
   // Use the captured chat.id so the response always saves to the originating chat
   // even if the user switched conversations mid-stream.
   qs('[data-stream-bubble]')?.remove();
-  appendMessage('assistant', fullText.trim() || 'No response generated.', chat.id, { webSearched: didWebSearch, sources: didSources });
+  appendMessage('assistant', fullText.trim() || 'No response generated.', chat.id, { webSearched: didWebSearch, sources: didSources, escalation: didEscalation });
   setTyping(false);
 }
 
@@ -734,4 +736,29 @@ function renderSources(sources) {
     return `<a class="source-chip source-chip-web" href="${escapeHtml(s.url)}" target="_blank" rel="noopener noreferrer" title="${escapeHtml(s.title)}">${escapeHtml(s.domain)}</a>`;
   }).join('');
   return `<div class="message-sources"><span class="sources-label">Sources</span>${chips}</div>`;
+}
+
+function renderEscalationCard(card) {
+  if (!card) return '';
+  const isUrgentLevel = card.level === 'urgent';
+  const stepsHtml = (card.steps || []).map(s => `<li>${escapeHtml(s)}</li>`).join('');
+  const formsHtml = card.forms?.length
+    ? `<div class="escalation-forms"><span class="escalation-label">Relevant forms</span>${card.forms.map(f => `<span class="escalation-form-tag">${escapeHtml(f)}</span>`).join('')}</div>`
+    : '';
+  const embassyHtml = card.embassy
+    ? `<div class="escalation-contact"><strong>${escapeHtml(card.embassy.name)}</strong><span>${escapeHtml(card.embassy.note)}</span></div>`
+    : '';
+  return `
+    <div class="escalation-card ${isUrgentLevel ? 'escalation-urgent' : 'escalation-warning'}">
+      <div class="escalation-header">
+        <span class="escalation-icon" aria-hidden="true">${isUrgentLevel ? '▲' : '!'}</span>
+        <span class="escalation-title">${escapeHtml(card.title)}</span>
+        <span class="escalation-badge">${isUrgentLevel ? 'Action required' : 'Heads up'}</span>
+      </div>
+      <ol class="escalation-steps">${stepsHtml}</ol>
+      ${formsHtml}
+      ${embassyHtml}
+      <div class="escalation-dso">${escapeHtml(card.dsoNote)}</div>
+    </div>
+  `;
 }

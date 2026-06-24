@@ -153,6 +153,158 @@ function isCompliance(message) {
   return COMPLIANCE_TRIGGERS.some((t) => q.includes(t));
 }
 
+const URGENCY_TRIGGERS = [
+  // time pressure
+  "expires", "expiring", "expired", "expiration", "expiry",
+  "overdue", "deadline", "due date",
+  "tomorrow", "today", "right now", "immediately",
+  "next week", "this week", "in a few days",
+  "running out of time", "out of status",
+  // violations / serious events
+  "violated", "violation", "violating", "in violation",
+  "arrested", "arrest", "detained", "detention",
+  "deported", "deportation", "removal", "removed",
+  "dismissed", "dismissal", "suspended", "suspension", "expelled", "expulsion",
+  "reinstatement", "reinstate",
+  "sevis terminated", "sevis termination",
+  "unlawful presence", "grace period",
+  "lost my status", "lose my status",
+  "overstayed", "overstay",
+  // medical
+  "emergency", "ambulance", "hospitalized",
+  // housing
+  "eviction", "evicted",
+  // academic
+  "academic probation", "probation",
+  // financial
+  "scholarship cancelled", "lost funding", "funding cut", "funding terminated",
+  // legal
+  "lawsuit", "sued", "court hearing",
+];
+
+function isUrgent(message) {
+  if (!message) return false;
+  const q = message.toLowerCase();
+  return URGENCY_TRIGGERS.some((t) => q.includes(t));
+}
+
+const ESCALATION_DSO = {
+  us: "Contact your university's International Student Services Office (ISSO) as soon as possible. Search \"[your university] international student office\" to find their emergency line and email.",
+  uk: "Contact your university's International Student Advisory Service and your Student Route sponsor immediately.",
+  au: "Contact your university's International Student Support Office immediately. For visa matters, also contact the Department of Home Affairs.",
+};
+
+const ESCALATION_EMBASSIES = {
+  us: { name: "Omani Embassy — Washington D.C.", note: "For emergencies (arrest, hospitalization, lost passport), contact the Cultural Attaché or Consular Section directly." },
+  uk: { name: "Omani Embassy — London", note: "For emergencies, contact the Omani Embassy Consular Section." },
+  au: { name: "Omani Embassy — Canberra", note: "For emergencies, contact the Omani Embassy for consular assistance." },
+};
+
+function buildEscalationCard(message, destination) {
+  const q = message.toLowerCase();
+  const dest = destination || "us";
+  const card = {
+    level: "urgent",
+    title: "",
+    steps: [],
+    dsoNote: ESCALATION_DSO[dest] || ESCALATION_DSO.us,
+    embassy: null,
+    forms: [],
+  };
+
+  if (q.includes("arrest") || q.includes("detained") || q.includes("court hearing") || q.includes("lawsuit") || q.includes("sued")) {
+    card.title = "Legal emergency — act now";
+    card.steps = [
+      "Do not make statements to authorities without legal representation.",
+      "Contact your university's International Student Services Office immediately.",
+      "Contact the Omani Embassy or Consulate in your country.",
+      "Do not travel internationally until your situation is resolved.",
+    ];
+    card.embassy = ESCALATION_EMBASSIES[dest] || ESCALATION_EMBASSIES.us;
+
+  } else if (q.includes("sevis terminated") || q.includes("sevis termination") || q.includes("out of status") || q.includes("unlawful presence") || q.includes("overstay") || (q.includes("violated") && (q.includes("visa") || q.includes("status") || q.includes("sevis"))) || q.includes("in violation")) {
+    card.title = "Status violation — contact DSO today";
+    card.steps = [
+      "Contact your DSO immediately — do not wait.",
+      "Do not leave the country until your status is resolved.",
+      "Do not begin or continue any work until your status is restored.",
+      dest === "us" ? "Ask your DSO about SEVIS reinstatement and whether Form I-539 applies." : "Ask your advisor about the reinstatement process.",
+    ];
+    if (dest === "us") card.forms = ["I-539 (Application to Extend/Change Nonimmigrant Status)"];
+
+  } else if (q.includes("deport") || (q.includes("removal") && (q.includes("visa") || q.includes("immigr") || q.includes("status")))) {
+    card.title = "Removal proceedings — seek help now";
+    card.steps = [
+      "Contact your DSO immediately.",
+      "Seek advice from a licensed immigration attorney.",
+      "Do not ignore any official government correspondence.",
+      "Contact the Omani Embassy in your country.",
+    ];
+    card.embassy = ESCALATION_EMBASSIES[dest] || ESCALATION_EMBASSIES.us;
+
+  } else if (q.includes("hospital") || q.includes("ambulance") || (q.includes("emergency") && !q.includes("emergency contact") && !q.includes("emergency form"))) {
+    card.title = "Medical emergency";
+    const emergencyNum = dest === "au" ? "000" : dest === "uk" ? "999" : "911";
+    card.steps = [
+      `Call ${emergencyNum} immediately if this is life-threatening.`,
+      "Contact your university health services.",
+      dest === "au" ? "Have your OSHC insurance card ready." : dest === "uk" ? "Have your NHS or private insurance details ready." : "Have your health insurance card ready.",
+      "Notify your DSO after the immediate situation is stabilized.",
+    ];
+
+  } else if (q.includes("evict")) {
+    card.level = "warning";
+    card.title = "Housing issue — know your rights";
+    card.steps = [
+      "Do not vacate without receiving proper written notice.",
+      "Contact your university's student legal services or housing office.",
+      "Document all communications with your landlord in writing.",
+      "Ask your DSO if this could affect your enrollment status.",
+    ];
+
+  } else if (q.includes("expires") || q.includes("expiring") || q.includes("expiration") || q.includes("expired") || q.includes("expiry")) {
+    card.level = "warning";
+    card.title = "Document expiry — act before the deadline";
+    card.steps = [
+      "Contact your DSO immediately to confirm which document needs renewal.",
+      dest === "us" ? "Request a program extension or new I-20 before the current one expires." : "Request an extension with your student visa sponsor before expiry.",
+      "Do not book international travel until the renewed document is in hand.",
+      "Check your passport: it must be valid at least 6 months beyond your program end date.",
+    ];
+    if (dest === "us") card.forms = ["I-20 Extension Request (via your DSO)"];
+
+  } else if (q.includes("dismissed") || q.includes("dismissal") || q.includes("suspension") || q.includes("suspended") || q.includes("expelled") || q.includes("expulsion") || q.includes("probation")) {
+    card.level = "warning";
+    card.title = "Academic standing at risk";
+    card.steps = [
+      "Contact your academic advisor immediately.",
+      "Contact your DSO — academic dismissal directly affects your visa status.",
+      "MoHE-sponsored students must notify their MoHE scholarship office.",
+      "Do not drop below full-time enrollment without DSO authorization.",
+    ];
+
+  } else if (q.includes("scholarship cancel") || q.includes("lost funding") || q.includes("funding cut") || q.includes("funding terminated")) {
+    card.level = "warning";
+    card.title = "Scholarship / funding change";
+    card.steps = [
+      "Contact your MoHE scholarship office immediately.",
+      "Notify your DSO — your financial documentation must be updated.",
+      "Do not make enrollment changes without consulting both MoHE and your DSO.",
+    ];
+
+  } else {
+    card.level = "warning";
+    card.title = "Time-sensitive — verify with your DSO";
+    card.steps = [
+      "Contact your DSO as soon as possible.",
+      "Gather all relevant documents before reaching out.",
+      "Do not take irreversible steps (travel, dropping courses, accepting work) until you have official guidance.",
+    ];
+  }
+
+  return card;
+}
+
 // ── TF-IDF KB Search ─────────────────────────────────────────────────────────
 
 const STOP_WORDS = new Set([
@@ -561,7 +713,8 @@ export default async function handler(req, res) {
           return { type: 'web', title: r.title, url: r.url, domain };
         }),
       ];
-      res.write(`data: ${JSON.stringify({ done: true, compliance, webSearched: webResults.length > 0, sources })}\n\n`);
+      const escalation = compliance && isUrgent(sanitizedMessage) ? buildEscalationCard(sanitizedMessage, destination) : null;
+      res.write(`data: ${JSON.stringify({ done: true, compliance, webSearched: webResults.length > 0, sources, escalation })}\n\n`);
       res.end();
     } catch (err) {
       console.error("[OmanX] Anthropic stream error:", err?.message);
