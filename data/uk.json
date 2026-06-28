@@ -5,7 +5,7 @@
     "authority": "Official UK Compliance Database",
     "validityPeriod": "Academic Year 2025-2026",
     "updateFrequency": "Quarterly",
-    "totalDocuments": 7,
+    "totalDocuments": 12,
     "targetAudience": "Omani Scholars in United Kingdom",
     "sources": [
       "https://www.gov.uk/student-visa",
@@ -656,6 +656,546 @@
           }
         ]
       }
+    }
+    ,
+    {
+      "id": "UK-COUNCIL-TAX-HOUSING-2026",
+      "title": "Council Tax Exemption and Renting in the UK",
+      "effectiveDate": "2025-01-01",
+      "summary": "Full-time students in the UK are exempt from Council Tax, but exemption is NOT automatic — you must apply and present a certificate from your university each year. Failing to claim can result in significant debt. UK private renting also carries specific obligations: tenancy deposits must be protected, and written tenancy agreements are standard.",
+      "scope": {
+        "appliesTo": ["All Omani students renting privately in UK", "MoHE-sponsored scholars in UK accommodation"],
+        "riskLevel": "Medium",
+        "complianceTier": "Legal and Financial Advisory",
+        "geographicScope": "United Kingdom",
+        "failureImpact": "Council Tax debt, credit damage, difficulty renting again"
+      },
+      "rules": [
+        {
+          "rule": "Council Tax Exemption for Full-Time Students",
+          "details": [
+            "Full-time students are completely exempt from Council Tax — you should pay nothing",
+            "Exemption is NOT applied automatically; you must inform your local council and provide a Council Tax exemption certificate from your university",
+            "Obtain the certificate from your university's student records or registry office — usually available via your student portal",
+            "Submit the certificate to your local council online or by post as soon as you move in",
+            "If all occupants of a property are full-time students, the whole property is exempt",
+            "If you live with non-students, they will still owe Council Tax but your share is disregarded",
+            "Renew your exemption certificate each academic year — councils require annual confirmation"
+          ],
+          "authorizationSources": ["gov.uk/council-tax/who-has-to-pay", "Local council authority"],
+          "commonViolations": [
+            {
+              "text": "Not claiming exemption and ignoring council tax bills",
+              "consequence": "Debt registered, enforcement action, court summons, bailiffs"
+            },
+            {
+              "text": "Forgetting to renew exemption certificate at the start of each academic year",
+              "consequence": "Liability resumes; backdated bills issued"
+            }
+          ],
+          "controls": [
+            "Claim exemption within the first two weeks of moving in",
+            "Keep a copy of your exemption certificate and the council's acknowledgment",
+            "Set a reminder to renew in September each year"
+          ]
+        },
+        {
+          "rule": "Tenancy Deposits and Renting Rights",
+          "details": [
+            "Landlords must protect your deposit in a government-approved Tenancy Deposit Scheme (TDS, mydeposits, or DPS) within 30 days of receipt",
+            "Deposit cap: landlords cannot charge more than 5 weeks' rent as a deposit (for annual rents under £50,000)",
+            "You must receive a signed tenancy agreement — never pay a deposit without one",
+            "Landlords must provide: a gas safety certificate, an electrical installation condition report, an EPC (energy performance certificate), and the government's 'How to Rent' guide",
+            "Landlords cannot evict you without a legal process — do not leave due to verbal pressure alone",
+            "Report disrepair in writing to your landlord; local councils can act against landlords who fail to maintain properties"
+          ],
+          "authorizationSources": ["gov.uk/private-renting", "gov.uk/tenancy-deposit-protection"],
+          "controls": [
+            "Check your deposit has been protected — landlord must give you a deposit protection certificate",
+            "Photograph the property on arrival and departure to document condition",
+            "Use Shelter's online checker (shelter.org.uk) to verify your rights if a dispute arises"
+          ]
+        },
+        {
+          "rule": "HMO (Houses in Multiple Occupation)",
+          "details": [
+            "A property is an HMO if 3 or more unrelated people share facilities (bathroom, kitchen)",
+            "Landlords of HMOs must hold a licence from the local council",
+            "HMO licence means the property meets minimum room size and fire safety standards",
+            "If your landlord's HMO is unlicensed, report to the local council — you may be entitled to rent repayment"
+          ],
+          "authorizationSources": ["gov.uk/house-in-multiple-occupation-licence"]
+        },
+        {
+          "rule": "Right to Rent Check",
+          "details": [
+            "UK landlords must check that all adult tenants have the right to rent in the UK before the tenancy begins",
+            "Your eVisa (Student Route) gives you the right to rent — share the online share code with your landlord via gov.uk/view-prove-immigration-status",
+            "If landlord asks for a physical BRP, explain that from July 2025 BRPs are no longer issued — your eVisa share code is the correct proof"
+          ],
+          "authorizationSources": ["gov.uk/check-tenant-right-to-rent-documents"]
+        }
+      ],
+      "contacts": {
+        "Shelter": {
+          "name": "Shelter",
+          "title": "Housing and tenancy advice charity",
+          "website": "https://www.shelter.org.uk",
+          "phone": "0808 800 4444",
+          "hours": "Mon-Fri 8am-8pm, Sat-Sun 9am-5pm",
+          "description": "Free housing advice including tenant rights, deposit disputes, and eviction"
+        },
+        "Citizens_Advice": {
+          "name": "Citizens Advice",
+          "title": "Free legal, financial and housing advice",
+          "website": "https://www.citizensadvice.org.uk",
+          "description": "Free, independent advice on any issue including housing, debt, and employment"
+        }
+      },
+      "resources": {
+        "links": [
+          {
+            "title": "Council Tax for students — GOV.UK",
+            "url": "https://www.gov.uk/council-tax/who-has-to-pay",
+            "description": "Official guidance on who must pay and who is exempt"
+          },
+          {
+            "title": "Tenancy Deposit Protection — GOV.UK",
+            "url": "https://www.gov.uk/tenancy-deposit-protection",
+            "description": "Verify your deposit is protected and learn your rights"
+          },
+          {
+            "title": "Private renting rights — GOV.UK",
+            "url": "https://www.gov.uk/private-renting",
+            "description": "Overview of tenant rights and landlord obligations"
+          }
+        ]
+      },
+      "complianceNotes": [
+        "University accommodation (halls of residence) is usually already council-tax exempt — contact your university if unsure",
+        "Council Tax exemption does not reduce your liability if you work full-time after withdrawing from your course — status change triggers liability",
+        "MoHE does not cover Council Tax separately — it is expected to come from your living allowance; budget for this even if claiming exemption, in case of administrative delays"
+      ]
+    },
+    {
+      "id": "UK-TAX-NI-2026",
+      "title": "UK Tax, National Insurance, and HMRC Obligations",
+      "effectiveDate": "2025-01-01",
+      "summary": "Students working in the UK are subject to UK income tax and National Insurance (NI) contributions. You need a National Insurance number before or shortly after starting work. Most employees are taxed through PAYE — tax is deducted automatically by your employer. The annual personal allowance for 2025/26 is £12,570; income below this threshold is not taxed. MoHE scholarships and living allowances are generally not classed as taxable income in the UK.",
+      "scope": {
+        "appliesTo": ["Omani students working in UK under Student Route", "MoHE-sponsored scholars with employment income"],
+        "riskLevel": "Medium",
+        "complianceTier": "Legal Mandatory (for those with employment income)",
+        "geographicScope": "United Kingdom",
+        "failureImpact": "Tax debt, HMRC investigation, penalties, issues with future UK visa applications"
+      },
+      "rules": [
+        {
+          "rule": "National Insurance (NI) Number",
+          "details": [
+            "A National Insurance (NI) number is required to work legally and pay the correct tax and NI contributions",
+            "Apply for a NI number online via gov.uk/apply-national-insurance-number — you can work while your application is pending, but give your employer your NI number as soon as it arrives",
+            "NI numbers are personal and permanent — keep it safe, never share it unnecessarily",
+            "Employers must not refuse to employ you while your NI number application is pending if you can otherwise prove your right to work"
+          ],
+          "authorizationSources": ["gov.uk/apply-national-insurance-number", "HMRC"]
+        },
+        {
+          "rule": "PAYE (Pay As You Earn)",
+          "details": [
+            "PAYE is the UK system where your employer deducts income tax and NI directly from your salary before you are paid",
+            "You will receive a payslip each pay period showing gross pay, deductions, and net pay",
+            "At the end of the tax year (5 April), your employer provides a P60 — keep this as it proves your earnings and tax paid",
+            "When you leave a job, you receive a P45 — give this to your next employer so they apply the correct tax code",
+            "If you are taxed too much (common for students who work part of the year), HMRC will usually refund automatically or you can claim via gov.uk/claim-tax-refund"
+          ],
+          "authorizationSources": ["gov.uk/paye-for-employees", "HMRC"]
+        },
+        {
+          "rule": "Personal Allowance and Tax Bands (2025/26)",
+          "details": [
+            "Personal Allowance: £12,570 per year — income up to this amount is not taxed",
+            "Basic rate (20%): taxable income from £12,571 to £50,270",
+            "Higher rate (40%): taxable income above £50,270",
+            "Most student part-time workers earn well below the personal allowance and pay little or no income tax",
+            "National Insurance: employees pay 8% on earnings between £12,570 and £50,270 per year (Employee Class 1 NI)"
+          ],
+          "authorizationSources": ["gov.uk/income-tax-rates", "HMRC"]
+        },
+        {
+          "rule": "Self-Assessment (if self-employed or additional income)",
+          "details": [
+            "If you are self-employed (on the Graduate Route, not the Student Route), you must register with HMRC for Self Assessment and file a tax return annually",
+            "Also required if you earn income above £1,000 from freelance work, rental income, or have multiple income sources",
+            "Register via gov.uk/register-for-self-assessment by 5 October following the end of the tax year in which you became self-employed",
+            "Self-employed individuals also pay Class 2 and Class 4 National Insurance contributions",
+            "IMPORTANT: Self-employment is NOT permitted on the Student Route — only on the Graduate Route or other post-study visas"
+          ],
+          "authorizationSources": ["gov.uk/self-assessment-tax-returns", "HMRC"]
+        },
+        {
+          "rule": "MoHE Scholarship Income and UK Tax",
+          "details": [
+            "MoHE scholarships (tuition payments made directly to the university) are not taxable in the UK — they are not income",
+            "Living allowances paid by MoHE are generally not taxable as they are classified as maintenance grants rather than employment income",
+            "However, if MoHE pays you for research services or consulting, that income may be taxable — seek advice from your university's tax advisor or HMRC",
+            "There is a Double Taxation Agreement between Oman and the UK — in most cases you will not be taxed twice on the same income"
+          ],
+          "authorizationSources": ["HMRC guidance on scholarships and grants", "UK-Oman Double Taxation Agreement"]
+        }
+      ],
+      "contacts": {
+        "HMRC": {
+          "name": "HM Revenue and Customs (HMRC)",
+          "title": "UK tax authority",
+          "website": "https://www.gov.uk/contact-hmrc",
+          "description": "For tax queries, NI number issues, Self Assessment, and overpayment refunds"
+        }
+      },
+      "resources": {
+        "links": [
+          {
+            "title": "Apply for a National Insurance Number — GOV.UK",
+            "url": "https://www.gov.uk/apply-national-insurance-number",
+            "description": "Apply online — do this as soon as you start looking for work"
+          },
+          {
+            "title": "Income tax rates and allowances — GOV.UK",
+            "url": "https://www.gov.uk/income-tax-rates",
+            "description": "Current personal allowance and tax band thresholds"
+          },
+          {
+            "title": "Check if you've paid too much tax — GOV.UK",
+            "url": "https://www.gov.uk/claim-tax-refund",
+            "description": "Claim a tax refund if PAYE over-deducted"
+          },
+          {
+            "title": "UKCISA — Taxation for International Students",
+            "url": "https://www.ukcisa.org.uk/student-advice/employment/tax/",
+            "description": "Plain-English guide to UK tax for international students"
+          }
+        ]
+      },
+      "complianceNotes": [
+        "Never give your NI number to third parties claiming to process jobs or visas on your behalf — this is a common scam targeting international students",
+        "Keep all payslips, P60s, and P45s for at least 6 years — HMRC can investigate this far back",
+        "Your university's international student office or student union often provides free tax advice sessions — use them before filing any return"
+      ]
+    },
+    {
+      "id": "UK-TRAVEL-REENTRY-2026",
+      "title": "Travel and Re-Entry to the UK on the Student Route",
+      "effectiveDate": "2025-01-01",
+      "summary": "Travelling internationally on the Student Route (UK) is simpler than the F-1 system — there is no travel signature required on a physical document. From July 2025, you use an eVisa and share your immigration status digitally. However, your passport must be valid, absence from the UK during term may violate your attendance obligations, and long absences can trigger sponsor reporting duties.",
+      "scope": {
+        "appliesTo": ["All Omani students on Student Route visa travelling internationally"],
+        "riskLevel": "Medium",
+        "complianceTier": "Regulatory Advisory",
+        "geographicScope": "United Kingdom",
+        "failureImpact": "Refusal of re-entry, leave curtailment, sponsor reporting to UKVI"
+      },
+      "rules": [
+        {
+          "rule": "Travelling with an eVisa (from July 2025)",
+          "details": [
+            "From July 2025, Student Route grants are issued as digital eVisas — there is no physical stamp, vignette, or BRP card",
+            "Before travelling, generate a 'share code' via gov.uk/view-prove-immigration-status and note it or share it with airlines when required",
+            "Most airlines check your UK immigration status electronically via the Home Office API — you may not need to provide a share code manually, but have one ready",
+            "UK Border Force at the airport can verify your status electronically — you do not need to print anything",
+            "If you have biometric enrolment, you can use eGates at UK airports for faster entry",
+            "Always log in to your UKVI account before travelling to confirm your eVisa is active and correctly recorded"
+          ],
+          "authorizationSources": ["gov.uk/evisa", "gov.uk/view-prove-immigration-status"],
+          "controls": [
+            "Check your eVisa status before every trip, especially if your passport has changed",
+            "Link your new passport to your UKVI account immediately if you renew your Omani passport",
+            "Note your eVisa expiry date — re-entry is refused if leave has expired even if your course is ongoing"
+          ]
+        },
+        {
+          "rule": "Passport Validity",
+          "details": [
+            "Your passport must be valid to travel — UK immigration does not require 6 months' passport validity beyond your return date (unlike some countries), but airlines may have their own rules",
+            "Your eVisa is linked to your passport number — if you renew your passport, you must update your UKVI account immediately via the online service",
+            "Failure to link your new passport to your UKVI account can result in denial of boarding or refusal of re-entry",
+            "Omani passports are renewed at the Omani Embassy in London — allow 4-6 weeks and do not travel with an expired passport"
+          ],
+          "authorizationSources": ["gov.uk/view-prove-immigration-status", "UKVI eVisa guidance"],
+          "failureModes": [
+            "Renewing passport without updating UKVI account — airlines cannot verify your immigration status",
+            "Travelling on an expired Omani passport"
+          ]
+        },
+        {
+          "rule": "Re-Entry to the UK",
+          "details": [
+            "There is no formal 'travel signature' requirement on the Student Route — unlike the US F-1, you do not need your DSO to sign anything before travel",
+            "At the UK border, your leave to remain is verified electronically against your passport biometrics and eVisa",
+            "If you are asked questions at the border about your studies or sponsor, answer honestly — carry your university enrolment confirmation or a letter from your International Student Office as supporting evidence",
+            "If you are travelling during term time, be prepared to explain your attendance arrangements — have contact details for your International Student Support team"
+          ],
+          "authorizationSources": ["UK Border Force guidance", "gov.uk/student-visa"]
+        },
+        {
+          "rule": "Term-Time Travel and Attendance",
+          "details": [
+            "Travelling during term time is not prohibited but you remain bound by your course attendance requirements — missing classes without authorization can trigger sponsor reporting",
+            "Notify your department and International Student Support team before any term-time travel exceeding a few days",
+            "Sponsors must report students who are absent for more than 28 days without authorization — extended travel home during term can trigger this",
+            "Extended absence from the UK (over a few weeks) may require your sponsor to notify UKVI, which can affect your leave",
+            "Travel during official university vacations is unrestricted — plan holidays during vacation periods where possible"
+          ],
+          "authorizationSources": ["UKVI Student Sponsor Compliance Guidance"]
+        },
+        {
+          "rule": "Common Travel Area (Ireland)",
+          "details": [
+            "The UK and Ireland share a Common Travel Area (CTA) — you can cross between England, Scotland, Wales, Northern Ireland, and the Republic of Ireland without border checks in most cases",
+            "However, your Student Route visa is UK-only — it does not give you the right to live or work in Ireland",
+            "If you travel from Ireland into the UK via a route that triggers a border check, your eVisa will be verified normally"
+          ],
+          "authorizationSources": ["gov.uk/common-travel-area"]
+        }
+      ],
+      "resources": {
+        "links": [
+          {
+            "title": "View and prove your immigration status (eVisa) — GOV.UK",
+            "url": "https://www.gov.uk/view-prove-immigration-status",
+            "description": "Generate share codes and manage your UKVI account"
+          },
+          {
+            "title": "UKCISA — Travelling and Returning to the UK",
+            "url": "https://www.ukcisa.org.uk/student-advice/visas-and-immigration/travelling-and-re-entering-the-uk/",
+            "description": "Practical guide to travel for students on the Student Route"
+          },
+          {
+            "title": "Embassy of Oman — London (Consular Services)",
+            "url": "https://www.omanembassylondon.com",
+            "description": "Passport renewal and emergency consular support for Omani students in the UK"
+          }
+        ]
+      },
+      "complianceNotes": [
+        "If you have been outside the UK for a total of 6 months or more in any 12-month period, this can affect future applications for Indefinite Leave to Remain (ILR) — relevant if you intend to settle in UK long-term",
+        "Re-entry is not guaranteed — even with a valid eVisa, Border Force officers have discretion. Carry your university enrollment letter and course details when returning from abroad",
+        "If your visa expires while you are abroad and you cannot return in time, contact UKVI immediately — do not try to re-enter on an expired visa"
+      ]
+    },
+    {
+      "id": "UK-ACADEMIC-INTEGRITY-2026",
+      "title": "Academic Integrity and Misconduct — UK Universities",
+      "effectiveDate": "2025-01-01",
+      "summary": "UK universities enforce strict academic integrity policies. Plagiarism, collusion, contract cheating, and unauthorized use of AI can result in failed assignments, failed modules, suspension, or expulsion. Contract cheating (paying for essays or using essay mills) has been illegal in England, Wales, and Northern Ireland since 2022. AI use policies vary by university and assessment — always check before submitting.",
+      "scope": {
+        "appliesTo": ["All Omani students enrolled at UK universities"],
+        "riskLevel": "High",
+        "complianceTier": "University Regulatory Mandatory",
+        "geographicScope": "United Kingdom",
+        "failureImpact": "Failed assessment, failed module, academic misconduct hearing, suspension, expulsion, degree withholding, future visa implications"
+      },
+      "rules": [
+        {
+          "rule": "Plagiarism",
+          "details": [
+            "Plagiarism means presenting someone else's words, ideas, data, or work as your own without proper attribution",
+            "This includes: copying from books or articles without citation, paraphrasing too closely without citation, using a classmate's work, and copying from websites without referencing",
+            "Self-plagiarism (reusing your own previous assessed work without disclosure) is also prohibited",
+            "Turnitin similarity reports are used at most UK universities — a high similarity score triggers manual review; percentage alone does not determine guilt",
+            "You are responsible for understanding what plagiarism means before submitting — ignorance is not an accepted defence"
+          ],
+          "authorizationSources": ["Your university's academic integrity policy (check your student handbook)"],
+          "controls": [
+            "Cite every source — in text and in your bibliography — using your department's required citation style (Harvard, APA, OSCOLA, etc.)",
+            "Use your university's plagiarism checker (often Turnitin) to review your own work before submission",
+            "When in doubt, cite it — over-referencing is never penalized"
+          ]
+        },
+        {
+          "rule": "Collusion",
+          "details": [
+            "Collusion is unauthorized collaboration on an individually assessed piece of work",
+            "Discussing ideas in a study group is encouraged; copying or sharing answers is not",
+            "You must not share draft assignments with classmates if the work is individual — even if your intention is to help",
+            "Group work must only be submitted as group work — submitting joint work as individual work is collusion"
+          ],
+          "authorizationSources": ["University academic integrity regulations"]
+        },
+        {
+          "rule": "Contract Cheating and Essay Mills",
+          "details": [
+            "Contract cheating means paying a third party (essay mill, homework help site, tutor) to produce work you then submit as your own",
+            "The Higher Education (Freedom of Speech) Act 2023 and preceding legislation make it a criminal offence in England, Wales, and Northern Ireland for essay mills to provide these services — penalties apply to providers",
+            "Students submitting contracted work face severe academic penalties including expulsion",
+            "This includes: using essay-writing websites, paying for completed problem sets, and having a tutor write your assignment",
+            "Ghostwritten dissertations or theses are treated as the most serious form of academic misconduct"
+          ],
+          "authorizationSources": ["Education (Student Loans) Act 2023", "University academic misconduct regulations"]
+        },
+        {
+          "rule": "Artificial Intelligence (AI) Use Policy",
+          "details": [
+            "UK universities have diverse AI use policies — policies vary by course, assessment type, and university",
+            "Many universities prohibit AI-generated text in essays, dissertations, and exams unless explicitly permitted",
+            "Some assessments permit AI as a tool (e.g., literature search, coding assistance) but require disclosure",
+            "Using AI without disclosure where prohibited is treated as academic misconduct equivalent to plagiarism",
+            "AI-detection tools (e.g., Turnitin's AI writing detection) are used at many institutions",
+            "ALWAYS check your module or course handbook for the specific AI policy before starting any assessed work"
+          ],
+          "authorizationSources": ["Your university's AI use in assessment policy (published per-module or in student handbook)"],
+          "controls": [
+            "Read the assessment brief carefully — look for any statement about permitted AI use",
+            "When AI is permitted, document how you used it (many universities require an AI use statement in the submission)",
+            "Contact your module leader or personal tutor if you are unsure whether a specific AI use is acceptable"
+          ]
+        },
+        {
+          "rule": "Academic Misconduct Process and Consequences",
+          "details": [
+            "If suspected misconduct is identified, your university will initiate a formal academic misconduct investigation",
+            "You will receive written notice and be given the opportunity to respond in writing and/or attend a hearing",
+            "Penalties (in increasing severity): formal warning, mark reduction, failed assessment, failed module, suspension, expulsion",
+            "Serious misconduct (especially dissertation fraud) may result in a degree being withheld or rescinded even after graduation",
+            "Academic misconduct findings may be disclosed on academic transcripts and in references",
+            "UKVI may be informed if expulsion results from misconduct — this can affect your immigration status"
+          ],
+          "authorizationSources": ["Your university's academic misconduct regulations"],
+          "mitigation": [
+            "If you receive a misconduct allegation letter, contact your Students' Union for free advice and representation before responding",
+            "Do not panic or admit to anything in writing before seeking advice — the process allows you to state your case",
+            "Contact your International Student Support team immediately — misconduct findings affecting enrolment have immigration consequences"
+          ]
+        }
+      ],
+      "contacts": {
+        "Students_Union": {
+          "name": "Students' Union Advice Service",
+          "title": "Free, confidential, independent advice and representation",
+          "description": "Available at every UK university Students' Union — contact them first if you face any academic misconduct allegation"
+        }
+      },
+      "resources": {
+        "links": [
+          {
+            "title": "UKCISA — Academic integrity",
+            "url": "https://www.ukcisa.org.uk/student-advice/student-life/academic-life/",
+            "description": "Overview of UK academic expectations for international students"
+          }
+        ]
+      },
+      "complianceNotes": [
+        "Cultural differences in citation practices mean some students arrive unfamiliar with Western referencing norms — many universities offer free academic writing workshops; attend these in your first semester",
+        "Using WhatsApp group chats to share assignment answers or problem-set solutions, even among friends, can constitute collusion — be cautious",
+        "Turnitin compares your submission against billions of web pages, journal articles, and previously submitted student work — unique phrasing alone does not guarantee a pass"
+      ]
+    },
+    {
+      "id": "UK-BANKING-FINANCE-2026",
+      "title": "Banking, Money Management, and Financial Setup — UK",
+      "effectiveDate": "2025-01-01",
+      "summary": "Opening a UK bank account as an international student can be challenging — traditional banks require proof of UK address, which students often lack on arrival. Digital banks (Monzo, Starling, Revolut) offer fast account opening with minimal documentation and are widely accepted for salary payments and direct debits. Understanding budgeting for UK living costs is essential for MoHE-sponsored students managing their living allowance.",
+      "scope": {
+        "appliesTo": ["All Omani students arriving in UK", "MoHE-sponsored scholars managing living allowances"],
+        "riskLevel": "Low",
+        "complianceTier": "Practical Advisory",
+        "geographicScope": "United Kingdom",
+        "failureImpact": "Inability to receive salary, pay rent, or access benefits of UK financial system"
+      },
+      "rules": [
+        {
+          "rule": "Opening a UK Bank Account",
+          "details": [
+            "Traditional UK banks (Barclays, HSBC, NatWest, Lloyds, Santander) offer student accounts but typically require: proof of UK address (tenancy agreement, utility bill), a valid passport, proof of student status (CAS or university letter)",
+            "The main difficulty: proof of address is required before you have an address — apply as soon as you have a tenancy agreement or university accommodation letter",
+            "HSBC and Santander have dedicated international student banking schemes that can be applied for before arrival via your university partnership — check if your university has a partner bank",
+            "Digital banks are the fastest option on arrival: Monzo, Starling, and Revolut allow account opening with just your passport and a selfie — no UK address required immediately",
+            "Digital bank accounts are widely accepted by employers for salary payments and by landlords for standing order rent",
+            "A UK bank account with a sort code and account number is required by most employers — set one up in your first week"
+          ],
+          "authorizationSources": ["Individual bank policies (check your bank's website for current requirements)"],
+          "controls": [
+            "Apply for a Monzo or Starling account from your phone in the first few days — both are free and take 5-10 minutes",
+            "Then apply for a traditional student bank account once you have a UK address — traditional accounts have overdraft facilities useful for managing cash flow",
+            "Never share your account details or online banking credentials with anyone"
+          ]
+        },
+        {
+          "rule": "Managing Your MoHE Living Allowance",
+          "details": [
+            "MoHE living allowances are typically paid monthly or quarterly — confirm the payment schedule before departure",
+            "MoHE usually transfers allowances in Omani Rial (OMR) or to a nominated account — confirm the transfer method and expected dates to avoid arriving with insufficient funds",
+            "Currency conversion from OMR to GBP: exchange rates fluctuate — receiving your allowance in a multi-currency account (Wise, Revolut) can reduce conversion fees versus traditional bank transfers",
+            "Build a 4-week emergency cash buffer: if a transfer is delayed, you need funds to cover rent and food",
+            "Typical monthly UK student living costs: London £1,400-£2,000; outside London £900-£1,400 (including rent, food, transport, phone — not tuition)"
+          ],
+          "authorizationSources": ["MoHE scholarship agreement", "Bank of England exchange rate data"],
+          "controls": [
+            "Confirm with MoHE the exact transfer timeline before you leave Oman",
+            "Bring enough cash or a prepaid travel card to cover at least 4 weeks of expenses on arrival",
+            "Set up a Wise or Revolut account to receive OMR and convert to GBP at interbank rates"
+          ]
+        },
+        {
+          "rule": "International Money Transfers",
+          "details": [
+            "Sending money between Oman and UK: use Wise (formerly TransferWise) or a specialist money transfer service for better exchange rates than banks",
+            "Bank-to-bank international wire transfers (SWIFT) typically take 3-5 business days and carry fees of £10-30 per transfer",
+            "Western Union and MoneyGram are available but typically have higher fees for student amounts",
+            "Wise transfers are usually cheaper and faster (often 1-2 days) for OMR to GBP conversions",
+            "Notify your UK bank if you are expecting a large international transfer — banks may freeze accounts if large unexpected transfers arrive"
+          ],
+          "authorizationSources": ["FCA-regulated money transfer services"]
+        },
+        {
+          "rule": "Scams Targeting International Students",
+          "details": [
+            "HMRC phone and email scams: HMRC does NOT call students demanding immediate payment or threatening arrest — these are scams. Hang up.",
+            "Visa fee scams: fraudulent 'visa extension' services charge fees for services that are free or cheaper direct from UKVI — always use gov.uk for visa applications",
+            "Landlord deposit scams: never pay a deposit without viewing the property in person or via a trusted agent, and never pay cash without a receipt",
+            "Cryptocurrency scams: no legitimate employer, landlord, or government agency will ask for payment in cryptocurrency",
+            "If you think you have been scammed: report to Action Fraud (actionfraud.police.uk) and your bank immediately"
+          ],
+          "authorizationSources": ["Action Fraud (actionfraud.police.uk)", "FCA ScamSmart"]
+        }
+      ],
+      "contacts": {
+        "Action_Fraud": {
+          "name": "Action Fraud",
+          "title": "UK fraud and cybercrime reporting",
+          "website": "https://www.actionfraud.police.uk",
+          "phone": "0300 123 2040",
+          "description": "Report scams, fraud, and cybercrime"
+        }
+      },
+      "resources": {
+        "links": [
+          {
+            "title": "Monzo — Digital bank account",
+            "url": "https://www.monzo.com",
+            "description": "Open a UK bank account from your phone in minutes — no UK address required on signup"
+          },
+          {
+            "title": "Starling Bank — Digital bank account",
+            "url": "https://www.starlingbank.com",
+            "description": "Free UK current account with easy international student onboarding"
+          },
+          {
+            "title": "Wise — International money transfers",
+            "url": "https://wise.com",
+            "description": "Low-fee international transfers at real exchange rates — widely used by international students"
+          },
+          {
+            "title": "UKCISA — Money and Banking",
+            "url": "https://www.ukcisa.org.uk/student-advice/student-life/money-and-finance/",
+            "description": "Overview of money management for international students in UK"
+          }
+        ]
+      },
+      "complianceNotes": [
+        "MoHE requires you to maintain a bank account in your own name for allowance disbursement — joint accounts may not be accepted",
+        "Some UK student bank accounts offer 0% interest overdrafts — useful for cash-flow gaps between allowance payments, but must be repaid on graduation",
+        "UK banks are required to report suspicious transactions — large unexplained cash deposits can trigger an investigation, which can affect your banking access"
+      ]
     }
   ],
   "globalReferences": {
