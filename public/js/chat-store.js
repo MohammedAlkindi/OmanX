@@ -80,6 +80,7 @@ const SETTINGS_DEFAULTS = {
   model: 'claude-sonnet-4-6',
   userContext: '',
   language: 'auto',
+  destination: 'auto',
   dataConsent: false,
   webSearch: true,
 };

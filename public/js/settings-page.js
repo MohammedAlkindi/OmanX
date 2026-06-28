@@ -22,6 +22,7 @@ form.addEventListener('submit', (event) => {
     notifications: form.notifications.checked,
     conciseMode: form.conciseMode.checked,
     model: form.model.value || 'claude-sonnet-4-6',
+    destination: form.destination.value || 'auto',
     userContext: form.userContext.value.trim(),
   };
   saveSettings(next);

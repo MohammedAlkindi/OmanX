@@ -202,6 +202,12 @@ function bindEvents() {
     saveSettings(state.settings);
   });
 
+  // destination
+  qs('[data-setting-destination]')?.addEventListener('change', (e) => {
+    state.settings.destination = e.target.value;
+    saveSettings(state.settings);
+  });
+
   // language
   qs('[data-setting-language]')?.addEventListener('change', (e) => {
     state.settings.language = e.target.value;
@@ -227,7 +233,7 @@ function bindEvents() {
 }
 
 function populateSettingsPanel() {
-  const { studentName, userContext, conciseMode, model, language, dataConsent, webSearch } = state.settings;
+  const { studentName, userContext, conciseMode, model, language, destination, dataConsent, webSearch } = state.settings;
 
   const nameEl = qs('[data-setting-name]');
   if (nameEl) nameEl.value = studentName === 'Student' ? '' : studentName;
@@ -240,6 +246,9 @@ function populateSettingsPanel() {
 
   const modelEl = qs('[data-setting-model]');
   if (modelEl) modelEl.value = model;
+
+  const destEl = qs('[data-setting-destination]');
+  if (destEl) destEl.value = destination || 'auto';
 
   const langEl = qs('[data-setting-language]');
   if (langEl) langEl.value = language || 'auto';
@@ -545,7 +554,7 @@ async function streamAssistantReply(message) {
     .slice(-20)
     .map(({ role, content }) => ({ role, content }));
 
-  const { model, conciseMode, userContext, language, webSearch } = state.settings;
+  const { model, conciseMode, userContext, language, destination, webSearch } = state.settings;
 
   let fullText = '';
   let didWebSearch = false;
@@ -586,7 +595,7 @@ async function streamAssistantReply(message) {
     const response = await fetch('/api/chat', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ message, history, model, conciseMode, userContext, language, webSearch: webSearch !== false, stream: true, sessionId: getSessionId() }),
+      body: JSON.stringify({ message, history, model, conciseMode, userContext, language, destination: destination || 'auto', webSearch: webSearch !== false, stream: true, sessionId: getSessionId() }),
     });
 
     if (!response.ok) {

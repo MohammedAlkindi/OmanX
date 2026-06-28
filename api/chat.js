@@ -35,6 +35,7 @@ const DEST_KB_PATHS = {
 
 const DEFAULT_MODEL = process.env.ANTHROPIC_MODEL || "claude-sonnet-4-6";
 const ALLOWED_MODELS = new Set(["claude-sonnet-4-6", "claude-haiku-4-5-20251001"]);
+const VALID_DESTINATIONS = new Set(["us", "uk", "au"]);
 
 // Authoritative domains we trust for live policy lookups
 const TRUSTED_DOMAINS = [
@@ -590,7 +591,7 @@ export default async function handler(req, res) {
     return res.status(429).json({ error: "Too many requests. Please slow down.", text: "You've sent too many messages too quickly. Please wait a moment before trying again." });
   }
 
-  const { message, history, model: clientModel, conciseMode, userContext, language, webSearch: clientWebSearch, sessionId } = req.body || {};
+  const { message, history, model: clientModel, conciseMode, userContext, language, destination: clientDestination, webSearch: clientWebSearch, sessionId } = req.body || {};
 
   if (!message || typeof message !== "string") {
     return res.status(400).json({ error: "Missing 'message' string." });
@@ -632,7 +633,9 @@ export default async function handler(req, res) {
   }
 
   const compliance = isCompliance(sanitizedMessage);
-  const destination = detectDestination(sanitizedUserContext, sanitizedMessage);
+  const destination = (typeof clientDestination === "string" && VALID_DESTINATIONS.has(clientDestination))
+    ? clientDestination
+    : detectDestination(sanitizedUserContext, sanitizedMessage);
 
   // Only cache non-compliance single-turn requests (compliance responses include live search data)
   const cacheKey = !hasHistory && !compliance
