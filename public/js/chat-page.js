@@ -2,10 +2,10 @@ import { initCore, qs, qsa, formatDateTime, formatRelative, showToast, uid, down
 import { loadChats, saveChats, getActiveChatId, setActiveChatId, createChat, updateChat, deleteChat, loadSettings, saveSettings, getSessionId } from './chat-store.js';
 
 const prompts = [
-  'Build me a pre-departure checklist for the 14 days before flying to the U.S.',
-  'How should I prioritize first-week setup after arriving on campus?',
-  'Help me compare on-campus housing vs. off-campus housing with key tradeoffs.',
-  'What should I escalate immediately if I have a visa or insurance concern?'
+  { label: 'Arrival', text: 'What do I need to complete in my first 72 hours on campus?' },
+  { label: 'Compliance', text: 'Can I work off-campus this semester under my current visa status?' },
+  { label: 'OPT / Visa', text: 'My OPT application window opens soon — what are the exact steps and deadlines?' },
+  { label: 'Housing', text: 'Help me compare on-campus vs off-campus housing — costs, contracts, and what to watch for.' },
 ];
 
 function pinIcon(pinned) {
@@ -654,11 +654,12 @@ function autoGrow(textarea) {
 function emptyStateMarkup() {
   return `
     <section class="message-empty">
-      <h3>Start a high-trust guidance session</h3>
-      <p>Create a focused conversation for travel readiness, arrival setup, housing, compliance, or academic planning.</p>
-      <div class="quick-prompts">
-        ${prompts.map((prompt) => `<button type="button" data-quick-prompt="${escapeHtml(prompt)}">${escapeHtml(prompt)}</button>`).join('')}
+      <div class="empty-brand">Oman<span>X</span></div>
+      <p class="empty-sub">Compliance-aware guidance for Omani scholars in the U.S., U.K., and Australia.</p>
+      <div class="prompt-grid">
+        ${prompts.map((p) => `<button type="button" class="prompt-card" data-quick-prompt="${escapeHtml(p.text)}"><span class="prompt-card-label">${escapeHtml(p.label)}</span><span class="prompt-card-text">${escapeHtml(p.text)}</span></button>`).join('')}
       </div>
+      <p class="empty-trust">Answers draw from MoHE scholarship rules and official visa regulations. Urgent compliance issues are flagged clearly.</p>
     </section>
   `;
 }
@@ -744,7 +745,7 @@ function renderSources(sources) {
     }
     return `<a class="source-chip source-chip-web" href="${escapeHtml(s.url)}" target="_blank" rel="noopener noreferrer" title="${escapeHtml(s.title)}">${escapeHtml(s.domain)}</a>`;
   }).join('');
-  return `<div class="message-sources"><span class="sources-label">Sources</span>${chips}</div>`;
+  return `<div class="message-sources"><span class="sources-label">Cited</span>${chips}</div>`;
 }
 
 function renderEscalationCard(card) {
@@ -760,7 +761,6 @@ function renderEscalationCard(card) {
   return `
     <div class="escalation-card ${isUrgentLevel ? 'escalation-urgent' : 'escalation-warning'}">
       <div class="escalation-header">
-        <span class="escalation-icon" aria-hidden="true">${isUrgentLevel ? '▲' : '!'}</span>
         <span class="escalation-title">${escapeHtml(card.title)}</span>
         <span class="escalation-badge">${isUrgentLevel ? 'Action required' : 'Heads up'}</span>
       </div>
