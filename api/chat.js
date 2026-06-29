@@ -1,6 +1,8 @@
 // api/chat.js - API route for OmanX chatbot
 
 import Anthropic from "@anthropic-ai/sdk";
+import { Ratelimit } from "@upstash/ratelimit";
+import { Redis } from "@upstash/redis";
 import fs from "fs/promises";
 import path from "path";
 import { fileURLToPath } from "url";
@@ -536,12 +538,27 @@ function cacheSet(key, value) {
   _cache.set(key, { ts: Date.now(), value });
 }
 
-// Per-IP rate limiting: 20 requests per 60-second window
+// Per-IP rate limiting: 20 requests per 60-second sliding window
+// Uses Upstash Redis when configured (required for multi-instance Vercel deployments);
+// falls back to an in-memory map for local development.
 const _rateLimitMap = new Map();
 const RATE_LIMIT_MAX = 20;
 const RATE_LIMIT_WINDOW_MS = 60_000;
 
-function isRateLimited(ip) {
+let _upstashLimiter = null;
+function getUpstashLimiter() {
+  if (_upstashLimiter) return _upstashLimiter;
+  const { UPSTASH_REDIS_REST_URL: url, UPSTASH_REDIS_REST_TOKEN: token } = process.env;
+  if (!url || !token) return null;
+  _upstashLimiter = new Ratelimit({
+    redis: new Redis({ url, token }),
+    limiter: Ratelimit.slidingWindow(RATE_LIMIT_MAX, "60 s"),
+    analytics: false,
+  });
+  return _upstashLimiter;
+}
+
+function inMemoryRateLimited(ip) {
   const now = Date.now();
   const entry = _rateLimitMap.get(ip);
   if (!entry || now - entry.windowStart > RATE_LIMIT_WINDOW_MS) {
@@ -556,6 +573,13 @@ function isRateLimited(ip) {
   if (entry.count >= RATE_LIMIT_MAX) return true;
   entry.count++;
   return false;
+}
+
+async function isRateLimited(ip) {
+  const limiter = getUpstashLimiter();
+  if (!limiter) return inMemoryRateLimited(ip);
+  const { success } = await limiter.limit(ip);
+  return !success;
 }
 
 let _client = null;
@@ -587,7 +611,7 @@ export default async function handler(req, res) {
   if (req.method !== "POST") return res.status(405).json({ error: "Method not allowed" });
 
   const ip = req.headers["x-forwarded-for"]?.split(",")[0].trim() || req.socket?.remoteAddress || "unknown";
-  if (isRateLimited(ip)) {
+  if (await isRateLimited(ip)) {
     return res.status(429).json({ error: "Too many requests. Please slow down.", text: "You've sent too many messages too quickly. Please wait a moment before trying again." });
   }
 
