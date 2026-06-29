@@ -5,7 +5,7 @@
     "authority": "Official Compliance Database v2",
     "validityPeriod": "Academic Year 2025-2026",
     "updateFrequency": "Quarterly",
-    "totalDocuments": 11,
+    "totalDocuments": 12,
     "targetAudience": "Omani Scholars in United States"
   },
   "documents": [
@@ -1298,6 +1298,173 @@
         "Seeking help is a sign of strength, not weakness",
         "MoHE provides additional cultural support through embassy contacts",
         "Maintaining Omani cultural identity while adapting to US norms is encouraged"
+      ]
+    },
+    {
+      "id": "US-BANKING-FINANCE-2026",
+      "title": "Banking, Money Management, and Financial Setup — US",
+      "effectiveDate": "2025-01-01",
+      "summary": "Opening a US bank account is a first-week priority — most traditional banks require a Social Security Number (SSN), but several have international student programmes that allow account opening with a passport and I-20 alone. Wise (formerly TransferWise) is the most cost-effective way to convert Omani Rial (OMR) to US Dollars and receive your MoHE stipend. Building a US credit history from day one matters: a good credit score is required for apartment rentals, mobile phone plans, and many financial services.",
+      "scope": {
+        "appliesTo": [
+          "All Omani students arriving in the US",
+          "MoHE-sponsored scholars managing living allowances in the US"
+        ],
+        "riskLevel": "Low",
+        "complianceTier": "Practical Advisory",
+        "geographicScope": "United States",
+        "failureImpact": "Inability to receive stipend, difficulty renting housing, limited access to US financial services"
+      },
+      "rules": [
+        {
+          "rule": "Opening a US Bank Account",
+          "details": [
+            "Most US banks require a Social Security Number (SSN) to open an account — however, several major banks have international student programmes that accept a passport, I-20, and university enrollment letter instead",
+            "Chase College Checking: one of the strongest international student options — many branches open accounts for F-1 students without an SSN using passport and I-20; no monthly fee with a linked college account",
+            "Bank of America Campus Checking: available at partner universities; some branches can open accounts without SSN — bring your passport, I-20, and a university acceptance or enrollment letter",
+            "Wells Fargo: student accounts available; SSN requirement varies by branch — call your local branch before visiting to confirm their international student policy",
+            "Wise (borderless USD account): the fastest option if you need to receive money before your US bank account is open — Wise gives you US account details (routing and account number) that work with most US payment systems; ideal for receiving your first MoHE stipend transfer",
+            "Documents typically required: valid passport, F-1 or J-1 visa stamp, I-20 or DS-2019, proof of US address (a university accommodation letter suffices on arrival), university enrollment letter",
+            "Apply for your bank account in the first week — you will need it for housing payments, stipend deposits, and on-campus employment"
+          ],
+          "authorizationSources": [
+            "Individual bank policies — verify current requirements directly with your bank branch"
+          ],
+          "controls": [
+            "Visit the bank branch closest to your university in week one — bring all documents listed above",
+            "If you are rejected due to SSN requirements, open a Wise account immediately as a bridge until you have a US bank account",
+            "Enable two-factor authentication on your online banking from day one"
+          ]
+        },
+        {
+          "rule": "Social Security Number (SSN) and ITIN",
+          "details": [
+            "SSN (Social Security Number): F-1 students cannot apply for an SSN unless they have authorised employment — on-campus employment or CPT/OPT qualifies",
+            "To apply for an SSN: obtain a job offer letter from your employer (on-campus department) and a letter from your DSO confirming your employment authorisation, then visit your local Social Security Administration (SSA) office in person",
+            "SSN applications can be filed no earlier than 30 days before your employment start date",
+            "ITIN (Individual Taxpayer Identification Number): for students who need to file a US tax return but are not eligible for an SSN — used only for tax purposes, not for work authorisation or identity verification",
+            "Apply for an ITIN using IRS Form W-7, submitted with your tax return — your international student tax services centre or DSO office can advise",
+            "Many F-1 students on MoHE scholarships (no work income) may not need either an SSN or ITIN in their first academic year — confirm with your DSO and university's tax support office",
+            "Once you have an SSN, update your bank account records — this can unlock additional account features and credit products"
+          ],
+          "authorizationSources": [
+            "IRS Publication 519 (US Tax Guide for Aliens)",
+            "Social Security Administration (ssa.gov)",
+            "Your university's International Student Office (DSO)"
+          ],
+          "controls": [
+            "Never pay anyone to 'get you an SSN faster' — SSN applications are free and processed only by the Social Security Administration",
+            "Confirm with your DSO before applying: premature or incorrect SSN applications can create complications with SEVIS"
+          ]
+        },
+        {
+          "rule": "Managing Your MoHE Living Allowance",
+          "details": [
+            "MoHE living allowances are disbursed monthly or quarterly — confirm your payment schedule and transfer method before departure from Oman",
+            "MoHE typically transfers funds in Omani Rial (OMR) via international wire — the most cost-effective way to receive these in the US is via a Wise or Remitly transfer to your USD account",
+            "Build a 4–6 week emergency cash buffer before you arrive: international bank transfers to the US typically take 3–5 business days and may be held by US banks for 5–10 business days on first receipt",
+            "Typical monthly US student living costs (2025 estimates): major cities (New York, Boston, Los Angeles, San Francisco) USD $2,500–$4,000; mid-size cities (Houston, Phoenix, Chicago, Seattle) USD $1,500–$2,500; smaller college towns USD $1,000–$1,800 — covering rent, food, transport, phone; not tuition",
+            "Halal food is available in major US cities through specialty grocery stores, halal butchers, and restaurant chains — budget may be slightly higher if purchasing from specialist retailers",
+            "MoHE allows a temporary increase in allowance for high-cost-of-living cities in some cases — contact your MoHE scholarship officer if your stipend does not cover basic living costs in your city"
+          ],
+          "authorizationSources": [
+            "MoHE scholarship agreement",
+            "Your MoHE scholarship officer"
+          ],
+          "controls": [
+            "Bring sufficient funds (cash or a pre-loaded travel debit card) to cover at least 4–6 weeks of expenses on arrival",
+            "Notify your US bank in advance when expecting a large international wire — banks can place holds or freeze accounts on unexpected large incoming transfers",
+            "Set up a Wise account to convert OMR to USD at interbank rates and reduce conversion fees"
+          ]
+        },
+        {
+          "rule": "International Money Transfers",
+          "details": [
+            "Wise (formerly TransferWise): the most widely recommended service for OMR to USD transfers — uses mid-market exchange rates with a transparent fee, typically far cheaper than bank-to-bank SWIFT transfers; transfers usually arrive in 1–3 business days",
+            "Remitly: a strong alternative to Wise for transfers to US bank accounts from Oman — competitive rates and mobile-friendly",
+            "Bank-to-bank SWIFT wire transfers: available from Bank Muscat, NBO, and other Omani banks, but fees of USD $25–50 per transfer and 3–5 business day delivery make them the most expensive option for regular allowance transfers",
+            "Western Union and MoneyGram: available but generally have less favourable exchange rates for the amounts typical of student allowances",
+            "US banks are required to report deposits over USD $10,000 under anti-money-laundering regulations — this is routine reporting, not an accusation; ensure any large transfers are documented as MoHE scholarship disbursements",
+            "Keep records of all international transfers — your MoHE scholarship officer may request evidence of allowance receipt"
+          ],
+          "authorizationSources": [
+            "FDIC-insured financial institutions and FinCEN-regulated transfer services"
+          ]
+        },
+        {
+          "rule": "Building a US Credit History",
+          "details": [
+            "The US has three major credit bureaus: Experian, Equifax, and TransUnion — your credit score is calculated from the activity they record; most international students arrive with no US credit history",
+            "No credit history means landlords and phone carriers often require larger deposits or guarantors — start building credit in your first semester",
+            "Secured credit cards are the most accessible credit-building tool for international students: Discover It Secured and Capital One Secured Mastercard do not require an SSN to apply (passport acceptable) and report to all three bureaus",
+            "How a secured card works: you deposit USD $200–$500 as collateral, receive a card with that credit limit, use it for small monthly purchases (groceries, subscriptions), and pay the full balance every month — no interest charges, and your credit score grows",
+            "Never carry a balance on a credit card: the interest rates on US credit cards (18–28% APR) will quickly exceed any reward benefits",
+            "Credit-building services: some banks (including Bank of America and Chase) offer credit-builder loans for students — ask about options when opening your account",
+            "After 6–12 months of on-time payments, your credit score will typically reach 680–720 — sufficient for most apartment leases without a cosigner"
+          ],
+          "controls": [
+            "Apply for a secured credit card within your first month — Discover It Secured is fully available to F-1 students with a passport (SSN not required at application)",
+            "Set up automatic payment of the full statement balance each month — never pay just the minimum",
+            "Monitor your credit report at annualcreditreport.com (free, once per year per bureau) — dispute any errors immediately"
+          ]
+        },
+        {
+          "rule": "Scams Targeting International Students",
+          "details": [
+            "IRS impersonation scams: the most common scam in the US — fraudsters call or email claiming to be the IRS and threatening arrest, deportation, or visa cancellation if you do not pay immediately by wire transfer or gift card. The IRS does NOT call students demanding immediate payment; they contact you by post. Hang up.",
+            "USCIS/immigration fee scams: fraudulent websites or callers posing as USCIS charge fees for status checks, OPT applications, or visa extensions that are free or processed directly through official channels — always use uscis.gov",
+            "Scholarship or visa 'consultant' scams: services that claim to guarantee scholarships, visas, or CPT/OPT approval for a fee — these are fraudulent; immigration advice must come from a licensed attorney or your university DSO",
+            "Cheque overpayment scams: a 'client' sends you a cheque for more than agreed and asks you to return the difference by wire — the original cheque is fake; you lose the money you 'return'",
+            "Apartment rental scams: listings on Craigslist and Facebook Marketplace for apartments in university cities are frequently fraudulent — never wire a deposit or 'application fee' to someone you have not met in person, and never pay before viewing",
+            "If you think you have been scammed: report to the FTC (reportfraud.ftc.gov) and your university's international student office immediately"
+          ],
+          "authorizationSources": [
+            "FTC (reportfraud.ftc.gov)",
+            "IRS (irs.gov/newsroom/tax-scam-consumer-alerts)"
+          ]
+        }
+      ],
+      "contacts": {
+        "FTC_Fraud": {
+          "name": "Federal Trade Commission — Report Fraud",
+          "website": "https://reportfraud.ftc.gov",
+          "description": "Report scams, fraud, and deceptive practices targeting international students"
+        },
+        "SSA_Office": {
+          "name": "Social Security Administration",
+          "website": "https://www.ssa.gov/locator",
+          "description": "Find your local SSA office to apply for a Social Security Number"
+        }
+      },
+      "resources": {
+        "links": [
+          {
+            "title": "Wise — International money transfers",
+            "url": "https://wise.com",
+            "description": "Low-fee OMR to USD transfers at real exchange rates — widely used by international students"
+          },
+          {
+            "title": "Discover It Secured Card",
+            "url": "https://www.discover.com/credit-cards/secured",
+            "description": "Secured credit card available to F-1 students without SSN — best tool for building US credit"
+          },
+          {
+            "title": "IRS — International Students",
+            "url": "https://www.irs.gov/individuals/international-taxpayers/foreign-students-and-scholars",
+            "description": "Official IRS guidance on tax obligations for F-1 and J-1 students"
+          },
+          {
+            "title": "AnnualCreditReport.com",
+            "url": "https://www.annualcreditreport.com",
+            "description": "Free annual credit report from all three US credit bureaus"
+          }
+        ]
+      },
+      "complianceNotes": [
+        "MoHE requires you to maintain a bank account in your own name for allowance disbursement — joint accounts or accounts in another person's name may not be accepted for stipend payments",
+        "Large unexplained cash deposits can trigger bank account freezes under US anti-money-laundering rules — always retain documentation showing that incoming transfers are your MoHE scholarship allowance",
+        "Opening a US bank account does not affect your F-1 immigration status — banking is a routine part of lawful student life in the US",
+        "If you take on-campus employment and obtain an SSN, update your bank records — an SSN unlocks credit card, loan, and investment account options unavailable without one"
       ]
     }
   ],

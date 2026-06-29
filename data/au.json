@@ -5,7 +5,7 @@
     "authority": "Official Australia Compliance Database",
     "validityPeriod": "Academic Year 2025-2026",
     "updateFrequency": "Quarterly",
-    "totalDocuments": 10,
+    "totalDocuments": 11,
     "targetAudience": "Omani Scholars in Australia",
     "sources": [
       "https://immi.homeaffairs.gov.au/visas/getting-a-visa/visa-listing/student-500",
@@ -971,6 +971,199 @@
         "Your rental bond must be lodged with the state rental bond authority — if a landlord insists on holding the bond personally, this is illegal; do not sign the lease under those terms",
         "Notify MoHE of your Australian residential address immediately upon arrival — this may be required under your scholarship agreement",
         "Open your bank account and send the BSB and account number to MoHE in week one — stipend payments cannot be processed without a valid Australian account"
+      ]
+    },
+    {
+      "id": "AU-DEPENDENT-VISA-2026",
+      "title": "Dependants on Student Visa — Subclass 500 Family Members",
+      "effectiveDate": "2025-01-01",
+      "summary": "Spouses, de facto partners, and dependent children of Omani scholars can accompany them to Australia on their own Subclass 500 student visa (as secondary applicants). Each dependant must lodge a separate visa application, hold their own Overseas Student Health Cover (OSHC) under a family policy, and comply with their own visa conditions. Dependant status is directly tied to the primary student's visa — if the scholar's visa is cancelled, dependant visas are cancelled too. Work rights for accompanying spouses vary depending on what level of study the primary student is enrolled in.",
+      "scope": {
+        "appliesTo": [
+          "Spouses and de facto partners of Omani scholars in Australia",
+          "Dependent children of Omani scholars in Australia",
+          "MoHE-sponsored scholars bringing family to Australia"
+        ],
+        "riskLevel": "High",
+        "complianceTier": "Regulatory Mandatory",
+        "geographicScope": "Australia",
+        "failureImpact": "Dependant visa cancellation, unlawful presence in Australia, family separation, breach of primary student's scholarship conditions"
+      },
+      "timeline": {
+        "Before departure": "Lodge dependant visa applications — process concurrently with primary student or after grant",
+        "Before arrival": "Obtain OSHC family policy covering all dependants",
+        "Within 7 days of arrival": "Notify education provider of Australian residential address for all family members",
+        "On enrolment (children)": "Enrol school-age children at an Australian school within the first month of arrival"
+      },
+      "rules": [
+        {
+          "rule": "Who Can Come as a Dependant",
+          "details": [
+            "Eligible dependants are: your spouse (legally married partner), your de facto partner (if in a genuine relationship for at least 12 months), and your dependent children (under 18, or 18 and over if genuinely dependent on you and not married or in a de facto relationship)",
+            "Parents, siblings, or other relatives cannot join as dependants on a student visa — they would need to apply for a separate visitor or other appropriate visa",
+            "De facto partner: you must demonstrate a genuine and continuing relationship — evidence includes joint financial accounts, co-habitation records, statutory declarations, and communication records spanning at least 12 months",
+            "Children aged 18 or over must demonstrate genuine dependency (e.g., studying full-time, disability, or financial dependency) — this is assessed at the time of visa application",
+            "Each dependant is listed as a secondary applicant on your student visa application or can lodge a separate linked application after your visa is granted"
+          ],
+          "authorizationSources": [
+            "Migration Act 1958",
+            "Migration Regulations 1994 — definition of 'member of the family unit'",
+            "Department of Home Affairs (homeaffairs.gov.au)"
+          ],
+          "commonViolations": [
+            {
+              "text": "Bringing a family member to Australia on a tourist visitor visa instead of a dependant student visa",
+              "consequence": "Tourist visa does not allow extended stay; breach of visa conditions; no Medicare or OSHC access"
+            },
+            {
+              "text": "Failing to include all family members in the visa application",
+              "consequence": "Subsequent applications may be more complex and require additional justification"
+            }
+          ]
+        },
+        {
+          "rule": "Visa Application Process",
+          "details": [
+            "Each dependant must lodge their own Subclass 500 student visa application through ImmiAccount (immi.homeaffairs.gov.au) — they cannot use your application",
+            "Dependant applications can be lodged at the same time as your primary application (recommended) or after your visa is granted",
+            "Documents required for each dependant: valid passport, proof of relationship (marriage certificate, de facto evidence, or birth certificate for children), evidence of your enrolment and CoE, proof of OSHC family cover",
+            "Visa fee: AUD $2,000 per dependant application (from 1 July 2025) — fees are non-refundable",
+            "MoHE scholarship may or may not cover dependant visa fees — check your scholarship agreement before applying; do not assume coverage",
+            "Processing times for dependant applications typically mirror the primary application — applying concurrently is strongly recommended to avoid delays in family reunion",
+            "Dependant visas are typically granted with the same expiry date as the primary student's visa"
+          ],
+          "authorizationSources": [
+            "immi.homeaffairs.gov.au/visas/getting-a-visa/visa-listing/student-500"
+          ],
+          "controls": [
+            "Apply for all dependant visas at the same time as your own application — separate applications filed later can cause family separation during processing",
+            "Keep printed copies of all dependant visa grants in a secure location separate from the originals",
+            "Check visa expiry dates for each family member — they may differ if lodged at different times"
+          ]
+        },
+        {
+          "rule": "Work Rights for Accompanying Spouses and Partners",
+          "details": [
+            "Work rights for dependants (spouses and de facto partners) depend on the level of study the primary student (you) is enrolled in",
+            "If you are enrolled in a bachelor's degree or below: your spouse or de facto partner may work up to 48 hours per fortnight while your course is in session; unlimited hours during official university vacation periods",
+            "If you are enrolled in a master's degree (coursework or research) or a doctoral (PhD) programme at a registered Australian university: your spouse or de facto partner has unrestricted work rights — they may work any number of hours at any time",
+            "These rules reflect the restoration of work restrictions from 1 July 2023 when the COVID-era unlimited work rights for student visa holders and their dependants ended",
+            "Work conditions are applied via visa condition 8104 or 8105 — the specific condition on your dependant's visa document determines their actual entitlement; always verify the visa grant notice",
+            "Dependants cannot work in any capacity during gaps in visa validity — ensure visas are renewed before expiry",
+            "Engaging in work beyond the visa work condition is a serious visa breach and may result in visa cancellation for both the dependant and potentially for you"
+          ],
+          "authorizationSources": [
+            "Department of Home Affairs — Student visa work conditions",
+            "immi.homeaffairs.gov.au/visas/getting-a-visa/visa-listing/student-500"
+          ],
+          "commonViolations": [
+            {
+              "text": "Spouse works unlimited hours while primary student is enrolled in an undergraduate degree",
+              "consequence": "Breach of visa condition 8104; visa cancellation for dependant"
+            },
+            {
+              "text": "Dependant works during a period when the primary student has taken an approved leave of absence",
+              "consequence": "May constitute a breach — confirm work entitlements with the education provider and Home Affairs when status changes"
+            }
+          ],
+          "controls": [
+            "Read your dependant's visa grant notice carefully — the specific work condition code is listed on the document",
+            "If your study level changes (e.g., you enrol in a PhD after a master's), notify Home Affairs — your dependant's work conditions may need to be updated",
+            "Contact your education provider's international student office if uncertain about what your dependant is permitted to do"
+          ]
+        },
+        {
+          "rule": "Schooling for Dependent Children",
+          "details": [
+            "School-age children accompanying you to Australia on a dependant student visa are entitled to enrol in Australian schools",
+            "Government schools in most Australian states charge tuition fees for dependants of international student visa holders — fees vary significantly by state: approximately AUD $4,500–$6,500 per year in New South Wales and Victoria; lower in some other states",
+            "Contact the Department of Education in your state or territory to confirm current fee structures for dependants of student visa holders before enrolment",
+            "To enrol: contact your state Department of Education's International Student Services unit; you will need the child's birth certificate, passport, visa grant notice, proof of your enrolment at an Australian university, and proof of OSHC cover",
+            "Children must be enrolled and attending school regularly — truancy can indirectly create issues with the primary student's scholarship compliance and with MoHE reporting",
+            "If your child is in year 11 or 12, their studies and assessments are state-based — understand the curriculum differences early and speak with the school about transition support",
+            "Islamic studies and Arabic language schooling: some major cities have Islamic schools that offer a dual curriculum — available in Sydney, Melbourne, and Brisbane; check with your university's international office for local recommendations"
+          ],
+          "authorizationSources": [
+            "Your state Department of Education — International student enrolment unit"
+          ],
+          "controls": [
+            "Enrol school-age children within the first four weeks of arriving in Australia — late enrolment can affect their academic year",
+            "Confirm whether MoHE scholarship covers dependent children's school fees — this is not always automatic; request clarification in writing from your scholarship officer"
+          ]
+        },
+        {
+          "rule": "Health Cover (OSHC) for Dependants",
+          "details": [
+            "All dependants must hold Overseas Student Health Cover (OSHC) for the full period of their stay in Australia — individual OSHC is insufficient; you must hold a family policy that names each dependant",
+            "OSHC family policies cover the student plus spouse/partner and all dependent children under the one policy — contact your OSHC provider to add dependants before they arrive",
+            "OSHC providers with family cover: Medibank, BUPA, AHM, Allianz Care Australia, nib OSHC — all are approved by the Australian Government",
+            "If a dependant is already in Australia and not yet covered, arrange OSHC immediately — gaps in cover can result in large out-of-pocket medical bills and may constitute a visa condition breach",
+            "OSHC covers: doctor visits (GP), specialist referrals, hospital treatment, prescription medicines at a reduced rate, and some mental health services",
+            "Ambulance: OSHC does not always cover ambulance services — check your policy and consider adding ambulance cover; in Queensland and Tasmania, ambulance is free for residents, but as a visa holder you may not qualify"
+          ],
+          "authorizationSources": [
+            "Australian Government OSHC requirements (homeaffairs.gov.au)",
+            "Private Health Insurance Act 2007"
+          ],
+          "controls": [
+            "Upgrade your OSHC policy to a family plan as soon as you know dependants will be joining you — do this before they arrive",
+            "Keep OSHC membership cards accessible for each dependant at all times",
+            "Renew the family OSHC policy before expiry — set a calendar reminder 60 days in advance"
+          ]
+        },
+        {
+          "rule": "Maintaining Dependant Status",
+          "details": [
+            "Dependant visas are automatically linked to your primary student visa — if your student visa is cancelled or expires, all dependant visas are cancelled or expire at the same time",
+            "If you are required to leave Australia (e.g., for a leave of absence exceeding the grace period), your dependants must also depart unless they hold another valid visa",
+            "If your dependant wishes to remain in Australia while you are temporarily absent, they must confirm with Home Affairs whether they are permitted to do so under their visa conditions",
+            "Significant life changes must be reported: if you and your spouse divorce or separate while in Australia, your spouse's dependant visa may no longer be valid — they should seek independent immigration advice immediately",
+            "If you change education providers, update your OSHC policy and notify Home Affairs if required — dependant records may need to be updated",
+            "Notify MoHE of any changes to your family circumstances that could affect your scholarship entitlements — some MoHE scholarship agreements include dependant allowance components that require notification of changes"
+          ],
+          "authorizationSources": [
+            "Migration Act 1958",
+            "Department of Home Affairs — ImmiAccount (immi.homeaffairs.gov.au)"
+          ],
+          "controls": [
+            "Monitor visa expiry dates for every family member — set calendar alerts 90 days before each expiry",
+            "If your own visa is at risk (e.g., failing ESOS progress requirements), address it immediately — your dependants' visa status depends entirely on yours",
+            "If your relationship status changes, seek immigration legal advice before assuming your dependant's visa remains valid"
+          ]
+        }
+      ],
+      "contacts": {
+        "Department_of_Home_Affairs": {
+          "name": "Australian Department of Home Affairs",
+          "title": "Student visa and dependant enquiries",
+          "website": "https://immi.homeaffairs.gov.au",
+          "description": "ImmiAccount portal — manage visa applications and track status for primary and dependant applications"
+        }
+      },
+      "resources": {
+        "links": [
+          {
+            "title": "Student Visa — Member of the Family Unit (Home Affairs)",
+            "url": "https://immi.homeaffairs.gov.au/visas/getting-a-visa/visa-listing/student-500",
+            "description": "Official guidance on including family members in a student visa application"
+          },
+          {
+            "title": "OSHC — Overseas Student Health Cover",
+            "url": "https://www.homeaffairs.gov.au/education/overseas-student-health-cover",
+            "description": "Australian Government OSHC requirements and approved providers"
+          },
+          {
+            "title": "NSW International Student School Enrolment",
+            "url": "https://www.study.sydney/live/schooling-children-in-nsw",
+            "description": "State government guidance on enrolling dependent children in NSW government schools"
+          }
+        ]
+      },
+      "complianceNotes": [
+        "MoHE scholarship agreements vary on whether dependant visa fees and school fees are covered — obtain written confirmation from your MoHE scholarship officer before committing to bringing family to Australia",
+        "Dependants cannot access Medicare — they must use OSHC for all medical needs; ensure your family policy is active and up to date at all times",
+        "Your dependant spouse's right to work is tied to your enrolment level — if you complete your master's and re-enrol in a bachelor's degree supplement, their unlimited work rights end; inform them of any study level changes immediately",
+        "Domestic violence support: if you or a family member is in an unsafe situation, contact 1800RESPECT (1800 737 732) or the NSW Domestic Violence Line (1800 656 463); your visa status is not at risk for seeking help"
       ]
     }
   ],
