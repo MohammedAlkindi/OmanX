@@ -1,11 +1,11 @@
 {
   "metadata": {
     "version": "3.1.0",
-    "lastUpdated": "2026-06-22",
+    "lastUpdated": "2026-06-30",
     "authority": "Official MoHE Compliance Database",
     "validityPeriod": "Academic Year 2025-2026",
     "updateFrequency": "Quarterly",
-    "totalDocuments": 4,
+    "totalDocuments": 8,
     "targetAudience": "Omani Scholars (All Destinations)"
   },
   "documents": [
@@ -369,6 +369,446 @@
         "A late academic report immediately suspends your stipend — submit early, never late",
         "Leave periods that extend into a teaching semester must be formally approved; a break that runs longer than expected is not automatically covered by your initial leave approval",
         "Always obtain written confirmation from MoHE for every leave and extension approval — verbal confirmations or WhatsApp messages are not sufficient for formal scholarship records"
+      ]
+    },
+    {
+      "id": "MOHE-COURSE-LOAD-2026",
+      "title": "MoHE Enrollment and Course Load Requirements",
+      "effectiveDate": "2025-01-01",
+      "summary": "MoHE requires all scholarship recipients to maintain full-time enrollment throughout their program. 'Full-time' has a specific credit hour definition that varies by degree level and institution. Dropping below full-time — even temporarily — constitutes a scholarship violation unless MoHE has granted prior written approval. This document covers credit hour minimums, course withdrawal rules, summer enrollment, failed courses, and academic probation procedures.",
+      "scope": {
+        "appliesTo": ["All MoHE scholarship recipients — US, UK, and Australia"],
+        "riskLevel": "High",
+        "complianceTier": "Government Contractual",
+        "failureImpact": "Stipend suspension; scholarship placed in breach; potential repayment demand for semesters spent below full-time without approval"
+      },
+      "rules": [
+        {
+          "rule": "Full-Time Enrollment Definition",
+          "details": [
+            "Undergraduate (US): minimum 12 credit hours per semester is the federal standard for full-time status — confirm with your institution's registrar as some universities set 15 credits as full-time for scholarship purposes",
+            "Graduate / Master's (US): typically 9 credit hours per semester constitutes full-time at most US universities — confirm your institution's definition as it varies",
+            "PhD / Doctoral (US): varies significantly — some programs define full-time as 9 credits, others as dissertation registration units only; confirm with your DSO and registrar in writing",
+            "UK (undergraduate and postgraduate): full-time is defined by your institution's term structure — typically 120 credits per academic year (60 per semester); confirm with your Student Records office",
+            "Australia: full-time is typically 0.5 EFTSL per semester (2 standard units of study) — confirm with your institution as definitions vary by faculty and course type",
+            "MoHE defers to your institution's registrar definition of full-time — obtain written confirmation of your status each semester and keep it on file"
+          ],
+          "authorizationSources": ["Your institution's registrar", "MoHE Scholarship Agreement"],
+          "controls": [
+            "Request a written enrollment verification letter from your registrar at the start of each semester confirming full-time status",
+            "Submit this letter to MoHE as part of your semester reporting obligation"
+          ]
+        },
+        {
+          "rule": "Course Withdrawal and Drop Rules",
+          "details": [
+            "Dropping a course that takes you below full-time status requires PRIOR written approval from MoHE — do not drop first and notify later",
+            "Withdrawing from a full course load (all courses) in a semester is treated as a Leave of Absence and requires formal MoHE approval (see MOHE-REPORTING-LEAVE-2026)",
+            "Late withdrawals that appear as 'W' on your transcript must be reported to MoHE — they do not count toward GPA but do affect enrollment status records",
+            "Medical withdrawals must be supported by a physician's certificate and reported to MoHE within 14 days — they are treated as medical leave and may be approved retroactively in genuine cases"
+          ],
+          "authorizationSources": ["MoHE Scholarship Department"],
+          "commonViolations": [
+            {
+              "text": "Dropping a course without MoHE approval, resulting in below-full-time status",
+              "consequence": "Stipend suspended for the affected semester; scholarship placed under review"
+            },
+            {
+              "text": "Withdrawing from all courses without formal leave approval",
+              "consequence": "Treated as unauthorized leave; scholarship may be terminated"
+            }
+          ]
+        },
+        {
+          "rule": "Summer Enrollment",
+          "details": [
+            "Summer enrollment is generally not required unless your program has mandatory summer components or you are on an approved remediation plan",
+            "If you enroll in summer courses, you remain subject to all MoHE reporting and conduct obligations during that period",
+            "Stipend payments during summer vary by scholarship agreement — some agreements suspend the stipend over summer if you return to Oman; confirm your specific arrangement",
+            "PhD students in continuous research programs are typically considered enrolled year-round — confirm your enrollment status with your DSO or supervisor during summer"
+          ],
+          "authorizationSources": ["MoHE Scholarship Agreement"]
+        },
+        {
+          "rule": "Failed Courses and Repeats",
+          "details": [
+            "Failing a course must be reported in your next Academic Progress Report — do not omit failed grades from submissions",
+            "A failing grade that does not itself breach the GPA minimum must still be disclosed — MoHE monitors trends, not just thresholds",
+            "Repeating a failed course is permitted without MoHE approval if it does not extend your program beyond the approved scholarship end date",
+            "If a course repeat will cause you to exceed your approved program duration, you must apply for a Study Extension before your scholarship end date (see MOHE-REPORTING-LEAVE-2026)",
+            "Two or more failed courses in a single semester triggers an automatic MoHE academic review — proactively contact the Scholarship Department with an explanation and remediation plan before they contact you"
+          ],
+          "authorizationSources": ["MoHE Scholarship Agreement"],
+          "controls": [
+            "If you fail a course, email MoHE proactively with an explanation and your remediation plan before submitting the formal progress report",
+            "Attach your academic advisor's statement confirming your continuation plan"
+          ]
+        },
+        {
+          "rule": "Academic Probation",
+          "details": [
+            "If your university places you on academic probation, notify MoHE in writing within 14 days — do not wait for the next scheduled report",
+            "MoHE permits one semester of academic probation with a documented remediation plan; a second consecutive probation semester triggers scholarship review",
+            "You must submit a MoHE-approved Academic Improvement Plan (AIP) within 30 days of being placed on probation — the AIP must be countersigned by your academic advisor",
+            "Clearing academic probation must be confirmed by a letter from your registrar or academic advisor and submitted to MoHE promptly",
+            "Being dismissed from your program due to academic failure is grounds for immediate scholarship termination and full repayment demand"
+          ],
+          "authorizationSources": ["MoHE Scholarship Agreement"],
+          "commonViolations": [
+            {
+              "text": "Failing to notify MoHE of academic probation within the 14-day window",
+              "consequence": "Treated as a reporting violation compounding the academic issue; stipend may be suspended"
+            }
+          ],
+          "controls": [
+            "If you are at risk of academic probation, contact MoHE before the probation is formally issued — early disclosure is treated more favorably than post-facto disclosure"
+          ]
+        }
+      ],
+      "contacts": {
+        "MoHE_Scholarship_Office": {
+          "name": "Oman Ministry of Higher Education — Scholarship Department",
+          "email": "scholarships@mohe.gov.om",
+          "website": "https://www.mohe.gov.om",
+          "hours": "Sunday–Thursday 7:30am–2:30pm (Oman Time / UTC+4)"
+        }
+      },
+      "resources": {
+        "forms": [
+          "Enrollment Verification Letter (from your institution's registrar — each semester)",
+          "Course Withdrawal / Drop Approval Request (submit to MoHE before dropping)",
+          "Academic Improvement Plan Form",
+          "Academic Probation Notification Letter"
+        ]
+      },
+      "complianceNotes": [
+        "Never assume that dropping a course is a minor administrative matter — if it affects your full-time status, it requires MoHE approval first",
+        "Your DSO (US) / Student Records office (UK/AU) and MoHE must both be informed of enrollment changes — informing one does not satisfy the other",
+        "When in doubt about whether a change affects your full-time status, email MoHE before making it — a 24-hour wait for confirmation is far less costly than a stipend suspension"
+      ]
+    },
+    {
+      "id": "MOHE-EMPLOYMENT-2026",
+      "title": "MoHE Work Authorization and Employment Rules",
+      "effectiveDate": "2025-01-01",
+      "summary": "MoHE scholarship recipients are primarily funded to study, not to work. Employment is restricted under both your host-country visa and your MoHE scholarship agreement. Violating MoHE employment rules — even when your visa technically permits some work — can result in stipend reduction, scholarship review, or termination. This document covers what work is permitted, what requires MoHE pre-approval, how income affects your stipend, and how to handle research assistantships and internships.",
+      "scope": {
+        "appliesTo": ["All MoHE scholarship recipients — US, UK, and Australia"],
+        "riskLevel": "High",
+        "complianceTier": "Government Contractual",
+        "failureImpact": "Stipend suspension or reduction; scholarship termination for unauthorized employment; visa violation if work exceeds visa permit"
+      },
+      "rules": [
+        {
+          "rule": "General Employment Principle",
+          "details": [
+            "Your MoHE scholarship is a full financial support package — MoHE's position is that you should not need to work to support yourself during your studies",
+            "The default position under most scholarship agreements is that paid employment requires prior written MoHE authorization, regardless of whether your visa permits it",
+            "Verify your specific scholarship agreement — some agreements prohibit all paid work; others permit limited on-campus work without prior approval; the agreement text is the authority",
+            "MoHE and your host-country visa rules are independent obligations — satisfying one does not satisfy the other; you must comply with both simultaneously"
+          ],
+          "authorizationSources": ["Your individual MoHE Scholarship Agreement", "MoHE Scholarship Department"]
+        },
+        {
+          "rule": "Research and Teaching Assistantships (RA / TA)",
+          "details": [
+            "Research Assistantships (RA) and Teaching Assistantships (TA) offered by your university are the most commonly permitted form of employment for MoHE scholars",
+            "Many scholarship agreements explicitly permit RA/TA positions that are part of your academic program, subject to the following conditions: the position is offered by your enrolled institution; the work is directly related to your field of study; the hours do not interfere with your full-time enrollment; and the position complies with your visa's work authorization rules",
+            "Before accepting any RA or TA offer, email MoHE with the position details (role, hours per week, compensation, and how it relates to your studies) and wait for written confirmation",
+            "RA/TA income received as a tuition waiver rather than a cash stipend is generally less likely to be treated as a scholarship conflict — but still disclose it to MoHE",
+            "If your RA/TA stipend is significant, MoHE may adjust your living allowance accordingly — disclose proactively rather than risk a later audit"
+          ],
+          "authorizationSources": ["MoHE Scholarship Department"],
+          "controls": [
+            "Do not sign an RA/TA contract or begin work before receiving written MoHE confirmation",
+            "Keep copies of all RA/TA contracts and MoHE authorization correspondence"
+          ]
+        },
+        {
+          "rule": "Internships and Co-op Programs",
+          "details": [
+            "Curricular Practical Training (CPT) in the US, placement years in the UK, and Work Integrated Learning (WIL) in Australia — when these are a mandatory or credit-bearing component of your degree — are generally permissible",
+            "Optional or elective internships that are not required for graduation require prior MoHE approval even if your visa permits them",
+            "For CPT (US): your DSO must authorize CPT on your I-20 before you begin; ensure MoHE is also informed in writing",
+            "Paid internships: disclose compensation details to MoHE; MoHE may request that stipend payments be paused or reduced during a paid internship period",
+            "Unpaid internships that are part of your academic program and do not conflict with enrollment are generally low-risk but should still be disclosed"
+          ],
+          "authorizationSources": ["MoHE Scholarship Department", "Your institution's DSO or Career Services office"]
+        },
+        {
+          "rule": "Prohibited Employment",
+          "details": [
+            "Off-campus employment not authorized by your visa is strictly prohibited and is simultaneously a visa violation and a scholarship violation",
+            "Freelance, consulting, or self-employment income earned in your host country without prior MoHE and visa authorization is prohibited",
+            "Working for a company or individual in Oman (remotely) while on scholarship may conflict with your scholarship agreement — confirm with MoHE before accepting any remote Omani employment",
+            "Social media monetization, sponsored content, or any activity generating income that is not disclosed to MoHE is a scholarship risk — disclose any income source regardless of amount",
+            "Working more hours than your visa permits — even in an otherwise authorized position — is both a visa and scholarship violation"
+          ],
+          "authorizationSources": ["MoHE Scholarship Agreement"],
+          "commonViolations": [
+            {
+              "text": "Taking undisclosed off-campus part-time work to supplement income",
+              "consequence": "Scholarship termination; visa revocation; repayment demand for all scholarship funds received"
+            },
+            {
+              "text": "Accepting a paid internship without MoHE approval",
+              "consequence": "Stipend suspension; scholarship review"
+            }
+          ]
+        },
+        {
+          "rule": "Income and Stipend Interaction",
+          "details": [
+            "MoHE may reduce your living allowance stipend if you are earning income that covers your living costs — the scholarship is designed to fund your studies, not supplement employment income",
+            "You are required to disclose any employment income to MoHE in your regular reporting — treat this the same as the GPA and enrollment reporting obligation",
+            "Do not assume that because MoHE has not yet adjusted your stipend after income disclosure, that adjustment will not come retroactively — MoHE may recalculate and deduct from future payments",
+            "Tax obligations on employment income are your personal responsibility — MoHE does not advise on tax and your income may be taxable in your host country; consult a tax advisor"
+          ],
+          "authorizationSources": ["MoHE Scholarship Agreement"]
+        }
+      ],
+      "contacts": {
+        "MoHE_Scholarship_Office": {
+          "name": "Oman Ministry of Higher Education — Scholarship Department",
+          "email": "scholarships@mohe.gov.om",
+          "website": "https://www.mohe.gov.om",
+          "hours": "Sunday–Thursday 7:30am–2:30pm (Oman Time / UTC+4)"
+        }
+      },
+      "resources": {
+        "forms": [
+          "Employment Authorization Request (submit to MoHE before accepting any position)",
+          "RA/TA Disclosure Form",
+          "Income Disclosure — Annual Reporting"
+        ]
+      },
+      "complianceNotes": [
+        "The safest rule: disclose any opportunity to MoHE before accepting — not after",
+        "Visa work authorization and MoHE work authorization are separate — having one does not mean you have the other",
+        "MoHE audits are retrospective — unauthorized income discovered months later still triggers repayment and scholarship action"
+      ]
+    },
+    {
+      "id": "MOHE-PREDEPARTURE-ARRIVAL-2026",
+      "title": "MoHE Pre-Departure Requirements and First-Arrival Checklist",
+      "effectiveDate": "2025-01-01",
+      "summary": "MoHE scholarship recipients must complete a set of requirements before departing Oman and within the first 30–60 days of arriving in their host country. Missing these steps causes delays to stipend payments, visa complications, and compliance flags that are difficult to resolve retroactively. This document covers what MoHE requires before you travel, what to complete immediately on arrival, and the key institutions you must register with in your first weeks abroad.",
+      "scope": {
+        "appliesTo": ["All MoHE scholarship recipients — US, UK, and Australia — at the start of their scholarship"],
+        "riskLevel": "High",
+        "complianceTier": "Government Procedural",
+        "failureImpact": "Delayed or withheld stipend payments; visa complications; compliance record flags that follow you through your scholarship period"
+      },
+      "rules": [
+        {
+          "rule": "Pre-Departure Requirements (Complete Before Leaving Oman)",
+          "details": [
+            "Obtain your MoHE departure authorization — some scholarship agreements require written MoHE clearance before you book travel; check your agreement",
+            "Attend the MoHE pre-departure orientation if one is scheduled for your cohort year — attendance is mandatory and your scholarship contact will notify you of the date",
+            "Ensure your passport validity covers at least 6 months beyond your expected program end date — renew in Oman before departure if needed; renewing abroad is significantly more complex",
+            "Obtain your host-country student visa before departing — do not travel on a tourist visa or visa waiver with the intent to convert it to a student visa, as this creates immigration complications in all three destination countries",
+            "Complete your medical examination if required by your host-country visa (required for Australia student visa; not required for US F-1 or UK Student visa at time of writing — verify current requirements)",
+            "Register your bank account details with MoHE before departure so your stipend can be set up — delays in bank registration are the most common cause of missed first stipend payments",
+            "Obtain copies of your full scholarship agreement, MoHE letter of sponsorship, and all financial entitlement documentation — carry these in both print and digital form; you will need them at your university, your bank, and potentially at immigration"
+          ],
+          "authorizationSources": ["MoHE Scholarship Agreement", "MoHE Scholarship Department"],
+          "controls": [
+            "Create a physical and digital folder with: passport, visa, scholarship agreement, MoHE sponsorship letter, university acceptance letter, and health insurance documents",
+            "Do not book flights until you have received your student visa — book only after visa approval"
+          ]
+        },
+        {
+          "rule": "Arrival: First 72 Hours",
+          "details": [
+            "Port of entry: have your student visa, university acceptance letter, and MoHE sponsorship letter accessible — immigration officers may ask to see evidence of funding",
+            "US (F-1 visa): your SEVIS record must be activated within 30 days of your program start date — report to your DSO within 3 business days of arrival to complete I-20 check-in",
+            "UK (Student visa): report to your university's International Student Advisory Service within 3 days of arrival — your CAS number must be confirmed active",
+            "Australia (Student visa 500): report to your university's international student office within 5 business days of arrival — your CoE (Confirmation of Enrolment) must be active and your OSHC cover must begin",
+            "Contact the Omani Cultural Attaché or Embassy in your host country within your first week to register as an Omani scholar — this registration is separate from MoHE reporting and gives you access to in-country consular support",
+            "Locate the nearest urgent medical facility, your university health center, and the Omani embassy address before you need them — not during an emergency"
+          ],
+          "authorizationSources": ["Your institution's international student office", "Omani Embassy in your host country"]
+        },
+        {
+          "rule": "Arrival: First 30 Days",
+          "details": [
+            "Open a local bank account and register the account details with MoHE immediately — stipend payments cannot be processed without a verified host-country bank account",
+            "Confirm your enrollment and full-time status with your university registrar and obtain a written enrollment verification letter — submit this to MoHE as your initial enrollment confirmation",
+            "Obtain your university student ID, library access, and university email — these are required for ongoing academic reporting and some MoHE correspondence",
+            "Arrange health insurance: confirm whether MoHE is paying directly or reimbursing you — do not assume coverage has started; verify with your institution that you are covered from day one (especially in Australia where OSHC must be active from arrival)",
+            "Set up your MoHE online reporting account if you have not already done so — confirm your login credentials before your first report is due",
+            "Provide your full host-country address and local phone number to MoHE in writing within 14 days of arrival"
+          ],
+          "authorizationSources": ["MoHE Scholarship Department"],
+          "controls": [
+            "Keep a checklist of completed items with the date each was done — you may be asked to confirm completion dates by MoHE during your first review",
+            "Send a single arrival confirmation email to MoHE within 7 days of arrival: include your local address, phone number, institution name, program, and bank account registration status"
+          ]
+        },
+        {
+          "rule": "Arrival: First 60 Days",
+          "details": [
+            "Submit your initial Academic Enrollment Confirmation to MoHE — this is a formal letter from your registrar confirming your program, full-time status, and expected completion date",
+            "Confirm your stipend has been received — if your first stipend payment has not arrived within 30 days of your confirmed bank account registration, contact MoHE Scholarship Department immediately",
+            "US only: complete your SEVIS check-in and verify your I-94 record online (cbp.gov/i94) — your I-94 admission class must show F-1 or J-1 (not WT/WB); contact your DSO immediately if there is a discrepancy",
+            "Australia only: confirm your OSHC health cover is active and that you have your membership card and policy number — log in to your OSHC provider portal to verify",
+            "Identify your university's mental health and counselling services, academic support center, and student financial hardship fund — knowing these resources before you need them reduces the risk of a crisis escalating"
+          ],
+          "authorizationSources": ["MoHE Scholarship Department", "Your institution's international student office"]
+        }
+      ],
+      "contacts": {
+        "MoHE_Scholarship_Office": {
+          "name": "Oman Ministry of Higher Education — Scholarship Department",
+          "email": "scholarships@mohe.gov.om",
+          "website": "https://www.mohe.gov.om",
+          "hours": "Sunday–Thursday 7:30am–2:30pm (Oman Time / UTC+4)"
+        }
+      },
+      "resources": {
+        "links": [
+          {
+            "title": "US I-94 Verification",
+            "url": "https://i94.cbp.dhs.gov",
+            "description": "Check your official US entry record and admission class after arrival"
+          },
+          {
+            "title": "Omani Ministry of Higher Education",
+            "url": "https://www.mohe.gov.om",
+            "description": "Submit enrollment confirmations and bank account registration"
+          }
+        ],
+        "forms": [
+          "MoHE Bank Account Registration Form (submit before departure or immediately on arrival)",
+          "Initial Enrollment Confirmation Letter (from your university registrar — within 60 days of arrival)",
+          "Arrival Notification Email to MoHE (within 7 days of arrival)",
+          "Omani Embassy Scholar Registration (at your host-country embassy within first week)"
+        ]
+      },
+      "complianceNotes": [
+        "The most common first-semester mistake is delaying bank account registration — your stipend cannot be paid until this is done; do it in your first week",
+        "Embassy registration and MoHE reporting are separate obligations — completing one does not satisfy the other",
+        "If anything goes wrong in your first 30 days (visa discrepancy, enrollment issue, bank delay), contact both MoHE and the Omani embassy in your host country immediately — early escalation resolves faster than late disclosure"
+      ]
+    },
+    {
+      "id": "MOHE-FAMILY-DEPENDENTS-2026",
+      "title": "MoHE Marriage and Dependent Policies",
+      "effectiveDate": "2025-01-01",
+      "summary": "MoHE has specific rules governing marriage during your scholarship period and the joining of family members (spouse and children) in your host country. These are not purely personal decisions — they have scholarship, financial, and visa implications. Marriage must be reported to MoHE. Dependents joining you abroad requires prior MoHE notification and may affect your financial entitlements. This document covers reporting obligations, financial arrangements for dependents, and visa implications by destination.",
+      "scope": {
+        "appliesTo": ["All MoHE scholarship recipients — US, UK, and Australia"],
+        "riskLevel": "Medium",
+        "complianceTier": "Government Contractual",
+        "failureImpact": "Unreported marriage or undisclosed dependents can constitute a breach of your scholarship agreement; dependent visa status issues can affect the scholar's own visa"
+      },
+      "rules": [
+        {
+          "rule": "Marriage During Scholarship",
+          "details": [
+            "Marriage during your scholarship period must be reported to MoHE in writing within 30 days of the marriage date — include a copy of your marriage certificate",
+            "Marriage does not automatically entitle you to additional financial support or a change in scholarship terms — any request for additional allowance must be made separately",
+            "Marriage in your host country is legally valid in Oman only if conducted in accordance with Omani personal status law or recognized under an agreement between Oman and the host country — consult the Omani embassy in your host country for guidance on recognition procedures before you marry abroad",
+            "If your spouse is a non-Omani national, additional documentation may be required by MoHE for scholarship record purposes — confirm requirements with MoHE Scholarship Department",
+            "Marriage does not suspend, extend, or otherwise modify your scholarship obligations — your GPA, enrollment, and reporting requirements remain unchanged"
+          ],
+          "authorizationSources": ["MoHE Scholarship Agreement", "Omani Embassy in your host country"],
+          "controls": [
+            "Report your marriage to MoHE and the Omani embassy in your host country within 30 days",
+            "Obtain an authenticated copy of your marriage certificate from the Omani embassy for your personal records"
+          ]
+        },
+        {
+          "rule": "Bringing Dependents Abroad",
+          "details": [
+            "You must notify MoHE in writing before your spouse or children join you in your host country — this is a disclosure obligation, not an approval process in most cases, but the timing matters",
+            "MoHE does not typically pay for dependent living costs under a standard scholarship agreement — confirm whether your specific agreement includes a dependent allowance; do not assume one exists",
+            "If your agreement includes a dependent allowance, it is typically a fixed supplement per dependent and is only activated upon written application with supporting documentation (marriage certificate, birth certificates, dependent visa confirmation)",
+            "Dependents must hold the appropriate visa for your host country — they cannot enter or remain in the country on a tourist visa for the duration of your studies (see destination-specific notes below)",
+            "Your dependent's visa status is linked to your student visa in some destinations — a problem with your student visa can affect their right to remain; conversely, a dependent visa overstay can create complications for your own compliance record"
+          ],
+          "authorizationSources": ["MoHE Scholarship Agreement", "MoHE Scholarship Department"],
+          "controls": [
+            "Apply for any dependent allowance before your dependents travel — do not assume payment will be backdated",
+            "Keep copies of all dependent visa approvals on file alongside your own scholarship documents"
+          ]
+        },
+        {
+          "rule": "Dependent Visa — US (F-2)",
+          "details": [
+            "Spouses and unmarried children under 21 of F-1 students may apply for F-2 dependent visas",
+            "F-2 holders may NOT work in the United States under any circumstances — this is a hard US immigration rule",
+            "F-2 holders may study part-time but may not pursue a full course of study at a US institution without changing to a different visa status",
+            "Your DSO must issue an updated I-20 listing your dependent before they apply for the F-2 visa — contact your DSO as your first step",
+            "F-2 status is tied to your F-1 status — if your F-1 is terminated or you transfer institutions, your dependents' F-2 status is also affected immediately"
+          ],
+          "authorizationSources": ["Your institution's DSO", "USCIS", "US Department of State"]
+        },
+        {
+          "rule": "Dependent Visa — UK (Student Dependant)",
+          "details": [
+            "You may bring dependants (spouse/civil partner and children under 18) to the UK if you are a postgraduate student on a course lasting more than 9 months, or an eligible government-sponsored student",
+            "Undergraduate students and students on courses of 9 months or less generally cannot bring dependants to the UK under the Student route — this is a UK Home Office restriction, not just an MoHE rule",
+            "Student Dependant visa holders may work in the UK if the main student has permission to work — check your Student visa Biometric Residence Permit (BRP) for your work permission",
+            "Your dependant's right to remain in the UK is contingent on your continuing student status — if you withdraw, transfer, or your visa is curtailed, their visa is affected",
+            "Apply for Student Dependant visas at the same time as or after your own Student visa — they cannot be granted before yours"
+          ],
+          "authorizationSources": ["UK Visas and Immigration (UKVI)", "Your institution's International Student Advisory Service"]
+        },
+        {
+          "rule": "Dependent Visa — Australia (Student Visa 500 — Secondary Applicant)",
+          "details": [
+            "Spouses and dependent children can be included as secondary applicants on your Australian Student visa (subclass 500) or apply for their own Student visa as secondary holders",
+            "Secondary applicants must be listed before or at the time of your visa grant — adding a dependent after your visa has been granted requires a separate visa application",
+            "Work rights for secondary applicants: spouses of student visa holders in Australia generally have unlimited work rights during your studies (as of the time of writing — confirm current rules with the Department of Home Affairs as policy changes)",
+            "Dependent children may attend school in Australia — OSHC does not automatically cover dependants; you must enroll them in a separate Overseas Visitor Health Cover (OVHC) or equivalent policy",
+            "Contact MoHE to confirm whether OSHC for dependants is a covered entitlement under your scholarship agreement or a personal cost"
+          ],
+          "authorizationSources": ["Australian Department of Home Affairs", "Your institution's international student office"]
+        },
+        {
+          "rule": "Financial Planning for Dependents",
+          "details": [
+            "If MoHE does not cover dependent costs, you must demonstrate sufficient funds to support your dependants in your visa application — ensure you can evidence this without relying on anticipated scholarship funds that are not confirmed in writing",
+            "The cost of living for a spouse and child significantly exceeds a typical scholarship stipend in all three destinations — make a realistic monthly budget before your dependants travel",
+            "Dependent school fees in Australia are significant for international students — public school fees for temporary residents apply in most states; this is typically not covered by MoHE",
+            "UK NHS surcharge must be paid for each Student Dependant visa applicant — this is an upfront cost at the time of application, not covered by the NHS once in the UK"
+          ],
+          "authorizationSources": ["MoHE Scholarship Agreement"]
+        }
+      ],
+      "contacts": {
+        "MoHE_Scholarship_Office": {
+          "name": "Oman Ministry of Higher Education — Scholarship Department",
+          "email": "scholarships@mohe.gov.om",
+          "website": "https://www.mohe.gov.om",
+          "hours": "Sunday–Thursday 7:30am–2:30pm (Oman Time / UTC+4)"
+        }
+      },
+      "resources": {
+        "links": [
+          {
+            "title": "UK Student Dependant Visa — Gov.uk",
+            "url": "https://www.gov.uk/student-visa/family-members",
+            "description": "Official UK guidance on bringing family members on a Student visa"
+          },
+          {
+            "title": "Australia Student Visa — Secondary Applicants",
+            "url": "https://immi.homeaffairs.gov.au/visas/getting-a-visa/visa-listing/student-500",
+            "description": "Australian Department of Home Affairs guidance on dependent secondary applicants"
+          }
+        ],
+        "forms": [
+          "MoHE Marriage Notification (submit within 30 days of marriage with marriage certificate)",
+          "Dependent Allowance Application Form (if applicable under your scholarship agreement)",
+          "I-20 Update Request for F-2 Dependent (US — submit to your DSO first)",
+          "Student Dependant Visa Application (UK — via UKVI online portal)"
+        ]
+      },
+      "complianceNotes": [
+        "Report your marriage to MoHE regardless of whether you intend to bring your spouse abroad — unreported life changes create compliance gaps",
+        "Dependent visa rules differ significantly across destinations — read the destination-specific rules carefully and do not assume what applies in one country applies in another",
+        "A dependent's immigration problem is your compliance problem — their visa overstay or unauthorized work can affect your scholarship record; monitor their status as carefully as your own"
       ]
     },
     {
