@@ -655,7 +655,7 @@ function emptyStateMarkup() {
   return `
     <section class="message-empty">
       <div class="empty-brand">Oman<span>X</span></div>
-      <p class="empty-sub">Compliance-aware guidance for Omani scholars in the U.S., U.K., and Australia.</p>
+      <p class="empty-sub">For Omani scholars in the US, UK & Australia.</p>
       <div class="prompt-grid">
         ${prompts.map((p) => `<button type="button" class="prompt-card" data-quick-prompt="${escapeHtml(p.text)}"><span class="prompt-card-label">${escapeHtml(p.label)}</span><span class="prompt-card-text">${escapeHtml(p.text)}</span></button>`).join('')}
       </div>
