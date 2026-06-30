@@ -23,8 +23,14 @@ const state = {
   confirmDeleteId: null,
 };
 
+const ONBOARDED_KEY = 'omanx.onboarded.v1';
+const DEST_FLAG = { us: '🇺🇸', uk: '🇬🇧', au: '🇦🇺' };
+const DEST_LABEL = { us: 'US', uk: 'UK', au: 'AU' };
+const THINKING_STAGES = ['Thinking…', 'Reading knowledge base…', 'Composing answer…'];
+
 // Tracks which chatId is actively streaming; null when idle.
 let streamingChatId = null;
+let thinkingTimer = null;
 
 const feedbackState = new Map(); // messageId -> 'up' | 'down'
 
@@ -32,6 +38,7 @@ initCore({ page: 'chat' });
 ensureActiveChat();
 render();
 bindEvents();
+if (!localStorage.getItem(ONBOARDED_KEY)) showOnboarding();
 
 // init composer height
 const _initTextarea = qs('[data-chat-input]');
@@ -58,9 +65,18 @@ function persist() {
 function setTyping(value) {
   state.typing = value;
   const btn = qs('[data-send-btn]');
-  const statusText = qs('[data-status-text]');
   if (btn) btn.disabled = value;
-  if (statusText) statusText.textContent = value ? 'Thinking…' : 'Ready';
+  if (value) {
+    let stage = 0;
+    thinkingTimer = setInterval(() => {
+      stage = (stage + 1) % THINKING_STAGES.length;
+      const el = qs('[data-thinking-status]');
+      if (el) el.textContent = THINKING_STAGES[stage];
+    }, 1800);
+  } else {
+    clearInterval(thinkingTimer);
+    thinkingTimer = null;
+  }
 }
 
 function doRename(chatId, value) {
@@ -278,6 +294,44 @@ function updateUserChip() {
   if (nameEl) nameEl.textContent = name;
 }
 
+function showOnboarding() {
+  const overlay = qs('[data-onboarding]');
+  if (!overlay) return;
+  overlay.hidden = false;
+
+  let selectedDest = 'auto';
+
+  qsa('[data-dest]', overlay).forEach((btn) => {
+    btn.addEventListener('click', () => {
+      qsa('[data-dest]', overlay).forEach((b) => b.classList.remove('selected'));
+      btn.classList.add('selected');
+      selectedDest = btn.dataset.dest;
+      qs('[data-ob-step="1"]', overlay).hidden = true;
+      qs('[data-ob-step="2"]', overlay).hidden = false;
+      qs('[data-onboarding-name]', overlay)?.focus();
+    });
+  });
+
+  function completeOnboarding() {
+    const name = (qs('[data-onboarding-name]', overlay)?.value || '').trim();
+    if (name) {
+      state.settings.studentName = name;
+    }
+    state.settings.destination = selectedDest;
+    saveSettings(state.settings);
+    localStorage.setItem(ONBOARDED_KEY, '1');
+    overlay.hidden = true;
+    updateUserChip();
+    populateSettingsPanel();
+    renderMessages();
+  }
+
+  qs('[data-onboarding-submit]', overlay)?.addEventListener('click', completeOnboarding);
+  qs('[data-onboarding-name]', overlay)?.addEventListener('keydown', (e) => {
+    if (e.key === 'Enter') completeOnboarding();
+  });
+}
+
 function render() {
   renderSidebar();
   // Skip message-list rebuild while the stream bubble is live on the active chat.
@@ -447,6 +501,7 @@ function renderMessages() {
       <div class="message-meta">
         <span>${message.role === 'assistant' ? 'OmanX' : state.settings.studentName}</span>
         <span>${formatDateTime(message.createdAt)}</span>
+        ${message.role === 'assistant' && message.destination && DEST_FLAG[message.destination] ? `<span class="dest-badge">${DEST_FLAG[message.destination]} ${DEST_LABEL[message.destination]}</span>` : ''}
         ${message.role === 'assistant' ? `
           <span class="message-tools">
             ${message.webSearched ? '<span class="web-search-badge" title="Live web search was used for this response">Web search</span>' : ''}
@@ -469,8 +524,11 @@ function renderMessages() {
     const typing = document.createElement('article');
     typing.className = 'message assistant';
     typing.innerHTML = `
-      <div class="message-bubble"><div class="typing"><span></span><span></span><span></span></div></div>
-      <div class="message-meta"><span>OmanX</span><span>Thinking</span></div>
+      <div class="message-bubble">
+        <div class="typing"><span></span><span></span><span></span></div>
+        <div class="thinking-status" data-thinking-status>Thinking…</div>
+      </div>
+      <div class="message-meta"><span>OmanX</span></div>
     `;
     container.appendChild(typing);
   }
@@ -560,6 +618,7 @@ async function streamAssistantReply(message) {
   let didWebSearch = false;
   let didSources = [];
   let didEscalation = null;
+  let didDestination = null;
   let bubbleEl = null;
   let rafPending = false;
 
@@ -620,7 +679,7 @@ async function streamAssistantReply(message) {
             const data = JSON.parse(line.slice(6));
             if (data.error) { fullText = `**Error:** ${data.error}`; break; }
             if (data.t) { fullText += data.t; scheduleRender(); }
-            if (data.done) { if (data.webSearched) didWebSearch = true; if (data.sources) didSources = data.sources; if (data.escalation) didEscalation = data.escalation; }
+            if (data.done) { if (data.webSearched) didWebSearch = true; if (data.sources) didSources = data.sources; if (data.escalation) didEscalation = data.escalation; if (data.destination) didDestination = data.destination; }
           } catch { /* malformed SSE line */ }
         }
       }
@@ -635,7 +694,7 @@ async function streamAssistantReply(message) {
   // Use the captured chat.id so the response always saves to the originating chat
   // even if the user switched conversations mid-stream.
   qs('[data-stream-bubble]')?.remove();
-  appendMessage('assistant', fullText.trim() || 'No response generated.', chat.id, { webSearched: didWebSearch, sources: didSources, escalation: didEscalation });
+  appendMessage('assistant', fullText.trim() || 'No response generated.', chat.id, { webSearched: didWebSearch, sources: didSources, escalation: didEscalation, destination: didDestination });
   setTyping(false);
 }
 
@@ -652,14 +711,15 @@ function autoGrow(textarea) {
 }
 
 function emptyStateMarkup() {
+  const name = state.settings.studentName && state.settings.studentName !== 'Student' ? `, ${state.settings.studentName}` : '';
   return `
     <section class="message-empty">
       <div class="empty-brand">Oman<span>X</span></div>
-      <p class="empty-sub">For Omani scholars in the US, UK & Australia.</p>
+      <p class="empty-sub">Good to see you${escapeHtml(name)}. Ask anything about visas, work, housing, or compliance in the US, UK, or Australia.</p>
+      <p class="empty-trust">Answers draw from MoHE scholarship rules and official visa regulations — urgent compliance issues are flagged clearly.</p>
       <div class="prompt-grid">
         ${prompts.map((p) => `<button type="button" class="prompt-card" data-quick-prompt="${escapeHtml(p.text)}"><span class="prompt-card-label">${escapeHtml(p.label)}</span><span class="prompt-card-text">${escapeHtml(p.text)}</span></button>`).join('')}
       </div>
-      <p class="empty-trust">Answers draw from MoHE scholarship rules and official visa regulations. Urgent compliance issues are flagged clearly.</p>
     </section>
   `;
 }

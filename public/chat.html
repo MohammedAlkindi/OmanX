@@ -43,7 +43,7 @@
                 <div class="muted">Conversations</div>
                 <h3>Decision history</h3>
               </div>
-              <button class="btn" data-new-chat type="button" style="height:32px;padding:0 14px;font-size:0.8125rem;">New</button>
+              <button class="btn btn-new-chat" data-new-chat type="button">New</button>
             </div>
 
             <label class="muted" for="chat-search">Search</label>
@@ -176,7 +176,10 @@
         <!-- Main chat area -->
         <section class="assistant-shell" aria-label="Decision workspace">
           <div class="mobile-chat-bar">
-            <button class="btn-ghost sidebar-toggle-btn" data-sidebar-toggle type="button">≡ Conversations</button>
+            <button class="btn-ghost sidebar-toggle-btn" data-sidebar-toggle type="button">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" aria-hidden="true"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+            Chats
+          </button>
           </div>
 
           <section class="chat-body" data-message-list></section>
@@ -187,14 +190,48 @@
             <div class="composer-box card">
               <textarea id="chat-input" data-chat-input placeholder="Ask about visas, campus setup, work authorization, housing…"></textarea>
               <div class="composer-actions">
-                <button class="btn" type="submit" data-send-btn style="height:34px;padding:0 20px;font-size:0.8125rem;">Send</button>
+                <button class="btn btn-send" type="submit" data-send-btn>Send</button>
               </div>
             </div>
+            <p class="composer-hint">Enter to send &middot; Shift+Enter for new line</p>
           </form>
         </section>
 
       </div>
     </main>
+
+    <!-- Onboarding overlay — shown on first visit -->
+    <div class="onboarding-overlay" data-onboarding hidden>
+      <div class="onboarding-card">
+        <div class="onboarding-brand">Oman<span>X</span></div>
+
+        <div class="onboarding-step" data-ob-step="1">
+          <p class="onboarding-title">Where are you studying?</p>
+          <p class="onboarding-hint">Guides which visa and scholarship rules apply to you.</p>
+          <div class="onboarding-dests">
+            <button class="dest-card" type="button" data-dest="us">
+              <span class="dest-flag">🇺🇸</span>
+              <span class="dest-name">United States</span>
+            </button>
+            <button class="dest-card" type="button" data-dest="uk">
+              <span class="dest-flag">🇬🇧</span>
+              <span class="dest-name">United Kingdom</span>
+            </button>
+            <button class="dest-card" type="button" data-dest="au">
+              <span class="dest-flag">🇦🇺</span>
+              <span class="dest-name">Australia</span>
+            </button>
+          </div>
+        </div>
+
+        <div class="onboarding-step" data-ob-step="2" hidden>
+          <p class="onboarding-title">What should we call you?</p>
+          <p class="onboarding-hint">Optional — you can change this anytime in settings.</p>
+          <input class="onboarding-name-input" data-onboarding-name type="text" placeholder="Your name" autocomplete="given-name" />
+          <button class="btn onboarding-submit" data-onboarding-submit type="button">Get started →</button>
+        </div>
+      </div>
+    </div>
 
     <script type="module" src="/js/chat-page.js"></script>
   </body>

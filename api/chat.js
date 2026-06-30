@@ -676,7 +676,7 @@ export default async function handler(req, res) {
       res.setHeader('Connection', 'keep-alive');
       res.flushHeaders();
       res.write(`data: ${JSON.stringify({ t: cached })}\n\n`);
-      res.write(`data: ${JSON.stringify({ done: true, compliance: false, webSearched: false })}\n\n`);
+      res.write(`data: ${JSON.stringify({ done: true, compliance: false, webSearched: false, destination })}\n\n`);
       return res.end();
     }
     return res.json({ text: cached, cached: true });
@@ -741,7 +741,7 @@ export default async function handler(req, res) {
         }),
       ];
       const escalation = compliance && isUrgent(sanitizedMessage) ? buildEscalationCard(sanitizedMessage, destination) : null;
-      res.write(`data: ${JSON.stringify({ done: true, compliance, webSearched: webResults.length > 0, sources, escalation })}\n\n`);
+      res.write(`data: ${JSON.stringify({ done: true, compliance, webSearched: webResults.length > 0, sources, escalation, destination })}\n\n`);
       res.end();
     } catch (err) {
       console.error("[OmanX] Anthropic stream error:", err?.message);
