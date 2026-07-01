@@ -469,9 +469,8 @@ function renderSidebar() {
       event.stopPropagation();
       menu.hidden = true;
       const chat = state.chats.find((c) => c.id === chatId);
-      const content = chat.messages.map((m) => `[${m.role}] ${m.content}`).join('\n\n');
-      downloadFile(`${slugify(chat.title)}.txt`, content);
-      showToast('Conversation exported.');
+      downloadFile(`${slugify(chat.title)}.md`, chatToMarkdown(chat), 'text/markdown;charset=utf-8');
+      showToast('Conversation exported as Markdown.');
     });
   });
 }
@@ -726,6 +725,59 @@ function emptyStateMarkup() {
 
 function slugify(value) {
   return value.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '') || 'omanx-chat';
+}
+
+function chatToMarkdown(chat) {
+  const destMsg = chat.messages.find((m) => m.destination);
+  const dest = destMsg?.destination;
+  const destStr = dest ? ` · ${DEST_FLAG[dest] || ''} ${DEST_LABEL[dest] || dest.toUpperCase()}` : '';
+  const exportDate = new Intl.DateTimeFormat('en', { dateStyle: 'long', timeStyle: 'short' }).format(new Date());
+
+  const lines = [
+    `# ${chat.title}`,
+    ``,
+    `**OmanX Conversation Export**${destStr}  `,
+    `Exported ${exportDate}`,
+    ``,
+    `---`,
+    ``,
+  ];
+
+  for (const msg of chat.messages) {
+    if (msg.role === 'user') {
+      lines.push(`## You`, ``, msg.content, ``);
+    } else {
+      lines.push(`## OmanX`, ``, msg.content, ``);
+
+      if (msg.sources?.length) {
+        lines.push(`**Sources:**`);
+        for (const s of msg.sources) {
+          if (s.type === 'kb') {
+            lines.push(`- ${s.title || s.id} *(Knowledge Base)*`);
+          } else {
+            lines.push(`- [${s.title || s.domain}](${s.url})`);
+          }
+        }
+        lines.push(``);
+      }
+
+      if (msg.escalation) {
+        const card = msg.escalation;
+        lines.push(`> **${card.title}**`);
+        for (const step of card.steps || []) lines.push(`> - ${step}`);
+        if (card.forms?.length) {
+          lines.push(`>`, `> *Relevant forms:* ${card.forms.join(', ')}`);
+        }
+        if (card.embassy) {
+          lines.push(`>`, `> **${card.embassy.name}** — ${card.embassy.note}`);
+        }
+        lines.push(`>`, `> ${card.dsoNote}`, ``);
+      }
+    }
+    lines.push(`---`, ``);
+  }
+
+  return lines.join('\n');
 }
 
 function escapeHtml(value) {
