@@ -377,7 +377,8 @@ function renderSidebar() {
               <div class="chat-item-dropdown" data-item-menu hidden>
                 <button type="button" data-pin-chat>${chat.pinned ? 'Unpin' : 'Pin'}</button>
                 <button type="button" data-copy-last-item>Copy last reply</button>
-                <button type="button" data-export-item>Export</button>
+                <button type="button" data-export-md>Export Markdown</button>
+                <button type="button" data-export-pdf>Export PDF</button>
                 <hr class="menu-divider" />
                 <button type="button" data-rename-item>Rename</button>
                 <button type="button" data-delete-item class="danger">Delete</button>
@@ -464,13 +465,21 @@ function renderSidebar() {
       await copyText(message.content, 'Last assistant message copied.');
     });
 
-    // export
-    item.querySelector('[data-export-item]')?.addEventListener('click', (event) => {
+    // export markdown
+    item.querySelector('[data-export-md]')?.addEventListener('click', (event) => {
       event.stopPropagation();
       menu.hidden = true;
       const chat = state.chats.find((c) => c.id === chatId);
       downloadFile(`${slugify(chat.title)}.md`, chatToMarkdown(chat), 'text/markdown;charset=utf-8');
       showToast('Conversation exported as Markdown.');
+    });
+
+    // export PDF
+    item.querySelector('[data-export-pdf]')?.addEventListener('click', (event) => {
+      event.stopPropagation();
+      menu.hidden = true;
+      const chat = state.chats.find((c) => c.id === chatId);
+      exportAsPdf(chat);
     });
   });
 }
@@ -780,6 +789,131 @@ function chatToMarkdown(chat) {
   return lines.join('\n');
 }
 
+function exportAsPdf(chat) {
+  const blob = new Blob([chatToPrintHtml(chat)], { type: 'text/html;charset=utf-8' });
+  const url = URL.createObjectURL(blob);
+  const win = window.open(url, '_blank');
+  if (!win) {
+    URL.revokeObjectURL(url);
+    showToast('Pop-up blocked — allow pop-ups for this site to export PDF.');
+    return;
+  }
+  setTimeout(() => URL.revokeObjectURL(url), 60000);
+  showToast('Opening print dialog — choose "Save as PDF".');
+}
+
+function chatToPrintHtml(chat) {
+  const destMsg = chat.messages.find((m) => m.destination);
+  const dest = destMsg?.destination;
+  const destStr = dest ? ` · ${DEST_FLAG[dest] || ''} ${DEST_LABEL[dest] || dest.toUpperCase()}` : '';
+  const exportDate = new Intl.DateTimeFormat('en', { dateStyle: 'long', timeStyle: 'short' }).format(new Date());
+  const studentName = state.settings.studentName || 'Student';
+
+  const messagesHtml = chat.messages.map((msg) => {
+    if (msg.role === 'user') {
+      return `
+        <div class="turn turn-user">
+          <div class="turn-label">${escapeHtml(studentName)}</div>
+          <div class="turn-body">${escapeHtml(msg.content).replace(/\n/g, '<br>')}</div>
+        </div><hr class="divider">
+      `;
+    }
+
+    let sourcesHtml = '';
+    if (msg.sources?.length) {
+      const chips = msg.sources.map((s) => {
+        if (s.type === 'kb') return escapeHtml(s.title || s.id) + ' <em>(Knowledge Base)</em>';
+        const safeUrl = /^https?:\/\//i.test(s.url) ? s.url : '#';
+        return `<a href="${escapeHtml(safeUrl)}" rel="noopener noreferrer">${escapeHtml(s.title || s.domain)}</a>`;
+      }).join(' · ');
+      sourcesHtml = `<div class="sources"><span class="sources-label">Sources:</span> ${chips}</div>`;
+    }
+
+    let escalationHtml = '';
+    if (msg.escalation) {
+      const card = msg.escalation;
+      const stepsHtml = (card.steps || []).map((s) => `<li>${escapeHtml(s)}</li>`).join('');
+      const formsHtml = card.forms?.length ? `<div><strong>Relevant forms:</strong> ${card.forms.map((f) => escapeHtml(f)).join(', ')}</div>` : '';
+      const embassyHtml = card.embassy ? `<div><strong>${escapeHtml(card.embassy.name)}</strong> — ${escapeHtml(card.embassy.note)}</div>` : '';
+      escalationHtml = `
+        <div class="escalation-card ${card.level === 'urgent' ? 'urgent' : 'warning'}">
+          <div class="escalation-title">${escapeHtml(card.title)} · ${card.level === 'urgent' ? 'Action Required' : 'Heads Up'}</div>
+          <ol>${stepsHtml}</ol>
+          ${formsHtml}${embassyHtml}
+          <div class="dso-note">${escapeHtml(card.dsoNote)}</div>
+        </div>
+      `;
+    }
+
+    return `
+      <div class="turn turn-assistant">
+        <div class="turn-label">OmanX</div>
+        <div class="turn-body">${renderRichText(msg.content)}</div>
+        ${sourcesHtml}${escalationHtml}
+      </div><hr class="divider">
+    `;
+  }).join('');
+
+  return `<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1.0">
+  <title>OmanX — ${escapeHtml(chat.title)}</title>
+  <style>
+    *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+    body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;font-size:14px;line-height:1.65;color:#1a1a1a;background:#fff;padding:2.5cm 2cm;max-width:21cm;margin:0 auto}
+    .doc-header{border-bottom:2px solid #1a1a1a;padding-bottom:1em;margin-bottom:2em}
+    .doc-brand{font-size:1.5em;font-weight:700;letter-spacing:-0.02em}
+    .doc-brand span{color:#c15a00}
+    .doc-title{font-size:1.1em;font-weight:600;margin:.3em 0 .1em}
+    .doc-meta{font-size:.8em;color:#666}
+    .turn{margin-bottom:1.25em}
+    .turn-label{font-size:.7em;font-weight:700;text-transform:uppercase;letter-spacing:.08em;margin-bottom:.35em}
+    .turn-user .turn-label{color:#1a4b8c}
+    .turn-assistant .turn-label{color:#7c3a00}
+    .turn-user .turn-body{background:#f0f4ff;border-left:3px solid #1a4b8c;padding:.7em 1em;border-radius:0 4px 4px 0}
+    .turn-body h3,.turn-body h4{font-size:1em;font-weight:600;margin:.75em 0 .25em}
+    .turn-body p{margin:.4em 0}
+    .turn-body br+br{display:none}
+    .turn-body ul,.turn-body ol{margin:.4em 0 .4em 1.5em}
+    .turn-body li{margin:.2em 0}
+    .turn-body blockquote{border-left:3px solid #ccc;padding-left:.85em;color:#555;margin:.5em 0}
+    .turn-body strong{font-weight:600}
+    .turn-body .code-inline{font-family:'SF Mono',Consolas,monospace;background:#f4f4f4;padding:.1em .3em;border-radius:3px;font-size:.88em}
+    .turn-body a{color:#1a4b8c}
+    .sources{margin-top:.65em;font-size:.8em;color:#555;border-top:1px solid #e5e5e5;padding-top:.5em}
+    .sources-label{font-weight:600}
+    .sources a{color:#1a4b8c;text-decoration:none}
+    .escalation-card{margin-top:.9em;padding:.75em 1em;border-radius:4px}
+    .escalation-card.urgent{background:#fff5f5;border-left:4px solid #c0392b}
+    .escalation-card.warning{background:#fffbf0;border-left:4px solid #e67e22}
+    .escalation-title{font-weight:700;font-size:.9em;margin-bottom:.5em}
+    .escalation-card ol{margin:.4em 0 .4em 1.4em}
+    .escalation-card li{margin:.2em 0}
+    .escalation-card div{margin-top:.4em;font-size:.88em}
+    .dso-note{font-style:italic;color:#555}
+    .divider{border:none;border-top:1px solid #e5e5e5;margin:1.25em 0}
+    @media print{
+      body{padding:0}
+      .turn,.escalation-card{break-inside:avoid}
+      a{color:inherit;text-decoration:none}
+      a[href]::after{content:' (' attr(href) ')';font-size:.78em;color:#666}
+    }
+  </style>
+</head>
+<body>
+  <div class="doc-header">
+    <div class="doc-brand">Oman<span>X</span></div>
+    <div class="doc-title">${escapeHtml(chat.title)}${escapeHtml(destStr)}</div>
+    <div class="doc-meta">Exported ${escapeHtml(exportDate)}</div>
+  </div>
+  <main>${messagesHtml}</main>
+  <script>window.addEventListener('load',function(){window.print();});<\/script>
+</body>
+</html>`;
+}
+
 function escapeHtml(value) {
   return String(value ?? '').replace(/[&<>"']/g, (char) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[char]));
 }
@@ -855,7 +989,8 @@ function renderSources(sources) {
     if (s.type === 'kb') {
       return `<span class="source-chip source-chip-kb" title="${escapeHtml(s.id)}">${escapeHtml(s.title || s.id)}</span>`;
     }
-    return `<a class="source-chip source-chip-web" href="${escapeHtml(s.url)}" target="_blank" rel="noopener noreferrer" title="${escapeHtml(s.title)}">${escapeHtml(s.domain)}</a>`;
+    const safeUrl = /^https?:\/\//i.test(s.url) ? s.url : '#';
+    return `<a class="source-chip source-chip-web" href="${escapeHtml(safeUrl)}" target="_blank" rel="noopener noreferrer" title="${escapeHtml(s.title)}">${escapeHtml(s.domain)}</a>`;
   }).join('');
   return `<div class="message-sources"><span class="sources-label">Cited</span>${chips}</div>`;
 }
