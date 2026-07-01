@@ -1,7 +1,7 @@
 {
   "metadata": {
     "version": "3.0.0",
-    "lastUpdated": "2026-06-10",
+    "lastUpdated": "2026-07-01",
     "authority": "Official Compliance Database v2",
     "validityPeriod": "Academic Year 2025-2026",
     "updateFrequency": "Quarterly",
@@ -105,9 +105,15 @@
           "details": [
             "CPT must be an integral part of the established curriculum (internship, practicum, co-op)",
             "Requires a specific course for credit or a mandatory degree requirement",
+            "Eligibility — enrollment period: student must have been lawfully enrolled full-time for at least one full academic year (typically two semesters, approximately 9 months) before CPT can be authorized; exception: graduate-level programs that require CPT from program inception may authorize it during the first semester — confirm with your DSO whether your graduate program qualifies",
+            "Employer letter requirement: a signed cooperative agreement or offer letter from the employer is required before CPT can be authorized; the letter must state the employer name and address, exact CPT start and end dates, hours per week, job title and description, and confirmation that the role is directly related to the student's major field of study",
+            "Part-time CPT: fewer than 20 hours per week — part-time CPT does NOT accumulate toward the 12-month OPT-elimination threshold, regardless of total duration",
+            "Full-time CPT: 20 or more hours per week — 12 or more cumulative months of full-time CPT eliminates ALL OPT eligibility at that degree level, including both the standard 12-month post-completion OPT and any 24-month STEM OPT extension; this is an absolute bar with no waiver",
             "Must have DSO authorization and a new I-20 with CPT notation before work begins",
-            "Full-time CPT for 12 months or more eliminates eligibility for post-completion OPT"
+            "Each CPT authorization is specific to one employer and one time period — a new DSO-authorized I-20 is required for each employer change or new CPT term"
           ],
+          "source": "ICE SEVP — studyinthestates.dhs.gov/sevis-help-hub/student-records/fm-student-employment/f-1-curricular-practical-training-cpt; 8 CFR 214.2(f)(10)",
+          "last_verified": "2025-07-01",
           "authorizationSources": [
             "University DSO (I-20 endorsement)",
             "Academic advisor/department"
@@ -124,12 +130,17 @@
             {
               "text": "CPT for a job unrelated to major field of study",
               "consequence": "CPT revocation, academic misconduct charge"
+            },
+            {
+              "text": "Accumulating 12+ months of full-time CPT without realizing the OPT consequence",
+              "consequence": "Permanent loss of post-completion OPT eligibility at that degree level, including STEM OPT extension"
             }
           ],
           "controls": [
             "Apply for CPT at least 10 business days before intended start date",
-            "Ensure job offer letter meets DSO requirements",
-            "Verify CPT authorization dates match employment dates exactly"
+            "Confirm with DSO whether your employer letter meets all content requirements before submitting",
+            "Verify CPT authorization dates match employment dates exactly",
+            "Track cumulative full-time CPT months if you participate in multiple CPT terms — 12 months is a hard ceiling"
           ],
           "mitigation": [
             "Submit complete CPT application package 15 days before start date",
@@ -139,12 +150,15 @@
         },
         {
           "rule": "Optional Practical Training (OPT)",
+          "source": "USCIS — uscis.gov/working-in-the-united-states/students-and-exchange-visitors/optional-practical-training-opt-for-f-1-students",
+          "last_verified": "2025-07-01",
           "details": [
-            "Pre-completion OPT: Limited to 20 hours/week while school is in session",
+            "Pre-completion OPT: Limited to 20 hours/week while school is in session; full-time permitted when school is not in session; any pre-completion OPT time used is deducted from the total 12-month OPT entitlement at that degree level",
+            "Final semester pre-completion OPT: a student in their final semester may work full-time on pre-completion OPT if the remaining coursework does not require full-time enrollment — confirm eligibility with DSO before applying",
             "Post-completion OPT: Full-time after degree completion",
             "Requires USCIS Form I-765 filing fee and adjudication (90+ day processing)",
             "Maximum 12 months of standard OPT per educational level",
-            "Unemployment limit: 90 days total during standard OPT"
+            "Unemployment limit: 90 days maximum during the standard 12-month post-completion OPT period; if later approved for a 24-month STEM OPT extension, up to 60 additional unemployment days are permitted, bringing the combined aggregate maximum to 150 days — unemployment days accrued during standard OPT count toward the 150-day aggregate; the clock does NOT reset when the STEM extension begins"
           ],
           "authorizationSources": [
             "USCIS (EAD card)",
@@ -163,11 +177,14 @@
         },
         {
           "rule": "STEM OPT Extension (24-Month)",
+          "source": "USCIS — uscis.gov/working-in-the-united-states/students-and-exchange-visitors/optional-practical-training-extension-for-stem-students-stem-opt",
+          "last_verified": "2025-07-01",
           "details": [
             "Eligibility: Degree in DHS STEM-designated program, employer enrolled in E-Verify",
+            "CPT interaction — critical: if a student accumulated 12 or more months of full-time CPT (20+ hrs/week) at a given degree level, they are ineligible for any OPT at that level — there is no standard OPT to extend, and therefore no STEM OPT extension is possible",
             "Requires formal training plan (Form I-983) signed by employer and student",
             "Must apply before initial 12-month OPT EAD expires",
-            "Unemployment limit: 150 days total (including initial OPT period)",
+            "Unemployment limit: 90 days maximum during the initial 12-month OPT period; STEM extension adds 60 additional days; the combined aggregate maximum across both the standard OPT and STEM extension is 150 days — days do NOT reset when the STEM extension period begins",
             "Mandatory self-evaluations and employer reporting to DSO every 6 months"
           ],
           "authorizationSources": [

@@ -1,7 +1,7 @@
 {
   "metadata": {
     "version": "1.0.0",
-    "lastUpdated": "2026-06-10",
+    "lastUpdated": "2026-07-01",
     "authority": "Official UK Compliance Database",
     "validityPeriod": "Academic Year 2025-2026",
     "updateFrequency": "Quarterly",
@@ -519,27 +519,81 @@
       "rules": [
         {
           "rule": "Immigration Health Surcharge (IHS)",
+          "source": "gov.uk/healthcare-immigration-application/how-much-pay",
+          "last_verified": "2025-07-01",
           "details": [
             "Paid upfront as part of your visa application — you cannot apply without paying it",
-            "Rate for students is currently lower than the standard rate — check gov.uk/healthcare-immigration-application/pay for the current figure before applying (rates are updated periodically)",
-            "Covers most NHS hospital and GP treatment at the same cost as UK residents",
-            "IHS does not cover: dental treatment (except emergency), optician services, and some specialist treatments",
-            "MoHE-sponsored students should check whether MoHE reimburses IHS costs — obtain written confirmation before applying"
+            "Current rate for students: £776 per year (as of 2025) — confirm the exact amount at gov.uk/healthcare-immigration-application/how-much-pay before applying, as the rate is updated by Parliament and can change",
+            "The IHS is calculated based on the full length of your visa — for a 3-year Student Route visa the total IHS is approximately £2,328; for a 4-year visa approximately £3,104",
+            "Covers most NHS hospital and GP treatment at the same cost as UK residents — but does NOT make all healthcare free",
+            "IHS does NOT cover: routine dental treatment, optician services (eye tests, glasses, contact lenses), or some specialist treatments — these require separate private payment",
+            "IHS does NOT make NHS prescriptions free — in England, each prescription item carries a flat charge (see NHS Prescription Charges rule below); prescriptions are free in Scotland, Wales, and Northern Ireland",
+            "MoHE-sponsored students should check whether MoHE reimburses IHS costs — obtain written confirmation from your scholarship officer before applying"
           ],
           "authorizationSources": ["gov.uk/healthcare-immigration-application"],
           "controls": [
             "Pay IHS in full as part of the visa application — partial payment causes refusal",
-            "Keep your IHS payment receipt — you may need it for NHS registration",
-            "Check gov.uk for the current IHS rate; it changes periodically"
+            "Keep your IHS payment reference number — you may need it when registering with a GP",
+            "Check gov.uk/healthcare-immigration-application/how-much-pay for the confirmed rate before applying"
+          ]
+        },
+        {
+          "rule": "NHS Prescription Charges (England)",
+          "source": "nhs.uk/nhs-services/prescriptions-and-pharmacies/nhs-prescription-charges/",
+          "last_verified": "2025-07-01",
+          "details": [
+            "In England, each NHS prescription item carries a flat charge of £9.90 per item (2024/25 rate, reviewed annually each April — check nhs.uk for the current charge)",
+            "If you take multiple regular medications, a Prescription Prepayment Certificate (PPC) may save money: a 3-month PPC (approximately £32) covers unlimited prescriptions for that period; a 12-month PPC (approximately £111) covers the full year",
+            "Prescriptions are FREE in Scotland, Wales, and Northern Ireland — if you study outside England, you will not pay prescription charges",
+            "You may be exempt from charges in England if you have certain qualifying medical conditions — ask your GP or pharmacist whether you qualify",
+            "Controlled drugs and some specialist medicines may have different dispensing rules — bring a 3-month supply of any chronic medications from Oman with a doctor's note and customs declaration"
+          ],
+          "authorizationSources": ["NHS England (nhs.uk)"]
+        },
+        {
+          "rule": "NHS Dental Charges",
+          "source": "nhs.uk/nhs-services/dentists/dental-costs/",
+          "last_verified": "2025-07-01",
+          "details": [
+            "The IHS does NOT make NHS dental treatment free — routine NHS dentistry carries patient charges in England even when you have paid the IHS",
+            "NHS England dental charges are banded (2024/25 rates, reviewed annually): Band 1 — £26.80 (check-up, diagnosis, scale and polish, preventive treatment); Band 2 — £73.50 (fillings, root canal treatment, extractions); Band 3 — £319.10 (crowns, dentures, bridges, more complex restorative work)",
+            "These are per-course-of-treatment charges, not per appointment — one Band 2 charge covers all treatment within that course regardless of how many appointments it takes",
+            "Scotland: NHS dental treatment is free for all patients; Wales and Northern Ireland: reduced or no charges — confirm with your specific provider if studying outside England",
+            "Emergency dental treatment in England: a Band 1 charge (£26.80) covers immediate pain relief or emergency treatment at an NHS dentist or walk-in dental clinic; call NHS 111 to find an emergency dentist",
+            "Private dental treatment has no fixed pricing — costs vary significantly by practice and treatment; budget for this separately if you prefer private dental care"
+          ],
+          "authorizationSources": ["NHS England (nhs.uk/nhs-services/dentists)"]
+        },
+        {
+          "rule": "NHS Entitlement If Your Visa Lapses or Expires",
+          "source": "gov.uk/government/publications/nhs-cost-recovery-overseas-visitors — charging-overseas-visitors-in-england-guidance-for-providers-of-nhs-services",
+          "last_verified": "2025-07-01",
+          "details": [
+            "Your NHS entitlement (from IHS) is linked to your valid leave to remain — it applies from visa grant to visa expiry",
+            "If your Student Route visa expires or is curtailed and you are no longer lawfully resident in the UK, your entitlement to free NHS treatment ends immediately",
+            "Treatment after leave expires is chargeable at 150% of the national NHS tariff rate — NHS hospitals are required to identify and charge overseas visitors",
+            "Emergency treatment (immediately necessary to save life or prevent serious deterioration) will NOT be withheld, but you remain liable for the cost at 150% of NHS tariff",
+            "Urgent treatment (not immediately life-threatening but cannot safely wait) may be withheld until payment arrangements are agreed, or provided with a debt registered",
+            "CRITICAL: if your visa extension is pending but has not yet been decided and your current leave has expired, notify the NHS provider — there are specific rules for patients with outstanding applications (section 3C leave); seek advice from your university's International Student Support team immediately",
+            "To protect your NHS entitlement: ensure your Student Route visa is renewed before it expires; keep your IHS payment record; do not allow your leave to lapse"
+          ],
+          "authorizationSources": [
+            "NHS Overseas Visitor Charging Regulations 2015 (as amended)",
+            "gov.uk — Charging overseas visitors in England guidance"
           ]
         },
         {
           "rule": "Registering with a GP",
+          "source": "nhs.uk/nhs-services/gps/how-to-register-with-a-gp/",
+          "last_verified": "2025-07-01",
           "details": [
-            "Register with a local GP (General Practitioner) as soon as possible after arrival — this is your primary care doctor",
+            "Register with a local GP (General Practitioner) as soon as possible after arrival — this is your primary care doctor for all non-emergency healthcare",
             "Use the NHS 'Find a GP' service (nhs.uk/service-search/find-a-gp) to find a surgery accepting new patients near your campus",
+            "Documents to bring when registering: your passport, proof of your IHS payment (your visa grant or IHS payment reference), and your UK address",
+            "GPs cannot refuse to register you solely because of your nationality or immigration status — however, they can decline new patients if their list is full",
+            "If no GP surgery near you is accepting new patients: contact your university health centre (most universities have an on-site medical practice for students); alternatively call NHS 111 who can direct you to the nearest available surgery",
             "Emergency treatment is available at A&E (Accident and Emergency) departments at NHS hospitals — call 999 for life-threatening emergencies",
-            "Call 111 (free) for urgent non-emergency medical advice, 24/7"
+            "Call 111 (free) for urgent non-emergency medical advice, 24/7 — NHS 111 can also arrange emergency GP appointments if needed"
           ],
           "authorizationSources": ["NHS England (nhs.uk)"]
         },

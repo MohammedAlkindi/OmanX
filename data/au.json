@@ -1,7 +1,7 @@
 {
   "metadata": {
     "version": "2.0.0",
-    "lastUpdated": "2026-06-22",
+    "lastUpdated": "2026-07-01",
     "authority": "Official Australia Compliance Database",
     "validityPeriod": "Academic Year 2025-2026",
     "updateFrequency": "Quarterly",
@@ -238,30 +238,55 @@
       },
       "rules": [
         {
+          "rule": "Medicare Ineligibility and No RHCA — Oman",
+          "source": "servicesaustralia.gov.au/about-reciprocal-health-care-agreements; health.gov.au/topics/medicare",
+          "last_verified": "2025-07-01",
+          "details": [
+            "Most student visa (subclass 500) holders are NOT eligible for Australia's Medicare program — Medicare is for Australian citizens, permanent residents, and visitors from Reciprocal Health Care Agreement (RHCA) countries only",
+            "Oman is NOT a signatory to any Reciprocal Health Care Agreement with Australia — Omani scholars therefore have zero Medicare access",
+            "The 11 countries that have RHCAs with Australia are: Belgium, Finland, Italy, Malta, Netherlands, New Zealand, Norway, Republic of Ireland, Slovenia, Sweden, and the United Kingdom — Oman is not among them",
+            "Students from RHCA countries (such as UK classmates) can access Medicare; Omani students cannot — do not assume the same rules apply to you",
+            "OSHC is the mandatory and only health coverage pathway for Omani student visa holders — it provides a Medicare-equivalent benefit structure but is a private insurance product, not Medicare",
+            "If you see 'bulk billing' advertised by a GP: bulk billing means the GP charges Medicare directly at no cost to the patient; Omani students cannot bulk-bill — you must pay the GP's fee and claim reimbursement from your OSHC provider instead"
+          ],
+          "authorizationSources": [
+            "Services Australia — Reciprocal Health Care Agreements (servicesaustralia.gov.au)",
+            "Department of Health, Disability and Ageing (health.gov.au)"
+          ]
+        },
+        {
           "rule": "OSHC Coverage Requirements",
+          "source": "health.gov.au/resources/collections/overseas-student-health-cover-oshc-resources; privatehealth.gov.au/health_insurance/overseas/overseas_student_health_cover.htm",
+          "last_verified": "2025-07-01",
           "details": [
             "Must be held for the full duration of your student visa — from arrival to departure",
             "Must be purchased from an Australian government-approved OSHC provider",
             "Approved OSHC providers include: Allianz Care Australia, BUPA Australia, Medibank, nib OSHC, and others — check privatehealth.gov.au for the current approved list",
             "Many Australian universities have a preferred OSHC provider and may include OSHC in their offer letter — you can purchase through the university or directly",
-            "Covers: hospital treatment, GP visits (Medicare-equivalent), some specialist services, and ambulance in most states",
-            "Does NOT fully cover: dental, optical, physiotherapy — budget separately or take additional cover"
+            "What standard OSHC covers: hospital treatment, GP consultations (at OSHC benefit rates), some specialist services, and prescription medicines at rates comparable to the PBS concession co-payment",
+            "Prescription medicines (PBS): OSHC covers medicines at comparable rates to the PBS concession level, but you cannot access the full PBS subsidy available to Medicare enrollees — some medicine costs may still be significant out-of-pocket; check your OSHC policy schedule",
+            "What standard OSHC does NOT cover — dental: routine dental care (check-ups, fillings, extractions, braces) is NOT covered by basic OSHC; emergency dental treatment may be partially covered depending on your specific provider and policy — check your policy document before assuming coverage",
+            "What standard OSHC does NOT cover — optical: eye tests, glasses, and contact lenses are NOT covered by standard OSHC",
+            "What standard OSHC does NOT cover — physiotherapy and allied health: physiotherapy, chiropractic, podiatry, occupational therapy, and most allied health services are NOT covered by standard OSHC",
+            "Extras (ancillary) OSHC policies: some OSHC providers offer add-on 'Extras' cover for dental, optical, physiotherapy, and other services at additional premium cost — compare options at privatehealth.gov.au",
+            "Ambulance: OSHC coverage of ambulance services varies significantly by provider and state — do NOT assume ambulance is covered; in Queensland and Tasmania, ambulance is subsidised for residents but student visa holders may not qualify; check your specific OSHC policy document for ambulance coverage details"
           ],
           "authorizationSources": ["Department of Home Affairs OSHC requirements", "Private Health Insurance Act 2007"],
           "commonViolations": [
             {
               "text": "Allowing OSHC to lapse during study period",
-              "consequence": "Visa condition breach, uninsured medical liability"
+              "consequence": "Visa condition breach, uninsured medical liability — any medical expenses during the gap are 100% out-of-pocket and cannot be claimed retroactively after reinstating OSHC"
             },
             {
               "text": "Purchasing OSHC from a non-approved provider",
-              "consequence": "Does not satisfy visa condition — treated as no cover"
+              "consequence": "Does not satisfy visa condition — treated as no cover; visa may be cancelled"
             }
           ],
           "controls": [
             "Set up auto-renewal on your OSHC policy before the first payment lapses",
             "Keep your OSHC membership card accessible at all times",
-            "Extend OSHC before any visa extension to ensure continuous coverage"
+            "Extend OSHC before any visa extension to ensure continuous coverage",
+            "Read your specific OSHC policy document for dental, ambulance, and medicine coverage details — do not assume all policies are identical"
           ]
         },
         {
