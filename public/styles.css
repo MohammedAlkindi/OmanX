@@ -3679,6 +3679,114 @@ footer,
   border-radius: 14px;
 }
 
+.chat-app .scholar-status {
+  background: #fffdf8;
+  border-color: #ded8cc;
+  color: #2f2d28;
+  box-shadow: 0 1px 2px rgba(38, 35, 29, 0.04);
+}
+
+.chat-app .scholar-status-main,
+.chat-app .status-brand {
+  color: #201f1b;
+}
+
+.chat-app .status-pill {
+  background: #f6f1e8;
+  border-color: #e2d9c9;
+  color: #5d574d;
+}
+
+.chat-app .answer-status {
+  background: #fffdf8;
+  border-color: #dfd8cc;
+  color: #282621;
+}
+
+.chat-app .answer-status-label {
+  color: #25231f;
+}
+
+.chat-app .answer-status-detail {
+  color: #6f675c;
+}
+
+.chat-app .answer-status-pills span {
+  background: #f7f2e9;
+  border-color: #e4dbcb;
+  color: #6a6257;
+}
+
+.chat-app .message.assistant .message-bubble {
+  background: #fffdf8;
+  border-color: #ded8cc;
+  color: #34312b;
+}
+
+.chat-app .message.assistant .message-bubble h3,
+.chat-app .message.assistant .message-bubble h4,
+.chat-app .message.assistant .message-bubble strong {
+  color: #25231f;
+}
+
+.chat-app .message.assistant .message-bubble li::marker,
+.chat-app .message.assistant .message-meta {
+  color: #81776b;
+}
+
+.chat-app .message.user .message-bubble {
+  background: #3b352b;
+  border-color: #3b352b;
+  color: #f8f4ea;
+  box-shadow: none;
+}
+
+.chat-app .composer-box,
+.chat-app .card.composer-box {
+  background: #fffdf8;
+  border-color: #dcd5c8;
+  box-shadow: 0 10px 32px rgba(36, 32, 26, 0.08);
+}
+
+.chat-app .composer-toolbar {
+  border-bottom-color: #e4ddd0;
+}
+
+.chat-app .composer-select-wrap,
+.chat-app .composer-search-toggle,
+.chat-app .composer-hint {
+  color: #746b5f;
+}
+
+.chat-app .composer-select-wrap select {
+  background: #fbf7ef;
+  border-color: #d8d0c2;
+  color: #282621;
+}
+
+.chat-app .composer-search-toggle input {
+  accent-color: #9f7c3f;
+}
+
+.chat-app .composer-box textarea {
+  color: #282621;
+}
+
+.chat-app .composer-box textarea::placeholder {
+  color: #746b5f;
+}
+
+.chat-app .source-chip {
+  background: #f7f2e9;
+  border-color: #e1d8c8;
+  color: #5f584e;
+}
+
+.chat-app .source-chip-web:hover {
+  background: #eee5d7;
+  color: #282621;
+}
+
 @media (max-width: 900px) {
   .chat-app .sidebar.open {
     top: 0;
