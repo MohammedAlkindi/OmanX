@@ -13,7 +13,7 @@
     <link rel="stylesheet" href="/styles.css" />
     <script defer src="/_vercel/insights/script.js"></script>
   </head>
-  <body>
+  <body class="chat-app">
     <!-- Navigation — sticky, frosted -->
     <nav>
       <a class="nav-logo" href="/">Oman<span>X</span></a>
@@ -38,17 +38,41 @@
         <!-- Sidebar — conversation history -->
         <aside class="sidebar" data-chat-sidebar>
           <div class="sidebar-inner">
-            <div class="sidebar-header">
-              <div>
-                <div class="muted">Guidance</div>
-                <h3>My questions</h3>
+            <div class="sidebar-app-header">
+              <a class="sidebar-brand" href="/">Oman<span>X</span></a>
+              <div class="sidebar-window-actions" aria-hidden="true">
+                <span></span>
+                <span></span>
               </div>
-              <button class="btn btn-new-chat" data-new-chat type="button">New</button>
             </div>
 
-            <label class="muted" for="chat-search">Search</label>
+            <div class="sidebar-nav" aria-label="Workspace navigation">
+              <button class="sidebar-nav-item sidebar-nav-primary" data-new-chat type="button">
+                <span class="sidebar-nav-icon">+</span>
+                <span>New chat</span>
+              </button>
+              <button class="sidebar-nav-item active" type="button">
+                <span class="sidebar-nav-icon">?</span>
+                <span>Chats</span>
+              </button>
+              <a class="sidebar-nav-item" href="/system">
+                <span class="sidebar-nav-icon">#</span>
+                <span>System</span>
+              </a>
+              <a class="sidebar-nav-item" href="/trust">
+                <span class="sidebar-nav-icon">i</span>
+                <span>Trust</span>
+              </a>
+              <button class="sidebar-nav-item" data-settings-toggle type="button">
+                <span class="sidebar-nav-icon">*</span>
+                <span>Customize</span>
+              </button>
+            </div>
+
+            <div class="sidebar-section-label">Search</div>
             <input id="chat-search" class="sidebar-search" data-chat-search type="search" placeholder="Search conversations" />
 
+            <div class="sidebar-section-label">Recent</div>
             <div class="chat-list" data-chat-list></div>
           </div>
 

@@ -184,8 +184,10 @@ function bindEvents() {
   // — settings panel —
   populateSettingsPanel();
 
-  qs('[data-settings-toggle]')?.addEventListener('click', () => {
-    qs('[data-settings-panel]').classList.add('open');
+  qsa('[data-settings-toggle]').forEach((button) => {
+    button.addEventListener('click', () => {
+      qs('[data-settings-panel]').classList.add('open');
+    });
   });
 
   qs('[data-settings-close]')?.addEventListener('click', () => {
