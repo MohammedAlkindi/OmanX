@@ -140,20 +140,6 @@ function bindEvents() {
     renderSidebar();
   });
 
-  qs('[data-composer-destination]')?.addEventListener('change', (event) => {
-    state.settings.destination = event.target.value;
-    saveSettings(state.settings);
-    populateSettingsPanel();
-    renderScholarStatus();
-  });
-
-  qs('[data-composer-web-search]')?.addEventListener('change', (event) => {
-    state.settings.webSearch = event.target.checked;
-    saveSettings(state.settings);
-    populateSettingsPanel();
-    renderScholarStatus();
-  });
-
   // — submit —
   qs('[data-chat-form]')?.addEventListener('submit', async (event) => {
     event.preventDefault();
@@ -220,13 +206,11 @@ function bindEvents() {
   qs('[data-setting-situation]')?.addEventListener('change', (e) => {
     state.settings.situation = e.target.value;
     saveSettings(state.settings);
-    renderScholarStatus();
   });
 
   qs('[data-setting-scholarship]')?.addEventListener('change', (e) => {
     state.settings.scholarshipStatus = e.target.value;
     saveSettings(state.settings);
-    renderScholarStatus();
   });
 
   // concise mode
@@ -247,7 +231,6 @@ function bindEvents() {
     state.settings.webSearch = e.target.checked;
     saveSettings(state.settings);
     populateSettingsPanel();
-    renderScholarStatus();
   });
 
   // destination
@@ -255,7 +238,6 @@ function bindEvents() {
     state.settings.destination = e.target.value;
     saveSettings(state.settings);
     populateSettingsPanel();
-    renderScholarStatus();
   });
 
   // language
@@ -346,16 +328,9 @@ function populateSettingsPanel() {
   const webSearchEl = qs('[data-setting-web-search]');
   if (webSearchEl) webSearchEl.checked = webSearch !== false;
 
-  const composerDestEl = qs('[data-composer-destination]');
-  if (composerDestEl) composerDestEl.value = destination || 'auto';
-
-  const composerWebSearchEl = qs('[data-composer-web-search]');
-  if (composerWebSearchEl) composerWebSearchEl.checked = webSearch !== false;
-
   updateThemePicker(getTheme());
   updateUserChip();
   renderUsagePanel();
-  renderScholarStatus();
 }
 
 function updateThemePicker(active) {
@@ -373,36 +348,6 @@ function updateUserChip() {
   if (nameEl) nameEl.textContent = name;
 }
 
-function renderScholarStatus() {
-  const el = qs('[data-scholar-status]');
-  if (!el) return;
-  const destination = state.settings.destination || 'auto';
-  const destinationLabel = DEST_FULL_LABEL[destination] || 'Auto-detect';
-  const rulesLabel = destination === 'auto'
-    ? 'MoHE + detected visa rules'
-    : `MoHE + ${DEST_LABEL[destination]} rules`;
-  const webLabel = state.settings.webSearch === false ? 'Saved rules only' : 'Current rules checked when needed';
-  const situation = state.settings.situation || 'No situation set';
-  const scholarship = state.settings.scholarshipStatus || 'Scholarship not set';
-  const usagePill = state.usage && state.usage.percentUsed >= 80
-    ? `<span class="status-pill status-pill-warning">${state.usage.percentUsed}% limit used</span>`
-    : '';
-
-  el.innerHTML = `
-    <div class="scholar-status-main">
-      <span class="status-brand">Ask OmanX</span>
-      <span>${escapeHtml(destinationLabel)}</span>
-    </div>
-    <div class="status-pills" aria-label="Guidance settings">
-      <span class="status-pill">${escapeHtml(rulesLabel)}</span>
-      <span class="status-pill">${escapeHtml(webLabel)}</span>
-      <span class="status-pill">${escapeHtml(situation)}</span>
-      <span class="status-pill">${escapeHtml(scholarship)}</span>
-      ${usagePill}
-    </div>
-  `;
-}
-
 async function refreshUsage() {
   try {
     const res = await fetch(`/api/usage?sessionId=${encodeURIComponent(getSessionId())}`, { cache: 'no-store' });
@@ -411,7 +356,6 @@ async function refreshUsage() {
     if (payload.usage) {
       state.usage = payload.usage;
       renderUsagePanel();
-      renderScholarStatus();
     }
   } catch {
     renderUsagePanel();
@@ -422,7 +366,6 @@ function setUsage(usage) {
   if (!usage) return;
   state.usage = usage;
   renderUsagePanel();
-  renderScholarStatus();
 }
 
 function formatReset(usage) {
@@ -509,7 +452,6 @@ function showOnboarding() {
 
 function render() {
   renderSidebar();
-  renderScholarStatus();
   // Skip message-list rebuild while the stream bubble is live on the active chat.
   // If the user switched to a different chat, render their messages normally.
   if (!streamingChatId || streamingChatId !== state.activeChatId) renderMessages();

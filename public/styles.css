@@ -1860,68 +1860,11 @@ select:focus {
   background: var(--white);
   padding: 24px;
   display: grid;
-  grid-template-rows: auto 1fr auto;
+  grid-template-rows: 1fr auto;
   gap: 16px;
   min-height: 0;
   overflow: hidden;
   position: relative;
-}
-
-.scholar-status {
-  max-width: 720px;
-  width: 100%;
-  margin: 0 auto;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 12px;
-  padding: 10px 12px;
-  border: 0.5px solid var(--border);
-  border-radius: 4px;
-  background: var(--sand);
-}
-
-.scholar-status-main {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  min-width: 0;
-  font-size: 0.8125rem;
-  color: var(--ink-2);
-}
-
-.status-brand {
-  font-weight: 500;
-  color: var(--ink);
-}
-
-.status-pills {
-  display: flex;
-  align-items: center;
-  justify-content: flex-end;
-  gap: 6px;
-  flex-wrap: wrap;
-}
-
-.status-pill {
-  display: inline-flex;
-  align-items: center;
-  min-height: 22px;
-  padding: 2px 8px;
-  border: 0.5px solid var(--border);
-  border-radius: 99px;
-  background: var(--white);
-  font-family: var(--mono);
-  font-size: 0.5625rem;
-  letter-spacing: 0.04em;
-  color: var(--ink-3);
-  white-space: nowrap;
-}
-
-.status-pill-warning {
-  color: #b45309;
-  border-color: rgba(180, 83, 9, 0.28);
-  background: rgba(180, 83, 9, 0.08);
 }
 
 .card.assistant-shell {
@@ -2359,50 +2302,6 @@ select:focus {
   transition: border-color 0.15s, box-shadow 0.15s;
 }
 
-.composer-toolbar {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 10px;
-  padding-bottom: 8px;
-  border-bottom: 0.5px solid var(--border);
-}
-
-.composer-select-wrap,
-.composer-search-toggle {
-  display: inline-flex;
-  align-items: center;
-  gap: 7px;
-  min-height: 28px;
-  font-family: var(--mono);
-  font-size: 0.5625rem;
-  letter-spacing: 0.06em;
-  text-transform: uppercase;
-  color: var(--ink-4);
-}
-
-.composer-select-wrap select {
-  height: 26px;
-  padding: 0 22px 0 8px;
-  border: 0.5px solid var(--border-strong);
-  border-radius: 3px;
-  background: var(--white);
-  color: var(--ink-2);
-  font-family: var(--sans);
-  font-size: 0.75rem;
-  font-weight: 400;
-}
-
-.composer-search-toggle {
-  cursor: pointer;
-}
-
-.composer-search-toggle input {
-  width: 14px;
-  height: 14px;
-  accent-color: var(--gold);
-}
-
 .composer-box textarea {
   border: none;
   background: transparent;
@@ -2414,7 +2313,7 @@ select:focus {
   line-height: 1.6;
   caret-color: var(--gold);
   box-shadow: none;
-  padding: 6px 0 0;
+  padding: 4px 0 0;
 }
 
 .composer-box textarea:focus {
@@ -3253,9 +3152,7 @@ footer,
   .sidebar-toggle-btn       { display: flex; }
 
   .mobile-chat-bar          { display: flex; }
-  .assistant-shell          { grid-template-rows: auto auto 1fr auto; padding: 0; gap: 0; }
-  .scholar-status           { border-width: 0 0 0.5px; border-radius: 0; max-width: none; flex-direction: column; align-items: flex-start; margin: 0; }
-  .status-pills             { justify-content: flex-start; }
+  .assistant-shell          { grid-template-rows: auto 1fr auto; padding: 0; gap: 0; }
   .assistant-shell .chat-body { padding: 16px; }
   .assistant-shell .composer  { padding: 0 16px 16px; }
 
@@ -3271,7 +3168,6 @@ footer,
   .message-empty            { padding: 32px 20px; }
   .answer-status            { grid-template-columns: 1fr; }
   .answer-status-pills      { justify-content: flex-start; }
-  .composer-toolbar         { align-items: flex-start; flex-direction: column; }
   .situation-grid           { grid-template-columns: 1fr; }
 
   .stat-grid,
@@ -3670,31 +3566,12 @@ footer,
   background: #f7f4ed;
 }
 
-.chat-app .scholar-status,
 .chat-app .composer-box {
   border-radius: 14px;
 }
 
 .chat-app .message-bubble {
   border-radius: 14px;
-}
-
-.chat-app .scholar-status {
-  background: #fffdf8;
-  border-color: #ded8cc;
-  color: #2f2d28;
-  box-shadow: 0 1px 2px rgba(38, 35, 29, 0.04);
-}
-
-.chat-app .scholar-status-main,
-.chat-app .status-brand {
-  color: #201f1b;
-}
-
-.chat-app .status-pill {
-  background: #f6f1e8;
-  border-color: #e2d9c9;
-  color: #5d574d;
 }
 
 .chat-app .answer-status {
@@ -3748,24 +3625,8 @@ footer,
   box-shadow: 0 10px 32px rgba(36, 32, 26, 0.08);
 }
 
-.chat-app .composer-toolbar {
-  border-bottom-color: #e4ddd0;
-}
-
-.chat-app .composer-select-wrap,
-.chat-app .composer-search-toggle,
 .chat-app .composer-hint {
   color: #746b5f;
-}
-
-.chat-app .composer-select-wrap select {
-  background: #fbf7ef;
-  border-color: #d8d0c2;
-  color: #282621;
-}
-
-.chat-app .composer-search-toggle input {
-  accent-color: #9f7c3f;
 }
 
 .chat-app .composer-box textarea {
