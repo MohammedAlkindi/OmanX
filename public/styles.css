@@ -1412,20 +1412,35 @@ select:focus {
   cursor: pointer;
 }
 
-.btn-settings-danger {
+.btn-settings-danger,
+.btn-settings-secondary {
   display: inline-flex;
   align-items: center;
+  justify-content: center;
   height: 32px;
   padding: 0 12px;
   border-radius: var(--radius);
-  border: 0.5px solid rgba(185, 28, 28, 0.35);
   background: transparent;
-  color: #b91c1c;
   font-family: var(--sans);
   font-size: 0.8125rem;
   font-weight: 400;
   cursor: pointer;
   transition: background 0.15s, border-color 0.15s;
+}
+
+.btn-settings-secondary {
+  border: 0.5px solid var(--border-strong);
+  color: var(--ink-2);
+}
+
+.btn-settings-secondary:hover {
+  background: var(--sand-dark);
+  border-color: var(--border-strong);
+}
+
+.btn-settings-danger {
+  border: 0.5px solid rgba(185, 28, 28, 0.35);
+  color: #b91c1c;
 }
 
 .btn-settings-danger:hover {
@@ -1481,6 +1496,63 @@ select:focus {
 
 .usage-panel-warning .usage-meter span {
   background: #b45309;
+}
+
+.settings-info-row,
+.settings-link-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  min-height: 34px;
+  padding: 8px 10px;
+  border: 0.5px solid var(--border);
+  border-radius: 4px;
+  background: var(--white);
+  color: var(--ink-2);
+  text-align: left;
+}
+
+.settings-link-row {
+  width: 100%;
+  cursor: pointer;
+  transition: background 0.15s, border-color 0.15s;
+}
+
+.settings-link-row:hover {
+  background: var(--sand);
+  border-color: var(--border-strong);
+}
+
+.settings-info-row span,
+.settings-link-row span {
+  font-size: 0.8125rem;
+  color: var(--ink-2);
+}
+
+.settings-info-row strong,
+.settings-link-row strong {
+  font-family: var(--mono);
+  font-size: 0.5625rem;
+  font-weight: 500;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--ink-4);
+  white-space: nowrap;
+}
+
+.settings-note {
+  font-size: 0.75rem;
+  line-height: 1.45;
+  color: var(--ink-3);
+}
+
+.settings-note-warning {
+  padding: 10px;
+  border: 0.5px solid rgba(180, 83, 9, 0.25);
+  border-left: 3px solid #b45309;
+  border-radius: 4px;
+  background: rgba(180, 83, 9, 0.06);
 }
 
 /* toggle row */

@@ -80,6 +80,7 @@ const SETTINGS_DEFAULTS = {
   model: 'claude-sonnet-4-6',
   userContext: '',
   situation: '',
+  scholarshipStatus: '',
   language: 'auto',
   destination: 'auto',
   dataConsent: false,

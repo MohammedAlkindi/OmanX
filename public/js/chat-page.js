@@ -215,6 +215,18 @@ function bindEvents() {
     saveSettings(state.settings);
   });
 
+  qs('[data-setting-situation]')?.addEventListener('change', (e) => {
+    state.settings.situation = e.target.value;
+    saveSettings(state.settings);
+    renderScholarStatus();
+  });
+
+  qs('[data-setting-scholarship]')?.addEventListener('change', (e) => {
+    state.settings.scholarshipStatus = e.target.value;
+    saveSettings(state.settings);
+    renderScholarStatus();
+  });
+
   // concise mode
   qs('[data-setting-concise]')?.addEventListener('change', (e) => {
     state.settings.conciseMode = e.target.checked;
@@ -266,10 +278,41 @@ function bindEvents() {
     render();
     showToast('All conversations deleted.');
   });
+
+  qs('[data-export-all-chats]')?.addEventListener('click', () => {
+    const exportedAt = new Intl.DateTimeFormat('en', { dateStyle: 'long', timeStyle: 'short' }).format(new Date());
+    const body = [
+      '# OmanX Conversation Export',
+      '',
+      `Exported ${exportedAt}`,
+      '',
+      ...state.chats.map(chatToMarkdown),
+    ].join('\n\n');
+    downloadFile('omanx-conversations.md', body, 'text/markdown;charset=utf-8');
+    showToast('All conversations exported.');
+  });
+
+  qs('[data-report-guidance]')?.addEventListener('click', async () => {
+    const chat = getActiveChat();
+    const lastAssistant = [...(chat?.messages || [])].reverse().find((m) => m.role === 'assistant');
+    const template = [
+      'OmanX guidance report',
+      '',
+      `Conversation: ${chat?.title || 'Untitled'}`,
+      `Message ID: ${lastAssistant?.id || 'Not available'}`,
+      '',
+      'What seems incorrect or missing?',
+      '- ',
+      '',
+      'What source or office should OmanX check?',
+      '- ',
+    ].join('\n');
+    await copyText(template, 'Report template copied.');
+  });
 }
 
 function populateSettingsPanel() {
-  const { studentName, userContext, conciseMode, model, language, destination, dataConsent, webSearch } = state.settings;
+  const { studentName, userContext, conciseMode, model, language, destination, situation, scholarshipStatus, dataConsent, webSearch } = state.settings;
 
   const nameEl = qs('[data-setting-name]');
   if (nameEl) nameEl.value = studentName === 'Student' ? '' : studentName;
@@ -285,6 +328,12 @@ function populateSettingsPanel() {
 
   const destEl = qs('[data-setting-destination]');
   if (destEl) destEl.value = destination || 'auto';
+
+  const situationEl = qs('[data-setting-situation]');
+  if (situationEl) situationEl.value = situation || '';
+
+  const scholarshipEl = qs('[data-setting-scholarship]');
+  if (scholarshipEl) scholarshipEl.value = scholarshipStatus || '';
 
   const langEl = qs('[data-setting-language]');
   if (langEl) langEl.value = language || 'auto';
@@ -332,6 +381,7 @@ function renderScholarStatus() {
     : `MoHE + ${DEST_LABEL[destination]} rules`;
   const webLabel = state.settings.webSearch === false ? 'Saved rules only' : 'Current rules checked when needed';
   const situation = state.settings.situation || 'No situation set';
+  const scholarship = state.settings.scholarshipStatus || 'Scholarship not set';
   const usagePill = state.usage && state.usage.percentUsed >= 80
     ? `<span class="status-pill status-pill-warning">${state.usage.percentUsed}% limit used</span>`
     : '';
@@ -345,6 +395,7 @@ function renderScholarStatus() {
       <span class="status-pill">${escapeHtml(rulesLabel)}</span>
       <span class="status-pill">${escapeHtml(webLabel)}</span>
       <span class="status-pill">${escapeHtml(situation)}</span>
+      <span class="status-pill">${escapeHtml(scholarship)}</span>
       ${usagePill}
     </div>
   `;
@@ -849,6 +900,7 @@ function autoGrow(textarea) {
 function buildProfileContext(userContext = '') {
   const parts = [];
   if (state.settings.situation) parts.push(`Student situation: ${state.settings.situation}.`);
+  if (state.settings.scholarshipStatus) parts.push(`Scholarship status: ${state.settings.scholarshipStatus}.`);
   if (state.settings.destination && state.settings.destination !== 'auto') {
     parts.push(`Study destination: ${DEST_FULL_LABEL[state.settings.destination] || state.settings.destination}.`);
   }

@@ -79,46 +79,6 @@
                   <label for="settings-name">Display name</label>
                   <input id="settings-name" class="settings-input" type="text" data-setting-name placeholder="Your name" autocomplete="off" />
                 </div>
-              </div>
-
-              <hr class="settings-divider" />
-
-              <!-- Appearance -->
-              <div class="settings-section">
-                <div class="settings-section-label">Appearance</div>
-                <div class="theme-picker" role="group" aria-label="Theme">
-                  <button class="theme-btn" data-set-theme="light" type="button">Light</button>
-                  <button class="theme-btn" data-set-theme="dark" type="button">Dark</button>
-                  <button class="theme-btn" data-set-theme="system" type="button">System</button>
-                </div>
-              </div>
-
-              <hr class="settings-divider" />
-
-              <!-- Assistant -->
-              <div class="settings-section">
-                <div class="settings-section-label">Guidance</div>
-                <div class="settings-field">
-                  <label for="settings-context">What should OmanX remember?</label>
-                  <textarea id="settings-context" class="settings-textarea" data-setting-context rows="3" placeholder="Example: I am on an MoHE scholarship, studying in the US, and graduating in May."></textarea>
-                </div>
-                <label class="toggle-row">
-                  <input class="toggle-checkbox" type="checkbox" data-setting-concise />
-                  <span class="toggle-track"><span class="toggle-thumb"></span></span>
-                  <span class="toggle-label">Concise replies</span>
-                </label>
-                <label class="toggle-row">
-                  <input class="toggle-checkbox" type="checkbox" data-setting-web-search />
-                  <span class="toggle-track"><span class="toggle-thumb"></span></span>
-                  <span class="toggle-label">Web search</span>
-                </label>
-                <div class="settings-field">
-                  <label for="settings-model">Model</label>
-                  <select id="settings-model" class="settings-select" data-setting-model>
-                    <option value="claude-sonnet-4-6">Sonnet 4.6 - Recommended</option>
-                    <option value="claude-haiku-4-5-20251001">Haiku 4.5 - Faster</option>
-                  </select>
-                </div>
                 <div class="settings-field">
                   <label for="settings-destination">Study destination</label>
                   <select id="settings-destination" class="settings-select" data-setting-destination>
@@ -128,6 +88,44 @@
                     <option value="au">Australia</option>
                   </select>
                 </div>
+                <div class="settings-field">
+                  <label for="settings-situation">Student situation</label>
+                  <select id="settings-situation" class="settings-select" data-setting-situation>
+                    <option value="">Not set</option>
+                    <option value="New student">New student</option>
+                    <option value="Current student">Current student</option>
+                    <option value="Graduating soon">Graduating soon</option>
+                    <option value="Visa or work issue">Visa or work issue</option>
+                    <option value="Scholarship issue">Scholarship issue</option>
+                  </select>
+                </div>
+                <div class="settings-field">
+                  <label for="settings-scholarship">Scholarship status</label>
+                  <select id="settings-scholarship" class="settings-select" data-setting-scholarship>
+                    <option value="">Not set</option>
+                    <option value="MoHE scholarship">MoHE scholarship</option>
+                    <option value="Other sponsor">Other sponsor</option>
+                    <option value="Self-funded">Self-funded</option>
+                    <option value="Not sure">Not sure</option>
+                  </select>
+                </div>
+              </div>
+
+              <hr class="settings-divider" />
+
+              <!-- Guidance -->
+              <div class="settings-section">
+                <div class="settings-section-label">Guidance</div>
+                <label class="toggle-row">
+                  <input class="toggle-checkbox" type="checkbox" data-setting-concise />
+                  <span class="toggle-track"><span class="toggle-thumb"></span></span>
+                  <span class="toggle-label">Concise replies</span>
+                </label>
+                <label class="toggle-row">
+                  <input class="toggle-checkbox" type="checkbox" data-setting-web-search />
+                  <span class="toggle-track"><span class="toggle-thumb"></span></span>
+                  <span class="toggle-label">Check current rules</span>
+                </label>
                 <div class="settings-field">
                   <label for="settings-language">Response language</label>
                   <select id="settings-language" class="settings-select" data-setting-language>
@@ -154,6 +152,25 @@
                     <option value="Swahili">Swahili (Kiswahili)</option>
                   </select>
                 </div>
+                <div class="settings-field">
+                  <label for="settings-model">Default model</label>
+                  <select id="settings-model" class="settings-select" data-setting-model>
+                    <option value="claude-sonnet-4-6">Sonnet 4.6 - Recommended</option>
+                    <option value="claude-haiku-4-5-20251001">Haiku 4.5 - Faster</option>
+                  </select>
+                </div>
+                <div class="settings-field">
+                  <label for="settings-context">Additional context</label>
+                  <textarea id="settings-context" class="settings-textarea" data-setting-context rows="3" placeholder="Example: I am graduating in May and need OPT guidance."></textarea>
+                </div>
+                <div class="settings-field">
+                  <label>Appearance</label>
+                  <div class="theme-picker" role="group" aria-label="Theme">
+                    <button class="theme-btn" data-set-theme="light" type="button">Light</button>
+                    <button class="theme-btn" data-set-theme="dark" type="button">Dark</button>
+                    <button class="theme-btn" data-set-theme="system" type="button">System</button>
+                  </div>
+                </div>
               </div>
 
               <hr class="settings-divider" />
@@ -171,6 +188,7 @@
                   </div>
                   <div class="usage-detail" data-usage-detail>Checking your current usage.</div>
                 </div>
+                <div class="settings-note">Usage is tracked on the server by anonymous session. It resets automatically.</div>
               </div>
 
               <hr class="settings-divider" />
@@ -178,12 +196,37 @@
               <!-- Data -->
               <div class="settings-section">
                 <div class="settings-section-label">Data</div>
+                <div class="settings-info-row">
+                  <span>History</span>
+                  <strong>Stored on this device</strong>
+                </div>
+                <div class="settings-info-row">
+                  <span>Sync</span>
+                  <strong>Off until sign-in exists</strong>
+                </div>
+                <button type="button" class="btn-settings-secondary" data-export-all-chats>Export all conversations</button>
                 <label class="toggle-row">
                   <input class="toggle-checkbox" type="checkbox" data-setting-data-consent />
                   <span class="toggle-track"><span class="toggle-thumb"></span></span>
                   <span class="toggle-label">Share conversations to improve OmanX</span>
                 </label>
                 <button type="button" class="btn-settings-danger" data-delete-all-chats>Delete all questions</button>
+              </div>
+
+              <hr class="settings-divider" />
+
+              <!-- Help -->
+              <div class="settings-section">
+                <div class="settings-section-label">Help</div>
+                <a class="settings-link-row" href="/contact">
+                  <span>Contact support</span>
+                  <strong>Open</strong>
+                </a>
+                <button type="button" class="settings-link-row" data-report-guidance>
+                  <span>Report incorrect guidance</span>
+                  <strong>Copy template</strong>
+                </button>
+                <div class="settings-note settings-note-warning">For emergencies, contact local emergency services, your university international office, or the Omani embassy. OmanX is guidance, not legal advice.</div>
               </div>
 
             </div>
