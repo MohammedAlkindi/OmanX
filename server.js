@@ -10,6 +10,7 @@ import healthHandler from './api/health.js';
 import readyHandler from './api/ready.js';
 import metricsHandler from './api/metrics.js';
 import feedbackHandler from './api/feedback.js';
+import usageHandler from './api/usage.js';
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const PORT = Number(process.env.PORT || 3000);
 
@@ -29,6 +30,7 @@ const ROUTE_METHODS = new Map([
   ['/collaboration', new Set(['GET'])],
   ['/api/chat', new Set(['POST'])],
   ['/api/feedback', new Set(['POST'])],
+  ['/api/usage', new Set(['GET'])],
   ['/api/health', new Set(['GET'])],
   ['/api/ready', new Set(['GET'])],
   ['/api/metrics', new Set(['GET'])],
@@ -53,6 +55,7 @@ app.use((req, res, next) => {
 // API Routes
 app.post('/api/chat', chatHandler);
 app.post('/api/feedback', feedbackHandler);
+app.get('/api/usage', usageHandler);
 app.get('/api/health', healthHandler);
 app.get('/api/ready', readyHandler);
 app.get('/api/metrics', metricsHandler);
@@ -136,6 +139,7 @@ app.listen(PORT, '0.0.0.0', () => {
   console.log(`OmanX running at http://localhost:${PORT}`);
   console.log('API endpoints available at:');
   console.log(`  - http://localhost:${PORT}/api/chat`);
+  console.log(`  - http://localhost:${PORT}/api/usage`);
   console.log(`  - http://localhost:${PORT}/api/health`);
   console.log(`  - http://localhost:${PORT}/api/ready`);
   console.log(`  - http://localhost:${PORT}/api/metrics`);

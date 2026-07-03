@@ -21,6 +21,7 @@ const state = {
   typing: false,
   settings: loadSettings(),
   confirmDeleteId: null,
+  usage: null,
 };
 
 const ONBOARDED_KEY = 'omanx.onboarded.v1';
@@ -38,6 +39,7 @@ initCore({ page: 'chat' });
 ensureActiveChat();
 render();
 bindEvents();
+refreshUsage();
 if (!localStorage.getItem(ONBOARDED_KEY)) showOnboarding();
 
 // init composer height
@@ -301,6 +303,7 @@ function populateSettingsPanel() {
 
   updateThemePicker(getTheme());
   updateUserChip();
+  renderUsagePanel();
   renderScholarStatus();
 }
 
@@ -329,6 +332,9 @@ function renderScholarStatus() {
     : `MoHE + ${DEST_LABEL[destination]} rules`;
   const webLabel = state.settings.webSearch === false ? 'Saved rules only' : 'Current rules checked when needed';
   const situation = state.settings.situation || 'No situation set';
+  const usagePill = state.usage && state.usage.percentUsed >= 80
+    ? `<span class="status-pill status-pill-warning">${state.usage.percentUsed}% limit used</span>`
+    : '';
 
   el.innerHTML = `
     <div class="scholar-status-main">
@@ -339,8 +345,63 @@ function renderScholarStatus() {
       <span class="status-pill">${escapeHtml(rulesLabel)}</span>
       <span class="status-pill">${escapeHtml(webLabel)}</span>
       <span class="status-pill">${escapeHtml(situation)}</span>
+      ${usagePill}
     </div>
   `;
+}
+
+async function refreshUsage() {
+  try {
+    const res = await fetch(`/api/usage?sessionId=${encodeURIComponent(getSessionId())}`, { cache: 'no-store' });
+    if (!res.ok) return;
+    const payload = await res.json();
+    if (payload.usage) {
+      state.usage = payload.usage;
+      renderUsagePanel();
+      renderScholarStatus();
+    }
+  } catch {
+    renderUsagePanel();
+  }
+}
+
+function setUsage(usage) {
+  if (!usage) return;
+  state.usage = usage;
+  renderUsagePanel();
+  renderScholarStatus();
+}
+
+function formatReset(usage) {
+  if (!usage?.resetInMs) return 'soon';
+  const totalSeconds = Math.max(Math.ceil(usage.resetInMs / 1000), 0);
+  if (totalSeconds < 60) return `${totalSeconds}s`;
+  const minutes = Math.floor(totalSeconds / 60);
+  const seconds = totalSeconds % 60;
+  return seconds ? `${minutes}m ${seconds}s` : `${minutes}m`;
+}
+
+function renderUsagePanel() {
+  const panel = qs('[data-usage-panel]');
+  if (!panel) return;
+  const percentEl = qs('[data-usage-percent]', panel);
+  const meterEl = qs('[data-usage-meter]', panel);
+  const detailEl = qs('[data-usage-detail]', panel);
+
+  if (!state.usage) {
+    if (percentEl) percentEl.textContent = 'Not available';
+    if (meterEl) meterEl.style.width = '0%';
+    if (detailEl) detailEl.textContent = 'Usage is tracked by the server once you send a message.';
+    return;
+  }
+
+  const usage = state.usage;
+  if (percentEl) percentEl.textContent = `${usage.percentUsed}% used`;
+  if (meterEl) meterEl.style.width = `${Math.min(Math.max(usage.percentUsed, 0), 100)}%`;
+  if (detailEl) {
+    detailEl.textContent = `${usage.remaining} of ${usage.limit} messages left. Resets in ${formatReset(usage)}.`;
+  }
+  panel.classList.toggle('usage-panel-warning', usage.percentUsed >= 80);
 }
 
 function showOnboarding() {
@@ -691,6 +752,7 @@ async function streamAssistantReply(message) {
   let didSources = [];
   let didEscalation = null;
   let didDestination = null;
+  let didUsage = null;
   let bubbleEl = null;
   let rafPending = false;
 
@@ -731,6 +793,7 @@ async function streamAssistantReply(message) {
 
     if (!response.ok) {
       const payload = await response.json().catch(() => ({}));
+      if (payload.usage) didUsage = payload.usage;
       fullText = `**Error:** ${payload.error || payload.text || `Server error (HTTP ${response.status})`}`;
     } else {
       const reader = response.body.getReader();
@@ -751,7 +814,7 @@ async function streamAssistantReply(message) {
             const data = JSON.parse(line.slice(6));
             if (data.error) { fullText = `**Error:** ${data.error}`; break; }
             if (data.t) { fullText += data.t; scheduleRender(); }
-            if (data.done) { if (data.webSearched) didWebSearch = true; if (data.sources) didSources = data.sources; if (data.escalation) didEscalation = data.escalation; if (data.destination) didDestination = data.destination; }
+            if (data.done) { if (data.webSearched) didWebSearch = true; if (data.sources) didSources = data.sources; if (data.escalation) didEscalation = data.escalation; if (data.destination) didDestination = data.destination; if (data.usage) didUsage = data.usage; }
           } catch { /* malformed SSE line */ }
         }
       }
@@ -766,6 +829,7 @@ async function streamAssistantReply(message) {
   // Use the captured chat.id so the response always saves to the originating chat
   // even if the user switched conversations mid-stream.
   qs('[data-stream-bubble]')?.remove();
+  setUsage(didUsage);
   appendMessage('assistant', fullText.trim() || 'No response generated.', chat.id, { webSearched: didWebSearch, sources: didSources, escalation: didEscalation, destination: didDestination });
   setTyping(false);
 }

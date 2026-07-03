@@ -1,12 +1,11 @@
 // api/chat.js - API route for OmanX chatbot
 
 import Anthropic from "@anthropic-ai/sdk";
-import { Ratelimit } from "@upstash/ratelimit";
-import { Redis } from "@upstash/redis";
 import fs from "fs/promises";
 import path from "path";
 import { fileURLToPath } from "url";
 import crypto from "crypto";
+import { consumeUsage, getRateLimitKey, sanitizeSessionId } from "./rate-limit.js";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
@@ -538,50 +537,6 @@ function cacheSet(key, value) {
   _cache.set(key, { ts: Date.now(), value });
 }
 
-// Per-IP rate limiting: 20 requests per 60-second sliding window
-// Uses Upstash Redis when configured (required for multi-instance Vercel deployments);
-// falls back to an in-memory map for local development.
-const _rateLimitMap = new Map();
-const RATE_LIMIT_MAX = 20;
-const RATE_LIMIT_WINDOW_MS = 60_000;
-
-let _upstashLimiter = null;
-function getUpstashLimiter() {
-  if (_upstashLimiter) return _upstashLimiter;
-  const { UPSTASH_REDIS_REST_URL: url, UPSTASH_REDIS_REST_TOKEN: token } = process.env;
-  if (!url || !token) return null;
-  _upstashLimiter = new Ratelimit({
-    redis: new Redis({ url, token }),
-    limiter: Ratelimit.slidingWindow(RATE_LIMIT_MAX, "60 s"),
-    analytics: false,
-  });
-  return _upstashLimiter;
-}
-
-function inMemoryRateLimited(ip) {
-  const now = Date.now();
-  const entry = _rateLimitMap.get(ip);
-  if (!entry || now - entry.windowStart > RATE_LIMIT_WINDOW_MS) {
-    _rateLimitMap.set(ip, { count: 1, windowStart: now });
-    if (_rateLimitMap.size > 5000) {
-      for (const [key, val] of _rateLimitMap) {
-        if (now - val.windowStart > RATE_LIMIT_WINDOW_MS) _rateLimitMap.delete(key);
-      }
-    }
-    return false;
-  }
-  if (entry.count >= RATE_LIMIT_MAX) return true;
-  entry.count++;
-  return false;
-}
-
-async function isRateLimited(ip) {
-  const limiter = getUpstashLimiter();
-  if (!limiter) return inMemoryRateLimited(ip);
-  const { success } = await limiter.limit(ip);
-  return !success;
-}
-
 let _client = null;
 function getClient() {
   if (_client) return _client;
@@ -610,13 +565,7 @@ export default async function handler(req, res) {
   if (req.method === "OPTIONS") return res.status(200).end();
   if (req.method !== "POST") return res.status(405).json({ error: "Method not allowed" });
 
-  const ip = req.headers["x-forwarded-for"]?.split(",")[0].trim() || req.socket?.remoteAddress || "unknown";
-  if (await isRateLimited(ip)) {
-    return res.status(429).json({ error: "Too many requests. Please slow down.", text: "You've sent too many messages too quickly. Please wait a moment before trying again." });
-  }
-
   const { message, history, model: clientModel, conciseMode, userContext, language, destination: clientDestination, webSearch: clientWebSearch, sessionId } = req.body || {};
-
   if (!message || typeof message !== "string") {
     return res.status(400).json({ error: "Missing 'message' string." });
   }
@@ -631,9 +580,23 @@ export default async function handler(req, res) {
     return res.status(400).json({ error: "Message too long (max 10,000 chars)." });
   }
 
+  const sanitizedSessionId = sanitizeSessionId(sessionId) || "unknown";
+  const rateLimitKey = getRateLimitKey(req, sanitizedSessionId);
+  const usage = await consumeUsage(rateLimitKey);
+  res.setHeader("X-RateLimit-Limit", String(usage.limit));
+  res.setHeader("X-RateLimit-Remaining", String(usage.remaining));
+  res.setHeader("X-RateLimit-Reset", String(Math.ceil(usage.resetAt / 1000)));
+
+  if (!usage.allowed) {
+    return res.status(429).json({
+      error: "Too many requests. Please slow down.",
+      text: "You've sent too many messages too quickly. Please wait a moment before trying again.",
+      usage,
+    });
+  }
+
   const model = ALLOWED_MODELS.has(clientModel) ? clientModel : DEFAULT_MODEL;
   const sanitizedUserContext = userContext ? sanitizeMessage(String(userContext)).slice(0, 2000) : "";
-  const sanitizedSessionId = typeof sessionId === 'string' ? sessionId.slice(0, 64).replace(/[^a-z0-9\-]/g, '') : 'unknown';
   const useConcise = conciseMode === true;
   const responseLanguage = (typeof language === 'string' && language !== 'auto') ? language : null;
 
@@ -676,10 +639,10 @@ export default async function handler(req, res) {
       res.setHeader('Connection', 'keep-alive');
       res.flushHeaders();
       res.write(`data: ${JSON.stringify({ t: cached })}\n\n`);
-      res.write(`data: ${JSON.stringify({ done: true, compliance: false, webSearched: false, destination })}\n\n`);
+      res.write(`data: ${JSON.stringify({ done: true, compliance: false, webSearched: false, destination, usage })}\n\n`);
       return res.end();
     }
-    return res.json({ text: cached, cached: true });
+    return res.json({ text: cached, cached: true, usage });
   }
 
   // Run KB lookup and web search in parallel
@@ -741,7 +704,7 @@ export default async function handler(req, res) {
         }),
       ];
       const escalation = compliance && isUrgent(sanitizedMessage) ? buildEscalationCard(sanitizedMessage, destination) : null;
-      res.write(`data: ${JSON.stringify({ done: true, compliance, webSearched: webResults.length > 0, sources, escalation, destination })}\n\n`);
+      res.write(`data: ${JSON.stringify({ done: true, compliance, webSearched: webResults.length > 0, sources, escalation, destination, usage })}\n\n`);
       res.end();
     } catch (err) {
       console.error("[OmanX] Anthropic stream error:", err?.message);
@@ -760,7 +723,7 @@ export default async function handler(req, res) {
     const response = await client.messages.create(requestParams);
     const text = response.content?.[0]?.text?.trim() || "No response generated.";
     if (cacheKey) cacheSet(cacheKey, text);
-    return res.json({ text, cached: false, compliance, webSearched: webResults.length > 0 });
+    return res.json({ text, cached: false, compliance, webSearched: webResults.length > 0, usage });
   } catch (err) {
     console.error("[OmanX] Anthropic error:", err?.message, err?.stack);
     if (err?.status === 429) {

@@ -1433,6 +1433,56 @@ select:focus {
   border-color: #b91c1c;
 }
 
+.usage-panel {
+  display: grid;
+  gap: 8px;
+  padding: 10px;
+  border: 0.5px solid var(--border);
+  border-radius: 4px;
+  background: var(--white);
+}
+
+.usage-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  font-size: 0.8125rem;
+  color: var(--ink-3);
+}
+
+.usage-row strong {
+  font-size: 0.8125rem;
+  font-weight: 500;
+  color: var(--ink);
+}
+
+.usage-meter {
+  height: 6px;
+  overflow: hidden;
+  border-radius: 99px;
+  background: var(--sand-dark);
+}
+
+.usage-meter span {
+  display: block;
+  width: 0%;
+  height: 100%;
+  border-radius: inherit;
+  background: var(--gold);
+  transition: width 0.2s ease;
+}
+
+.usage-detail {
+  font-size: 0.75rem;
+  line-height: 1.45;
+  color: var(--ink-3);
+}
+
+.usage-panel-warning .usage-meter span {
+  background: #b45309;
+}
+
 /* toggle row */
 .toggle-row {
   display: flex;
@@ -1794,6 +1844,12 @@ select:focus {
   letter-spacing: 0.04em;
   color: var(--ink-3);
   white-space: nowrap;
+}
+
+.status-pill-warning {
+  color: #b45309;
+  border-color: rgba(180, 83, 9, 0.28);
+  background: rgba(180, 83, 9, 0.08);
 }
 
 .card.assistant-shell {
