@@ -3,9 +3,9 @@ import { loadChats, saveChats, getActiveChatId, setActiveChatId, createChat, upd
 
 const prompts = [
   { label: 'Arrival', text: 'What do I need to complete in my first 72 hours on campus?' },
-  { label: 'Compliance', text: 'Can I work off-campus this semester under my current visa status?' },
-  { label: 'OPT / Visa', text: 'My OPT application window opens soon — what are the exact steps and deadlines?' },
-  { label: 'Housing', text: 'Help me compare on-campus vs off-campus housing — costs, contracts, and what to watch for.' },
+  { label: 'Work rules', text: 'Can I work off campus this semester, and what facts do you need to check first?' },
+  { label: 'Visa deadline', text: 'My OPT application window opens soon. What are the steps, dates, and people I need to contact?' },
+  { label: 'Housing', text: 'Help me compare on-campus and off-campus housing, including costs, contracts, and risks.' },
 ];
 
 function pinIcon(pinned) {
@@ -24,9 +24,9 @@ const state = {
 };
 
 const ONBOARDED_KEY = 'omanx.onboarded.v1';
-const DEST_FLAG = { us: '🇺🇸', uk: '🇬🇧', au: '🇦🇺' };
-const DEST_LABEL = { us: 'US', uk: 'UK', au: 'AU' };
-const THINKING_STAGES = ['Thinking…', 'Reading knowledge base…', 'Composing answer…'];
+const DEST_LABEL = { auto: 'Auto', us: 'US', uk: 'UK', au: 'AU' };
+const DEST_FULL_LABEL = { auto: 'Auto-detect', us: 'United States', uk: 'United Kingdom', au: 'Australia' };
+const THINKING_STAGES = ['Checking your question...', 'Reading saved rules...', 'Writing guidance...'];
 
 // Tracks which chatId is actively streaming; null when idle.
 let streamingChatId = null;
@@ -138,6 +138,20 @@ function bindEvents() {
     renderSidebar();
   });
 
+  qs('[data-composer-destination]')?.addEventListener('change', (event) => {
+    state.settings.destination = event.target.value;
+    saveSettings(state.settings);
+    populateSettingsPanel();
+    renderScholarStatus();
+  });
+
+  qs('[data-composer-web-search]')?.addEventListener('change', (event) => {
+    state.settings.webSearch = event.target.checked;
+    saveSettings(state.settings);
+    populateSettingsPanel();
+    renderScholarStatus();
+  });
+
   // — submit —
   qs('[data-chat-form]')?.addEventListener('submit', async (event) => {
     event.preventDefault();
@@ -216,12 +230,16 @@ function bindEvents() {
   qs('[data-setting-web-search]')?.addEventListener('change', (e) => {
     state.settings.webSearch = e.target.checked;
     saveSettings(state.settings);
+    populateSettingsPanel();
+    renderScholarStatus();
   });
 
   // destination
   qs('[data-setting-destination]')?.addEventListener('change', (e) => {
     state.settings.destination = e.target.value;
     saveSettings(state.settings);
+    populateSettingsPanel();
+    renderScholarStatus();
   });
 
   // language
@@ -275,8 +293,15 @@ function populateSettingsPanel() {
   const webSearchEl = qs('[data-setting-web-search]');
   if (webSearchEl) webSearchEl.checked = webSearch !== false;
 
+  const composerDestEl = qs('[data-composer-destination]');
+  if (composerDestEl) composerDestEl.value = destination || 'auto';
+
+  const composerWebSearchEl = qs('[data-composer-web-search]');
+  if (composerWebSearchEl) composerWebSearchEl.checked = webSearch !== false;
+
   updateThemePicker(getTheme());
   updateUserChip();
+  renderScholarStatus();
 }
 
 function updateThemePicker(active) {
@@ -294,12 +319,37 @@ function updateUserChip() {
   if (nameEl) nameEl.textContent = name;
 }
 
+function renderScholarStatus() {
+  const el = qs('[data-scholar-status]');
+  if (!el) return;
+  const destination = state.settings.destination || 'auto';
+  const destinationLabel = DEST_FULL_LABEL[destination] || 'Auto-detect';
+  const rulesLabel = destination === 'auto'
+    ? 'MoHE + detected visa rules'
+    : `MoHE + ${DEST_LABEL[destination]} rules`;
+  const webLabel = state.settings.webSearch === false ? 'Saved rules only' : 'Current rules checked when needed';
+  const situation = state.settings.situation || 'No situation set';
+
+  el.innerHTML = `
+    <div class="scholar-status-main">
+      <span class="status-brand">Ask OmanX</span>
+      <span>${escapeHtml(destinationLabel)}</span>
+    </div>
+    <div class="status-pills" aria-label="Guidance settings">
+      <span class="status-pill">${escapeHtml(rulesLabel)}</span>
+      <span class="status-pill">${escapeHtml(webLabel)}</span>
+      <span class="status-pill">${escapeHtml(situation)}</span>
+    </div>
+  `;
+}
+
 function showOnboarding() {
   const overlay = qs('[data-onboarding]');
   if (!overlay) return;
   overlay.hidden = false;
 
   let selectedDest = 'auto';
+  let selectedSituation = state.settings.situation || 'Current student';
 
   qsa('[data-dest]', overlay).forEach((btn) => {
     btn.addEventListener('click', () => {
@@ -308,6 +358,16 @@ function showOnboarding() {
       selectedDest = btn.dataset.dest;
       qs('[data-ob-step="1"]', overlay).hidden = true;
       qs('[data-ob-step="2"]', overlay).hidden = false;
+    });
+  });
+
+  qsa('[data-situation]', overlay).forEach((btn) => {
+    btn.addEventListener('click', () => {
+      qsa('[data-situation]', overlay).forEach((b) => b.classList.remove('selected'));
+      btn.classList.add('selected');
+      selectedSituation = btn.dataset.situation;
+      qs('[data-ob-step="2"]', overlay).hidden = true;
+      qs('[data-ob-step="3"]', overlay).hidden = false;
       qs('[data-onboarding-name]', overlay)?.focus();
     });
   });
@@ -318,12 +378,13 @@ function showOnboarding() {
       state.settings.studentName = name;
     }
     state.settings.destination = selectedDest;
+    state.settings.situation = selectedSituation;
     saveSettings(state.settings);
     localStorage.setItem(ONBOARDED_KEY, '1');
     overlay.hidden = true;
     updateUserChip();
     populateSettingsPanel();
-    renderMessages();
+    render();
   }
 
   qs('[data-onboarding-submit]', overlay)?.addEventListener('click', completeOnboarding);
@@ -334,6 +395,7 @@ function showOnboarding() {
 
 function render() {
   renderSidebar();
+  renderScholarStatus();
   // Skip message-list rebuild while the stream bubble is live on the active chat.
   // If the user switched to a different chat, render their messages normally.
   if (!streamingChatId || streamingChatId !== state.activeChatId) renderMessages();
@@ -503,23 +565,24 @@ function renderMessages() {
 
   container.innerHTML = chat.messages.map((message) => `
     <article class="message ${message.role}">
+      ${message.role === 'assistant' ? renderAnswerStatus(message) : ''}
       <div class="message-bubble">${message.role === 'assistant' ? renderRichText(message.content) : renderUserText(message.content)}</div>
       ${message.role === 'assistant' ? renderSources(message.sources) : ''}
       ${message.role === 'assistant' ? renderEscalationCard(message.escalation) : ''}
       <div class="message-meta">
         <span>${message.role === 'assistant' ? 'OmanX' : state.settings.studentName}</span>
         <span>${formatDateTime(message.createdAt)}</span>
-        ${message.role === 'assistant' && message.destination && DEST_FLAG[message.destination] ? `<span class="dest-badge">${DEST_FLAG[message.destination]} ${DEST_LABEL[message.destination]}</span>` : ''}
+        ${message.role === 'assistant' && message.destination && DEST_LABEL[message.destination] ? `<span class="dest-badge">${DEST_LABEL[message.destination]}</span>` : ''}
         ${message.role === 'assistant' ? `
           <span class="message-tools">
-            ${message.webSearched ? '<span class="web-search-badge" title="Live web search was used for this response">Web search</span>' : ''}
+            ${message.webSearched ? '<span class="web-search-badge" title="Current web search was used for this response">Current rules</span>' : ''}
             <button type="button" data-copy-message="${message.id}">Copy</button>
             <span class="feedback-buttons" data-feedback-id="${message.id}">
               <button type="button" class="feedback-btn ${feedbackState.get(message.id) === 'up' ? 'feedback-submitted' : ''}" data-feedback-up="${message.id}" title="Helpful" aria-label="Mark as helpful">
-                ${feedbackState.get(message.id) === 'up' ? '✓' : '↑'}
+                ${feedbackState.get(message.id) === 'up' ? 'OK' : '+'}
               </button>
               <button type="button" class="feedback-btn ${feedbackState.get(message.id) === 'down' ? 'feedback-submitted' : ''}" data-feedback-down="${message.id}" title="Not helpful" aria-label="Mark as not helpful">
-                ${feedbackState.get(message.id) === 'down' ? '✓' : '↓'}
+                ${feedbackState.get(message.id) === 'down' ? 'OK' : '-'}
               </button>
             </span>
           </span>
@@ -534,7 +597,7 @@ function renderMessages() {
     typing.innerHTML = `
       <div class="message-bubble">
         <div class="typing"><span></span><span></span><span></span></div>
-        <div class="thinking-status" data-thinking-status>Thinking…</div>
+        <div class="thinking-status" data-thinking-status>Checking...</div>
       </div>
       <div class="message-meta"><span>OmanX</span></div>
     `;
@@ -563,7 +626,7 @@ function renderMessages() {
 
       qsa(`[data-feedback-up="${messageId}"], [data-feedback-down="${messageId}"]`, container).forEach((b) => {
         b.disabled = true;
-        b.textContent = b.dataset[`feedback${rating === 'up' ? 'Up' : 'Down'}`] === messageId ? '✓' : '–';
+        b.textContent = b.dataset[`feedback${rating === 'up' ? 'Up' : 'Down'}`] === messageId ? 'OK' : '-';
       });
 
       renderMessages();
@@ -621,6 +684,7 @@ async function streamAssistantReply(message) {
     .map(({ role, content }) => ({ role, content }));
 
   const { model, conciseMode, userContext, language, destination, webSearch } = state.settings;
+  const profileContext = buildProfileContext(userContext);
 
   let fullText = '';
   let didWebSearch = false;
@@ -662,7 +726,7 @@ async function streamAssistantReply(message) {
     const response = await fetch('/api/chat', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ message, history, model, conciseMode, userContext, language, destination: destination || 'auto', webSearch: webSearch !== false, stream: true, sessionId: getSessionId() }),
+      body: JSON.stringify({ message, history, model, conciseMode, userContext: profileContext, language, destination: destination || 'auto', webSearch: webSearch !== false, stream: true, sessionId: getSessionId() }),
     });
 
     if (!response.ok) {
@@ -718,13 +782,26 @@ function autoGrow(textarea) {
   textarea.style.height = `${Math.min(textarea.scrollHeight, 220)}px`;
 }
 
+function buildProfileContext(userContext = '') {
+  const parts = [];
+  if (state.settings.situation) parts.push(`Student situation: ${state.settings.situation}.`);
+  if (state.settings.destination && state.settings.destination !== 'auto') {
+    parts.push(`Study destination: ${DEST_FULL_LABEL[state.settings.destination] || state.settings.destination}.`);
+  }
+  if (userContext) parts.push(userContext);
+  return parts.join('\n');
+}
+
 function emptyStateMarkup() {
   const name = state.settings.studentName && state.settings.studentName !== 'Student' ? `, ${state.settings.studentName}` : '';
+  const destination = state.settings.destination && state.settings.destination !== 'auto'
+    ? DEST_FULL_LABEL[state.settings.destination]
+    : 'the US, UK, or Australia';
   return `
     <section class="message-empty">
       <div class="empty-brand">Oman<span>X</span></div>
-      <p class="empty-sub">Good to see you${escapeHtml(name)}. Ask anything about visas, work, housing, or compliance in the US, UK, or Australia.</p>
-      <p class="empty-trust">Answers draw from MoHE scholarship rules and official visa regulations — urgent compliance issues are flagged clearly.</p>
+      <p class="empty-sub">Good to see you${escapeHtml(name)}. Ask about visas, work, housing, insurance, or scholarship rules in ${escapeHtml(destination)}.</p>
+      <p class="empty-trust">OmanX shows sources, flags risky situations, and gives next steps before you act.</p>
       <div class="prompt-grid">
         ${prompts.map((p) => `<button type="button" class="prompt-card" data-quick-prompt="${escapeHtml(p.text)}"><span class="prompt-card-label">${escapeHtml(p.label)}</span><span class="prompt-card-text">${escapeHtml(p.text)}</span></button>`).join('')}
       </div>
@@ -739,7 +816,7 @@ function slugify(value) {
 function chatToMarkdown(chat) {
   const destMsg = chat.messages.find((m) => m.destination);
   const dest = destMsg?.destination;
-  const destStr = dest ? ` · ${DEST_FLAG[dest] || ''} ${DEST_LABEL[dest] || dest.toUpperCase()}` : '';
+  const destStr = dest ? ` - ${DEST_LABEL[dest] || dest.toUpperCase()}` : '';
   const exportDate = new Intl.DateTimeFormat('en', { dateStyle: 'long', timeStyle: 'short' }).format(new Date());
 
   const lines = [
@@ -778,7 +855,7 @@ function chatToMarkdown(chat) {
           lines.push(`>`, `> *Relevant forms:* ${card.forms.join(', ')}`);
         }
         if (card.embassy) {
-          lines.push(`>`, `> **${card.embassy.name}** — ${card.embassy.note}`);
+            lines.push(`>`, `> **${card.embassy.name}** - ${card.embassy.note}`);
         }
         lines.push(`>`, `> ${card.dsoNote}`, ``);
       }
@@ -795,17 +872,17 @@ function exportAsPdf(chat) {
   const win = window.open(url, '_blank');
   if (!win) {
     URL.revokeObjectURL(url);
-    showToast('Pop-up blocked — allow pop-ups for this site to export PDF.');
+    showToast('Pop-up blocked. Allow pop-ups for this site to export PDF.');
     return;
   }
   setTimeout(() => URL.revokeObjectURL(url), 60000);
-  showToast('Opening print dialog — choose "Save as PDF".');
+  showToast('Opening print dialog. Choose "Save as PDF".');
 }
 
 function chatToPrintHtml(chat) {
   const destMsg = chat.messages.find((m) => m.destination);
   const dest = destMsg?.destination;
-  const destStr = dest ? ` · ${DEST_FLAG[dest] || ''} ${DEST_LABEL[dest] || dest.toUpperCase()}` : '';
+  const destStr = dest ? ` - ${DEST_LABEL[dest] || dest.toUpperCase()}` : '';
   const exportDate = new Intl.DateTimeFormat('en', { dateStyle: 'long', timeStyle: 'short' }).format(new Date());
   const studentName = state.settings.studentName || 'Student';
 
@@ -834,7 +911,7 @@ function chatToPrintHtml(chat) {
       const card = msg.escalation;
       const stepsHtml = (card.steps || []).map((s) => `<li>${escapeHtml(s)}</li>`).join('');
       const formsHtml = card.forms?.length ? `<div><strong>Relevant forms:</strong> ${card.forms.map((f) => escapeHtml(f)).join(', ')}</div>` : '';
-      const embassyHtml = card.embassy ? `<div><strong>${escapeHtml(card.embassy.name)}</strong> — ${escapeHtml(card.embassy.note)}</div>` : '';
+      const embassyHtml = card.embassy ? `<div><strong>${escapeHtml(card.embassy.name)}</strong> - ${escapeHtml(card.embassy.note)}</div>` : '';
       escalationHtml = `
         <div class="escalation-card ${card.level === 'urgent' ? 'urgent' : 'warning'}">
           <div class="escalation-title">${escapeHtml(card.title)} · ${card.level === 'urgent' ? 'Action Required' : 'Heads Up'}</div>
@@ -859,7 +936,7 @@ function chatToPrintHtml(chat) {
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width,initial-scale=1.0">
-  <title>OmanX — ${escapeHtml(chat.title)}</title>
+  <title>OmanX - ${escapeHtml(chat.title)}</title>
   <style>
     *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
     body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;font-size:14px;line-height:1.65;color:#1a1a1a;background:#fff;padding:2.5cm 2cm;max-width:21cm;margin:0 auto}
@@ -983,6 +1060,67 @@ function renderUserText(content) {
   return escapeHtml(content).replace(/\n/g, '<br>');
 }
 
+function classifyAnswer(message) {
+  const text = `${message.content || ''}`.toLowerCase();
+  const complianceTerms = [
+    'visa', 'dso', 'sevis', 'uscis', 'i-20', 'opt', 'cpt', 'work authorization',
+    'off-campus', 'off campus', 'ukvi', 'cas', 'brp', 'student visa', 'mohe',
+    'scholarship', 'insurance', 'academic standing', 'probation',
+  ];
+  const isCompliance = !!message.escalation || message.webSearched || message.sources?.length || complianceTerms.some((term) => text.includes(term));
+
+  if (message.escalation?.level === 'urgent') {
+    return {
+      level: 'high',
+      label: 'High risk',
+      detail: 'Do not act on this alone. Confirm with your university office, sponsor, or embassy contact first.',
+      relevant: true,
+    };
+  }
+
+  if (message.escalation || isCompliance) {
+    return {
+      level: 'medium',
+      label: 'Check before acting',
+      detail: 'Rules can depend on your exact status, sponsor approval, and university policy.',
+      relevant: true,
+    };
+  }
+
+  return {
+    level: 'low',
+    label: 'General guidance',
+    detail: 'Useful for planning. Ask a follow-up if your visa, scholarship, or deadline is involved.',
+    relevant: false,
+  };
+}
+
+function renderAnswerStatus(message) {
+  const risk = classifyAnswer(message);
+  const sourceCount = message.sources?.length || 0;
+  const sourceLabel = sourceCount
+    ? `${sourceCount} source${sourceCount === 1 ? '' : 's'} used`
+    : 'No source shown';
+  const webLabel = message.webSearched ? 'Current rules checked' : 'Saved rules used';
+  const destinationLabel = message.destination && DEST_LABEL[message.destination]
+    ? DEST_LABEL[message.destination]
+    : DEST_LABEL[state.settings.destination] || 'Auto';
+
+  return `
+    <div class="answer-status answer-status-${risk.level}">
+      <div>
+        <span class="answer-status-label">${escapeHtml(risk.label)}</span>
+        <span class="answer-status-detail">${escapeHtml(risk.detail)}</span>
+      </div>
+      <div class="answer-status-pills">
+        <span>${escapeHtml(destinationLabel)}</span>
+        <span>${escapeHtml(webLabel)}</span>
+        <span>${escapeHtml(sourceLabel)}</span>
+      </div>
+    </div>
+  `;
+}
+
 function renderSources(sources) {
   if (!sources?.length) return '';
   const chips = sources.map(s => {
@@ -992,7 +1130,7 @@ function renderSources(sources) {
     const safeUrl = /^https?:\/\//i.test(s.url) ? s.url : '#';
     return `<a class="source-chip source-chip-web" href="${escapeHtml(safeUrl)}" target="_blank" rel="noopener noreferrer" title="${escapeHtml(s.title)}">${escapeHtml(s.domain)}</a>`;
   }).join('');
-  return `<div class="message-sources"><span class="sources-label">Cited</span>${chips}</div>`;
+  return `<div class="message-sources"><span class="sources-label">Sources used</span>${chips}</div>`;
 }
 
 function renderEscalationCard(card) {

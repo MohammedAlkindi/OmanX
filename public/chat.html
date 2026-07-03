@@ -8,8 +8,8 @@
     <link rel="icon" type="image/png" sizes="16x16" href="/assets/favicon-16x16.png" />
     <link rel="icon" type="image/svg+xml" href="/assets/icon.svg" />
     <link rel="manifest" href="/assets/site.webmanifest" />
-    <title>OmanX Workspace</title>
-    <meta name="description" content="Structured workspace for policy-aware decision guidance." />
+    <title>OmanX Guidance</title>
+    <meta name="description" content="Guidance for Omani scholars studying abroad." />
     <link rel="stylesheet" href="/styles.css" />
     <script defer src="/_vercel/insights/script.js"></script>
   </head>
@@ -18,7 +18,7 @@
     <nav>
       <a class="nav-logo" href="/">Oman<span>X</span></a>
       <div class="nav-right">
-        <a class="nav-cta" href="/">← Home</a>
+        <a class="nav-cta" href="/">&larr; Home</a>
         <button class="nav-hamburger" data-mobile-toggle aria-label="Open menu" aria-expanded="false">
           <span></span><span></span><span></span>
         </button>
@@ -40,8 +40,8 @@
           <div class="sidebar-inner">
             <div class="sidebar-header">
               <div>
-                <div class="muted">Conversations</div>
-                <h3>Decision history</h3>
+                <div class="muted">Guidance</div>
+                <h3>My questions</h3>
               </div>
               <button class="btn btn-new-chat" data-new-chat type="button">New</button>
             </div>
@@ -57,7 +57,7 @@
               <span class="user-avatar" data-user-avatar>S</span>
               <span class="user-chip-info">
                 <span class="user-chip-name" data-user-chip-name>Student</span>
-                <span class="user-chip-sub">OmanX Workspace</span>
+                <span class="user-chip-sub">Scholar profile</span>
               </span>
               <svg class="user-chip-gear" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
             </button>
@@ -67,7 +67,7 @@
           <div class="settings-panel" data-settings-panel>
             <div class="settings-panel-header">
               <h3>Settings</h3>
-              <button class="settings-panel-close" data-settings-close type="button" aria-label="Close settings">✕</button>
+              <button class="settings-panel-close" data-settings-close type="button" aria-label="Close settings">&times;</button>
             </div>
 
             <div class="settings-panel-body">
@@ -97,10 +97,10 @@
 
               <!-- Assistant -->
               <div class="settings-section">
-                <div class="settings-section-label">Assistant</div>
+                <div class="settings-section-label">Guidance</div>
                 <div class="settings-field">
-                  <label for="settings-context">Custom context</label>
-                  <textarea id="settings-context" class="settings-textarea" data-setting-context rows="3" placeholder="Tell the assistant about your situation, goals, or preferences…"></textarea>
+                  <label for="settings-context">What should OmanX remember?</label>
+                  <textarea id="settings-context" class="settings-textarea" data-setting-context rows="3" placeholder="Example: I am on an MoHE scholarship, studying in the US, and graduating in May."></textarea>
                 </div>
                 <label class="toggle-row">
                   <input class="toggle-checkbox" type="checkbox" data-setting-concise />
@@ -115,27 +115,27 @@
                 <div class="settings-field">
                   <label for="settings-model">Model</label>
                   <select id="settings-model" class="settings-select" data-setting-model>
-                    <option value="claude-sonnet-4-6">Sonnet 4.6 — Recommended</option>
-                    <option value="claude-haiku-4-5-20251001">Haiku 4.5 — Faster</option>
+                    <option value="claude-sonnet-4-6">Sonnet 4.6 - Recommended</option>
+                    <option value="claude-haiku-4-5-20251001">Haiku 4.5 - Faster</option>
                   </select>
                 </div>
                 <div class="settings-field">
                   <label for="settings-destination">Study destination</label>
                   <select id="settings-destination" class="settings-select" data-setting-destination>
                     <option value="auto">Auto-detect from message</option>
-                    <option value="us">United States 🇺🇸</option>
-                    <option value="uk">United Kingdom 🇬🇧</option>
-                    <option value="au">Australia 🇦🇺</option>
+                    <option value="us">United States</option>
+                    <option value="uk">United Kingdom</option>
+                    <option value="au">Australia</option>
                   </select>
                 </div>
                 <div class="settings-field">
                   <label for="settings-language">Response language</label>
                   <select id="settings-language" class="settings-select" data-setting-language>
-                    <option value="auto">Auto — match my language</option>
+                    <option value="auto">Auto - match my language</option>
                     <option value="English">English</option>
-                    <option value="Arabic">Arabic (العربية)</option>
-                    <option value="French">French (Français)</option>
-                    <option value="Spanish">Spanish (Español)</option>
+                    <option value="Arabic">Arabic</option>
+                    <option value="French">French</option>
+                    <option value="Spanish">Spanish</option>
                     <option value="German">German (Deutsch)</option>
                     <option value="Chinese">Chinese (中文)</option>
                     <option value="Japanese">Japanese (日本語)</option>
@@ -166,7 +166,7 @@
                   <span class="toggle-track"><span class="toggle-thumb"></span></span>
                   <span class="toggle-label">Share conversations to improve OmanX</span>
                 </label>
-                <button type="button" class="btn-settings-danger" data-delete-all-chats>Delete all conversations</button>
+                <button type="button" class="btn-settings-danger" data-delete-all-chats>Delete all questions</button>
               </div>
 
             </div>
@@ -174,7 +174,7 @@
         </aside>
 
         <!-- Main chat area -->
-        <section class="assistant-shell" aria-label="Decision workspace">
+        <section class="assistant-shell" aria-label="Ask OmanX">
           <div class="mobile-chat-bar">
             <button class="btn-ghost sidebar-toggle-btn" data-sidebar-toggle type="button">
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" aria-hidden="true"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
@@ -182,13 +182,30 @@
           </button>
           </div>
 
+          <header class="scholar-status" data-scholar-status></header>
+
           <section class="chat-body" data-message-list></section>
 
-          <button class="scroll-bottom-btn" data-scroll-bottom type="button" hidden aria-label="Scroll to bottom">↓</button>
+          <button class="scroll-bottom-btn" data-scroll-bottom type="button" hidden aria-label="Scroll to bottom">&darr;</button>
 
           <form class="composer" data-chat-form>
             <div class="composer-box card">
-              <textarea id="chat-input" data-chat-input placeholder="Ask about visas, campus setup, work authorization, housing…"></textarea>
+              <div class="composer-toolbar" aria-label="Question settings">
+                <label class="composer-select-wrap">
+                  <span>Destination</span>
+                  <select data-composer-destination>
+                    <option value="auto">Auto</option>
+                    <option value="us">US</option>
+                    <option value="uk">UK</option>
+                    <option value="au">AU</option>
+                  </select>
+                </label>
+                <label class="composer-search-toggle">
+                  <input type="checkbox" data-composer-web-search />
+                  <span>Check current rules</span>
+                </label>
+              </div>
+              <textarea id="chat-input" data-chat-input placeholder="Ask about visas, work, housing, insurance, or scholarship rules."></textarea>
               <div class="composer-actions">
                 <button class="btn btn-send" type="submit" data-send-btn>Send</button>
               </div>
@@ -207,28 +224,37 @@
 
         <div class="onboarding-step" data-ob-step="1">
           <p class="onboarding-title">Where are you studying?</p>
-          <p class="onboarding-hint">Guides which visa and scholarship rules apply to you.</p>
+          <p class="onboarding-hint">This helps OmanX apply the right visa and scholarship rules.</p>
           <div class="onboarding-dests">
             <button class="dest-card" type="button" data-dest="us">
-              <span class="dest-flag">🇺🇸</span>
               <span class="dest-name">United States</span>
             </button>
             <button class="dest-card" type="button" data-dest="uk">
-              <span class="dest-flag">🇬🇧</span>
               <span class="dest-name">United Kingdom</span>
             </button>
             <button class="dest-card" type="button" data-dest="au">
-              <span class="dest-flag">🇦🇺</span>
               <span class="dest-name">Australia</span>
             </button>
           </div>
         </div>
 
         <div class="onboarding-step" data-ob-step="2" hidden>
+          <p class="onboarding-title">What are you dealing with?</p>
+          <p class="onboarding-hint">Pick the closest fit. It only changes the starting guidance.</p>
+          <div class="situation-grid">
+            <button class="situation-card" type="button" data-situation="New student">New student</button>
+            <button class="situation-card" type="button" data-situation="Current student">Current student</button>
+            <button class="situation-card" type="button" data-situation="Graduating soon">Graduating soon</button>
+            <button class="situation-card" type="button" data-situation="Visa or work issue">Visa or work issue</button>
+            <button class="situation-card" type="button" data-situation="Scholarship issue">Scholarship issue</button>
+          </div>
+        </div>
+
+        <div class="onboarding-step" data-ob-step="3" hidden>
           <p class="onboarding-title">What should we call you?</p>
-          <p class="onboarding-hint">Optional — you can change this anytime in settings.</p>
+          <p class="onboarding-hint">Optional. You can change this anytime in settings.</p>
           <input class="onboarding-name-input" data-onboarding-name type="text" placeholder="Your name" autocomplete="given-name" />
-          <button class="btn onboarding-submit" data-onboarding-submit type="button">Get started →</button>
+          <button class="btn onboarding-submit" data-onboarding-submit type="button">Start asking &rarr;</button>
         </div>
       </div>
     </div>

@@ -14,7 +14,7 @@ export function getSessionId() {
 const ACTIVE_KEY = 'omanx.mindspace.active.v1';
 const SETTINGS_KEY = 'omanx.settings.v1';
 
-const STARTER_CONTENT = 'Welcome to OmanX. I can help you structure questions about study planning, housing, first-week setup, and safe escalation for high-stakes issues. Start with a question or use one of the guided prompts below.';
+const STARTER_CONTENT = 'Welcome to OmanX. Ask about visas, work rules, housing, insurance, scholarship rules, or first-week setup. For risky questions, OmanX will show sources and the next people to contact before you act.';
 
 function makeStarterReply() {
   return { id: uid('msg'), role: 'assistant', content: STARTER_CONTENT, createdAt: new Date().toISOString() };
@@ -79,6 +79,7 @@ const SETTINGS_DEFAULTS = {
   conciseMode: false,
   model: 'claude-sonnet-4-6',
   userContext: '',
+  situation: '',
   language: 'auto',
   destination: 'auto',
   dataConsent: false,
