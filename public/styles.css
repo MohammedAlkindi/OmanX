@@ -861,6 +861,42 @@ select:focus {
 
 .trust-item:hover { background: var(--sand); }
 
+.preview-caption {
+  margin-top: 16px;
+  font-size: 0.8125rem;
+  font-weight: 300;
+  color: var(--ink-4);
+}
+
+.preview-caption a { color: var(--gold); }
+.preview-caption a:hover { border-bottom: 0.5px solid var(--gold); }
+
+/* question category chips */
+.question-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.question-chip {
+  display: inline-flex;
+  align-items: center;
+  padding: 10px 18px;
+  border: 0.5px solid var(--border-strong);
+  border-radius: 999px;
+  background: var(--white);
+  font-size: 0.8125rem;
+  font-weight: 400;
+  color: var(--ink-2);
+  transition: border-color 0.15s, color 0.15s, background 0.15s;
+}
+
+.question-chip:hover {
+  border-color: var(--gold);
+  color: var(--ink);
+  background: var(--sand);
+}
+
 /* decision artifact / preview card */
 .preview-card { padding: 40px; }
 
@@ -894,25 +930,55 @@ select:focus {
   line-height: 1.6;
 }
 
-/* CTA band — dark strip */
-.cta-band {
-  background: var(--black);
-  padding: var(--section-pad) 0;
+/* founder card */
+.founder-card {
+  display: flex;
+  align-items: flex-start;
+  gap: 24px;
+  padding: 32px;
 }
 
-.cta-band h2,
-.cta-band p { color: #fafaf8; }
+.founder-avatar {
+  flex-shrink: 0;
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  background: var(--gold-dim);
+  border: 1px solid var(--gold);
+  color: var(--ink);
+  font-family: var(--sans);
+  font-size: 1rem;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
 
-.cta-band p { color: rgba(250,250,248,0.6); margin-top: 12px; }
+.founder-info h3 { margin: 0 0 8px; }
 
-.cta-band .eyebrow { color: var(--gold); }
-.cta-band .eyebrow::before { background: var(--gold); }
+.founder-info p {
+  margin: 0;
+  max-width: 560px;
+  font-size: 0.9375rem;
+  font-weight: 300;
+  color: var(--ink-3);
+  line-height: 1.6;
+}
 
-.cta-band .hero-actions { margin-top: 32px; }
+.founder-links {
+  display: flex;
+  gap: 20px;
+  flex-wrap: wrap;
+  margin-top: 16px;
+}
 
-.cta-band-ghost { color: rgba(250,250,248,0.6); }
-.cta-band-ghost:hover { color: var(--white); }
+.founder-links a {
+  font-size: 0.8125rem;
+  font-weight: 400;
+  color: var(--ink-3);
+}
 
+.founder-links a:hover { color: var(--gold); }
 
 /* ============================================================
    10. CONTENT PAGES — system, method, vision, contact
@@ -1068,6 +1134,10 @@ select:focus {
 
 .feature-grid.compact-grid-3 {
   grid-template-columns: repeat(3, 1fr);
+}
+
+.feature-grid.compact-grid-4 {
+  grid-template-columns: repeat(4, 1fr);
 }
 
 .feature-card {
@@ -3130,6 +3200,7 @@ footer,
   .metric-grid              { grid-template-columns: 1fr 1fr; }
   .workspace-grid           { grid-template-columns: 1fr 1fr; }
   .feature-grid.compact-grid-3 { grid-template-columns: 1fr 1fr; }
+  .feature-grid.compact-grid-4 { grid-template-columns: 1fr 1fr; }
   .settings-grid            { grid-template-columns: 1fr 1fr; }
   .split-section            { grid-template-columns: 1fr; }
   .table-row                { grid-template-columns: 1fr auto; }
@@ -3175,6 +3246,7 @@ footer,
   .metric-grid              { grid-template-columns: 1fr 1fr; }
   .workspace-grid           { grid-template-columns: 1fr; }
   .feature-grid.compact-grid-3 { grid-template-columns: 1fr; }
+  .feature-grid.compact-grid-4 { grid-template-columns: 1fr; }
   .settings-grid            { grid-template-columns: 1fr; }
   .table-row                { grid-template-columns: 1fr; }
 
@@ -3182,6 +3254,8 @@ footer,
   .footer-row               { flex-direction: column; gap: 12px; align-items: flex-start; }
 
   .preview-card             { padding: 24px; }
+
+  .founder-card             { flex-direction: column; padding: 24px; }
 
   .auth-card                { padding: 32px 24px; }
   .onboarding-card          { padding: 32px 24px; }

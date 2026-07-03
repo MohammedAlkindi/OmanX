@@ -4,6 +4,7 @@ node_modules
 .env.*.local
 .claude
 CLAUDE.md
+AGENTS.md
 
 # Logs
 *.log
