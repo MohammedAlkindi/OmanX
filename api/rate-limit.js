@@ -25,9 +25,7 @@ export function sanitizeSessionId(sessionId) {
     : "";
 }
 
-export function getRateLimitKey(req, sessionId) {
-  const cleanSessionId = sanitizeSessionId(sessionId);
-  if (cleanSessionId) return `session:${cleanSessionId}`;
+export function getRateLimitKey(req) {
   return `ip:${getClientIp(req)}`;
 }
 

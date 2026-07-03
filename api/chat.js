@@ -581,7 +581,7 @@ export default async function handler(req, res) {
   }
 
   const sanitizedSessionId = sanitizeSessionId(sessionId) || "unknown";
-  const rateLimitKey = getRateLimitKey(req, sanitizedSessionId);
+  const rateLimitKey = getRateLimitKey(req);
   const usage = await consumeUsage(rateLimitKey);
   res.setHeader("X-RateLimit-Limit", String(usage.limit));
   res.setHeader("X-RateLimit-Remaining", String(usage.remaining));
