@@ -105,7 +105,10 @@ function bindEvents() {
 
   // — sidebar toggle (mobile) —
   qs('[data-sidebar-toggle]')?.addEventListener('click', () => {
-    qs('[data-chat-sidebar]').classList.toggle('open');
+    qs('[data-chat-sidebar]')?.classList.toggle('open');
+  });
+  qs('[data-sidebar-backdrop]')?.addEventListener('click', () => {
+    qs('[data-chat-sidebar]')?.classList.remove('open');
   });
 
   // — close item menus and sidebar on outside click —
@@ -125,13 +128,16 @@ function bindEvents() {
   });
 
   // — new chat —
-  qs('[data-new-chat]')?.addEventListener('click', () => {
-    const chat = createChat({ title: 'New chat' });
-    state.chats.unshift(chat);
-    state.activeChatId = chat.id;
-    persist();
-    render();
-    showToast('New chat created.');
+  qsa('[data-new-chat]').forEach((button) => {
+    button.addEventListener('click', () => {
+      const chat = createChat({ title: 'New chat' });
+      state.chats.unshift(chat);
+      state.activeChatId = chat.id;
+      qs('[data-chat-sidebar]')?.classList.remove('open');
+      persist();
+      render();
+      showToast('New chat created.');
+    });
   });
 
   // — search —
@@ -238,6 +244,7 @@ function bindEvents() {
     state.settings.destination = e.target.value;
     saveSettings(state.settings);
     populateSettingsPanel();
+    updateMobileChatContext();
   });
 
   // language
@@ -348,6 +355,16 @@ function updateUserChip() {
   if (nameEl) nameEl.textContent = name;
 }
 
+function updateMobileChatContext() {
+  const el = qs('[data-mobile-chat-context]');
+  if (!el) return;
+  const activeChat = state.chats.find((chat) => chat.id === state.activeChatId);
+  const destination = DEST_FULL_LABEL[state.settings.destination || 'auto'] || 'Auto-detect';
+  el.textContent = activeChat?.title && activeChat.title !== 'New chat'
+    ? activeChat.title
+    : destination;
+}
+
 async function refreshUsage() {
   try {
     const res = await fetch(`/api/usage?sessionId=${encodeURIComponent(getSessionId())}`, { cache: 'no-store' });
@@ -452,6 +469,7 @@ function showOnboarding() {
 
 function render() {
   renderSidebar();
+  updateMobileChatContext();
   // Skip message-list rebuild while the stream bubble is live on the active chat.
   // If the user switched to a different chat, render their messages normally.
   if (!streamingChatId || streamingChatId !== state.activeChatId) renderMessages();

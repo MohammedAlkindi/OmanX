@@ -256,14 +256,19 @@
             </div>
           </div>
         </aside>
+        <button class="sidebar-backdrop" data-sidebar-backdrop type="button" aria-label="Close conversations"></button>
 
         <!-- Main chat area -->
         <section class="assistant-shell" aria-label="Ask OmanX">
           <div class="mobile-chat-bar">
-            <button class="btn-ghost sidebar-toggle-btn" data-sidebar-toggle type="button">
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" aria-hidden="true"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
-            Chats
-          </button>
+            <button class="btn-ghost sidebar-toggle-btn" data-sidebar-toggle type="button" aria-label="Open conversations">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" aria-hidden="true"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+            </button>
+            <div class="mobile-chat-title">
+              <strong>Oman<span>X</span></strong>
+              <small data-mobile-chat-context>Guidance workspace</small>
+            </div>
+            <button class="mobile-new-chat" data-new-chat type="button" aria-label="Start new chat">+</button>
           </div>
 
           <section class="chat-body" data-message-list></section>
