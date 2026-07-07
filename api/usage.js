@@ -1,4 +1,4 @@
-import { getRateLimitKey, getUsage } from "./rate-limit.js";
+import { getRateLimitKey, getRequestSessionId, getUsage } from "./rate-limit.js";
 
 export default async function handler(req, res) {
   const allowedOrigin = process.env.ALLOWED_ORIGIN;
@@ -13,7 +13,8 @@ export default async function handler(req, res) {
   if (req.method === "OPTIONS") return res.status(200).end();
   if (req.method !== "GET") return res.status(405).json({ error: "Method not allowed" });
 
-  const key = getRateLimitKey(req);
+  const sessionId = getRequestSessionId(req);
+  const key = getRateLimitKey(req, sessionId);
   const usage = await getUsage(key);
 
   res.setHeader("Cache-Control", "no-store");

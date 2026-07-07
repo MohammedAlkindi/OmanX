@@ -25,7 +25,23 @@ export function sanitizeSessionId(sessionId) {
     : "";
 }
 
-export function getRateLimitKey(req) {
+function getQueryParam(req, name) {
+  if (req.query && typeof req.query[name] === "string") return req.query[name];
+  try {
+    const url = new URL(req.url || "", "http://localhost");
+    return url.searchParams.get(name) || "";
+  } catch {
+    return "";
+  }
+}
+
+export function getRequestSessionId(req, bodySessionId) {
+  return sanitizeSessionId(bodySessionId || getQueryParam(req, "sessionId"));
+}
+
+export function getRateLimitKey(req, sessionId = "") {
+  const sanitizedSessionId = sanitizeSessionId(sessionId);
+  if (sanitizedSessionId) return `session:${sanitizedSessionId}`;
   return `ip:${getClientIp(req)}`;
 }
 

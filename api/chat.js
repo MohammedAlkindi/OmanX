@@ -5,7 +5,7 @@ import fs from "fs/promises";
 import path from "path";
 import { fileURLToPath } from "url";
 import crypto from "crypto";
-import { consumeUsage, getRateLimitKey, sanitizeSessionId } from "./rate-limit.js";
+import { consumeUsage, getRateLimitKey, getRequestSessionId } from "./rate-limit.js";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
@@ -580,8 +580,8 @@ export default async function handler(req, res) {
     return res.status(400).json({ error: "Message too long (max 10,000 chars)." });
   }
 
-  const sanitizedSessionId = sanitizeSessionId(sessionId) || "unknown";
-  const rateLimitKey = getRateLimitKey(req);
+  const sanitizedSessionId = getRequestSessionId(req, sessionId);
+  const rateLimitKey = getRateLimitKey(req, sanitizedSessionId);
   const usage = await consumeUsage(rateLimitKey);
   res.setHeader("X-RateLimit-Limit", String(usage.limit));
   res.setHeader("X-RateLimit-Remaining", String(usage.remaining));
