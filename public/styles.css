@@ -2402,8 +2402,160 @@ select:focus {
 
 .composer-actions {
   display: flex;
+  align-items: center;
+  gap: 8px;
   justify-content: flex-end;
   margin-top: 8px;
+}
+
+.attach-menu-wrap {
+  position: relative;
+  display: inline-flex;
+}
+
+.btn-attach-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 34px;
+  height: 34px;
+  border: 0.5px solid var(--border-strong);
+  border-radius: 50%;
+  color: var(--ink-3);
+  background: var(--white);
+  cursor: pointer;
+  transition: color 0.15s, background 0.15s, border-color 0.15s;
+}
+
+.btn-attach-icon:hover:not(:disabled) {
+  color: var(--ink);
+  border-color: var(--gold);
+  background: var(--gold-dim);
+}
+
+.btn-attach-icon[aria-expanded="true"] {
+  color: var(--ink);
+  border-color: var(--gold);
+  background: var(--gold-dim);
+}
+
+.btn-attach-icon:disabled {
+  cursor: not-allowed;
+  opacity: 0.55;
+}
+
+.attach-menu {
+  position: absolute;
+  bottom: calc(100% + 8px);
+  left: 0;
+  z-index: 20;
+  display: flex;
+  flex-direction: column;
+  min-width: 168px;
+  padding: 6px;
+  gap: 2px;
+  background: var(--white);
+  border: 0.5px solid var(--border-strong);
+  border-radius: var(--radius);
+  box-shadow: 0 12px 32px rgba(36, 32, 26, 0.16);
+}
+
+.attach-menu-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  height: 34px;
+  padding: 0 8px;
+  border: none;
+  border-radius: calc(var(--radius) - 4px);
+  background: transparent;
+  color: var(--ink);
+  font-family: var(--sans);
+  font-size: 0.8125rem;
+  text-align: left;
+  cursor: pointer;
+  transition: background 0.15s;
+}
+
+.attach-menu-item:hover:not(:disabled) {
+  background: var(--gold-dim);
+}
+
+.attach-menu-item:disabled {
+  color: var(--ink-4);
+  cursor: not-allowed;
+}
+
+.attach-menu-badge {
+  margin-left: auto;
+  padding: 1px 6px;
+  border-radius: 999px;
+  background: var(--sand);
+  color: var(--ink-4);
+  font-family: var(--mono);
+  font-size: 0.5625rem;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+}
+
+.attachment-preview,
+.message-attachments {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  max-width: 720px;
+  width: 100%;
+  margin: 8px auto 0;
+}
+
+.attachment-chip,
+.message-attachment-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  max-width: 100%;
+  min-height: 28px;
+  padding: 4px 8px;
+  border: 0.5px solid var(--border);
+  border-radius: 999px;
+  background: var(--sand);
+  color: var(--ink-2);
+  font-size: 0.75rem;
+}
+
+.attachment-chip span,
+.message-attachment-chip span {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.attachment-chip small,
+.message-attachment-chip small {
+  color: var(--ink-4);
+  font-family: var(--mono);
+  font-size: 0.5625rem;
+  flex-shrink: 0;
+}
+
+.attachment-chip button {
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  color: var(--ink-4);
+  background: var(--white);
+  line-height: 1;
+  flex-shrink: 0;
+}
+
+.attachment-chip button:hover {
+  color: var(--ink);
+}
+
+.message-attachments {
+  justify-content: flex-end;
+  margin-top: 2px;
 }
 
 .status-inline {
@@ -3273,9 +3425,15 @@ footer,
 
 /* send / new-chat button sizing (replaces inline styles) */
 .btn-send {
+  width: 34px;
   height: 34px;
-  padding: 0 20px;
-  font-size: 0.8125rem;
+  padding: 0;
+  border-radius: 50%;
+}
+
+.btn-send:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
 }
 
 .btn-new-chat {
@@ -3870,11 +4028,16 @@ footer,
   }
 
   .chat-app .btn-send {
-    width: 54px;
-    min-width: 54px;
+    width: 40px;
+    min-width: 40px;
     height: 40px;
     padding: 0;
-    border-radius: 12px;
+    border-radius: 50%;
+  }
+
+  .chat-app .btn-attach-icon {
+    width: 40px;
+    height: 40px;
   }
 
   .chat-app .composer-hint {

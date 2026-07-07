@@ -1,51 +1,58 @@
-# OmanX Authentication (Passwordless, Serverless)
+# OmanX Authentication
 
-This project now uses **Supabase Auth magic links** with a **server-set HttpOnly session cookie**.
+OmanX supports optional Google OAuth through Supabase Auth. Anonymous chat still works, but signed-in users get durable per-user daily quotas and can attach screenshots/images to chat requests.
 
-## Why this architecture
+## Architecture
 
-- Works with static frontend + Vercel serverless API routes (no framework migration).
-- Passwordless flow avoids password storage and reset complexity.
-- Minimal moving parts: Supabase Auth and lightweight verification using Supabase `/auth/v1/user`.
-- API routes can verify the user identity before processing sensitive prompts.
+- Browser auth lives in `public/js/auth-client.js`.
+- Server auth helpers live in `api/auth-utils.js`.
+- Public Supabase config is exposed by `GET /api/auth/config`.
+- Token verification is exposed by `GET /api/auth/session`.
+- `/api/chat` and `/api/usage` accept `Authorization: Bearer <supabase-access-token>`.
+- If the token is valid, quota keys use `user:<supabase-user-id>`.
+- If no token is present, quota keys fall back to the anonymous browser session id.
 
-## Flow
+No chat history is stored in Supabase yet. Conversation history remains localStorage-only.
 
-1. User submits email in the OmanX frontend.
-2. `POST /api/auth/start` calls Supabase `/auth/v1/otp` to send magic link.
-3. User clicks email link, returns to app with `token_hash` and `type` query params.
-4. Frontend calls `POST /api/auth/verify`.
-5. `verify` endpoint exchanges token with Supabase and sets `omanx_session` HttpOnly cookie.
-6. Protected APIs (e.g., `/api/chat`) call `requireAuth(req)`, which validates the token against Supabase `/auth/v1/user`.
+## Supabase Setup
 
-## Protected routes
-
-- `/api/chat` now requires an authenticated user.
-- `/api/auth/session` returns current authenticated user from session cookie.
-- `/api/auth/logout` clears session cookie.
-
-## Environment variables
-
-Add to Vercel and local `.env`:
+1. Create a Supabase project.
+2. Enable Google as an Auth provider in the Supabase dashboard.
+3. Add OAuth callback URLs for local and production:
+   - `http://localhost:3000/workspace`
+   - `https://<your-production-domain>/workspace`
+4. Add the environment variables to Vercel and local `.env`.
 
 ```bash
 SUPABASE_URL=https://<project-ref>.supabase.co
-SUPABASE_ANON_KEY=<supabase-anon-key>
-APP_BASE_URL=https://omanx.org
-AUTH_REDIRECT_URL=https://omanx.org/
+SUPABASE_PUBLISHABLE_KEY=<supabase-publishable-or-anon-key>
 ```
 
-`AUTH_REDIRECT_URL` should point to the frontend page that handles `token_hash` and `type`.
+## Quotas
 
-## Security notes
+Anonymous and signed-in users currently share the same daily message count by default:
 
-- Session cookie is `HttpOnly` and `SameSite=Lax`.
-- Cookie is marked `Secure` in production.
-- Session tokens are verified with Supabase before each protected request.
-- User identity is logged in `/api/chat` request metadata for accountability.
+```bash
+RATE_LIMIT_DAILY_MAX=20
+```
 
-## Future extensions
+The difference is durability: signed-in quota follows the Supabase user id across refreshes, browsers, and devices. Anonymous quota follows the local browser session id and can still be bypassed by clearing site data.
 
-- Add role-based rules (student/admin/auditor) by reading JWT claims.
-- Store compliance cases in a DB table keyed by `user.id`.
-- Add refresh-token handling for longer sessions when needed.
+## Image Uploads
+
+Signed-in users can attach screenshots/images to `/api/chat`. Images are sent ephemerally to Anthropic and are not saved in localStorage.
+
+Defaults:
+
+```bash
+IMAGE_UPLOAD_MAX_COUNT=1
+IMAGE_UPLOAD_MAX_BYTES=3145728
+```
+
+Supported types:
+
+- PNG
+- JPEG
+- WebP
+
+PDF upload and saved document history are intentionally not implemented yet.

@@ -11,6 +11,8 @@ import readyHandler from './api/ready.js';
 import metricsHandler from './api/metrics.js';
 import feedbackHandler from './api/feedback.js';
 import usageHandler from './api/usage.js';
+import authConfigHandler from './api/auth/config.js';
+import authSessionHandler from './api/auth/session.js';
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const PORT = Number(process.env.PORT || 3000);
 
@@ -29,6 +31,8 @@ const ROUTE_METHODS = new Map([
   ['/settings', new Set(['GET'])],
   ['/collaboration', new Set(['GET'])],
   ['/api/chat', new Set(['POST'])],
+  ['/api/auth/config', new Set(['GET'])],
+  ['/api/auth/session', new Set(['GET'])],
   ['/api/feedback', new Set(['POST'])],
   ['/api/usage', new Set(['GET'])],
   ['/api/health', new Set(['GET'])],
@@ -37,7 +41,7 @@ const ROUTE_METHODS = new Map([
 ]);
 
 // Middleware
-app.use(express.json({ limit: '1mb' }));
+app.use(express.json({ limit: '8mb' }));
 
 app.use((req, res, next) => {
   const allowedMethods = ROUTE_METHODS.get(req.path);
@@ -54,6 +58,8 @@ app.use((req, res, next) => {
 
 // API Routes
 app.post('/api/chat', chatHandler);
+app.get('/api/auth/config', authConfigHandler);
+app.get('/api/auth/session', authSessionHandler);
 app.post('/api/feedback', feedbackHandler);
 app.get('/api/usage', usageHandler);
 app.get('/api/health', healthHandler);

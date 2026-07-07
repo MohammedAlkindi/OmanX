@@ -6,6 +6,7 @@ import path from "path";
 import { fileURLToPath } from "url";
 import crypto from "crypto";
 import { consumeUsage, getRateLimitKey, getRequestSessionId } from "./rate-limit.js";
+import { getAuthUser } from "./auth-utils.js";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
@@ -37,6 +38,9 @@ const DEST_KB_PATHS = {
 const DEFAULT_MODEL = process.env.ANTHROPIC_MODEL || "claude-sonnet-4-6";
 const ALLOWED_MODELS = new Set(["claude-sonnet-4-6", "claude-haiku-4-5-20251001"]);
 const VALID_DESTINATIONS = new Set(["us", "uk", "au"]);
+const ALLOWED_IMAGE_TYPES = new Set(["image/jpeg", "image/png", "image/webp"]);
+const MAX_IMAGE_ATTACHMENTS = Number(process.env.IMAGE_UPLOAD_MAX_COUNT || 1);
+const MAX_IMAGE_BYTES = Number(process.env.IMAGE_UPLOAD_MAX_BYTES || 3 * 1024 * 1024);
 
 // Authoritative domains we trust for live policy lookups
 const TRUSTED_DOMAINS = [
@@ -552,6 +556,48 @@ function sanitizeMessage(message) {
   return message.replace(/[\x00-\x1F\x7F-\x9F]/g, "").trim();
 }
 
+function sanitizeImageAttachments(attachments, authUser) {
+  if (!Array.isArray(attachments) || attachments.length === 0) return [];
+  if (!authUser) {
+    const error = new Error("Image upload requires Google sign-in.");
+    error.status = 401;
+    throw error;
+  }
+  if (attachments.length > MAX_IMAGE_ATTACHMENTS) {
+    const error = new Error(`Attach up to ${MAX_IMAGE_ATTACHMENTS} images at a time.`);
+    error.status = 400;
+    throw error;
+  }
+
+  return attachments.map((item, index) => {
+    const mediaType = typeof item?.type === "string" ? item.type.toLowerCase() : "";
+    const rawData = typeof item?.data === "string" ? item.data : "";
+    const data = rawData.includes(",") ? rawData.split(",").pop() : rawData;
+    const name = typeof item?.name === "string" ? item.name.slice(0, 120) : `image-${index + 1}`;
+
+    if (!ALLOWED_IMAGE_TYPES.has(mediaType)) {
+      const error = new Error("Only PNG, JPEG, and WebP images are supported.");
+      error.status = 400;
+      throw error;
+    }
+    if (!/^[a-z0-9+/=]+$/i.test(data)) {
+      const error = new Error("Image data is invalid.");
+      error.status = 400;
+      throw error;
+    }
+
+    const size = Buffer.byteLength(data, "base64");
+    if (size > MAX_IMAGE_BYTES) {
+      const mb = Math.round(MAX_IMAGE_BYTES / (1024 * 1024));
+      const error = new Error(`Each image must be ${mb}MB or smaller.`);
+      error.status = 400;
+      throw error;
+    }
+
+    return { name, mediaType, data, size };
+  });
+}
+
 export default async function handler(req, res) {
   const allowedOrigin = process.env.ALLOWED_ORIGIN;
   const requestOrigin = req.headers.origin;
@@ -565,7 +611,7 @@ export default async function handler(req, res) {
   if (req.method === "OPTIONS") return res.status(200).end();
   if (req.method !== "POST") return res.status(405).json({ error: "Method not allowed" });
 
-  const { message, history, model: clientModel, conciseMode, userContext, language, destination: clientDestination, webSearch: clientWebSearch, sessionId } = req.body || {};
+  const { message, history, model: clientModel, conciseMode, userContext, language, destination: clientDestination, webSearch: clientWebSearch, sessionId, attachments } = req.body || {};
   if (!message || typeof message !== "string") {
     return res.status(400).json({ error: "Missing 'message' string." });
   }
@@ -580,8 +626,20 @@ export default async function handler(req, res) {
     return res.status(400).json({ error: "Message too long (max 10,000 chars)." });
   }
 
+  const auth = await getAuthUser(req);
+  if (auth.error && auth.token) {
+    return res.status(401).json({ error: auth.error });
+  }
+
+  let imageAttachments = [];
+  try {
+    imageAttachments = sanitizeImageAttachments(attachments, auth.user);
+  } catch (error) {
+    return res.status(error.status || 400).json({ error: error.message });
+  }
+
   const sanitizedSessionId = getRequestSessionId(req, sessionId);
-  const rateLimitKey = getRateLimitKey(req, sanitizedSessionId);
+  const rateLimitKey = auth.user ? `user:${auth.user.id}` : getRateLimitKey(req, sanitizedSessionId);
   const usage = await consumeUsage(rateLimitKey);
   res.setHeader("X-RateLimit-Limit", String(usage.limit));
   res.setHeader("X-RateLimit-Remaining", String(usage.remaining));
@@ -589,8 +647,8 @@ export default async function handler(req, res) {
 
   if (!usage.allowed) {
     return res.status(429).json({
-      error: "Too many requests. Please slow down.",
-      text: "You've sent too many messages too quickly. Please wait a moment before trying again.",
+      error: "Daily message limit reached.",
+      text: "You've reached today's anonymous message limit. Please come back tomorrow.",
       usage,
     });
   }
@@ -609,7 +667,20 @@ export default async function handler(req, res) {
       if (sanitized) conversationMessages.push({ role: turn.role, content: sanitized });
     }
   }
-  conversationMessages.push({ role: "user", content: sanitizedMessage });
+  const userContent = imageAttachments.length
+    ? [
+        { type: "text", text: sanitizedMessage },
+        ...imageAttachments.map((image) => ({
+          type: "image",
+          source: {
+            type: "base64",
+            media_type: image.mediaType,
+            data: image.data,
+          },
+        })),
+      ]
+    : sanitizedMessage;
+  conversationMessages.push({ role: "user", content: userContent });
 
   const client = getClient();
   if (!client) {
@@ -625,7 +696,7 @@ export default async function handler(req, res) {
     : detectDestination(sanitizedUserContext, sanitizedMessage);
 
   // Only cache non-compliance single-turn requests (compliance responses include live search data)
-  const cacheKey = !hasHistory && !compliance
+  const cacheKey = !hasHistory && !compliance && imageAttachments.length === 0
     ? crypto.createHash("sha256").update(`${model}::${useConcise}::${sanitizedUserContext}::${sanitizedMessage}`).digest("hex")
     : null;
 
@@ -676,6 +747,8 @@ export default async function handler(req, res) {
     conciseMode: useConcise,
     hasUserContext: !!sanitizedUserContext,
     chars: sanitizedMessage.length,
+    attachments: imageAttachments.map((image) => ({ name: image.name, mediaType: image.mediaType, size: image.size })),
+    authUserId: auth.user?.id || null,
     sessionId: sanitizedSessionId,
   });
 

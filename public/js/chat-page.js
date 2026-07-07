@@ -1,5 +1,6 @@
 import { initCore, qs, qsa, formatDateTime, formatRelative, showToast, uid, downloadFile, copyText, setTheme, getTheme } from './core.js';
 import { loadChats, saveChats, getActiveChatId, setActiveChatId, createChat, updateChat, deleteChat, loadSettings, saveSettings, getSessionId } from './chat-store.js';
+import { getAccessToken, initAuth, onAuthChange, signInWithGoogle, signOut } from './auth-client.js';
 
 const prompts = [
   { label: 'Arrival', text: 'What do I need to complete in my first 72 hours on campus?' },
@@ -22,6 +23,8 @@ const state = {
   settings: loadSettings(),
   confirmDeleteId: null,
   usage: null,
+  auth: { ready: false, enabled: false, signedIn: false, user: null },
+  pendingImages: [],
 };
 
 const ONBOARDED_KEY = 'omanx.onboarded.v1';
@@ -40,6 +43,16 @@ ensureActiveChat();
 render();
 bindEvents();
 refreshUsage();
+initAuth().then((auth) => {
+  state.auth = auth;
+  updateAuthUi();
+  refreshUsage();
+});
+onAuthChange((auth) => {
+  state.auth = auth;
+  updateAuthUi();
+  refreshUsage();
+});
 if (!localStorage.getItem(ONBOARDED_KEY)) showOnboarding();
 
 // init composer height
@@ -130,10 +143,18 @@ function bindEvents() {
   // — new chat —
   qsa('[data-new-chat]').forEach((button) => {
     button.addEventListener('click', () => {
+      qs('[data-chat-sidebar]')?.classList.remove('open');
+
+      const activeChat = state.chats.find((chat) => chat.id === state.activeChatId);
+      const alreadyEmpty = activeChat && activeChat.title === 'New chat' && activeChat.messages.length === 0;
+      if (alreadyEmpty) {
+        showToast('Already on a new chat.');
+        return;
+      }
+
       const chat = createChat({ title: 'New chat' });
       state.chats.unshift(chat);
       state.activeChatId = chat.id;
-      qs('[data-chat-sidebar]')?.classList.remove('open');
       persist();
       render();
       showToast('New chat created.');
@@ -151,16 +172,23 @@ function bindEvents() {
     event.preventDefault();
     const textarea = qs('[data-chat-input]');
     const content = textarea.value.trim();
-    if (!content || state.typing) return;
+    const hasImages = state.pendingImages.length > 0;
+    if ((!content && !hasImages) || state.typing) return;
 
-    appendMessage('user', content);
+    const submittedImages = [...state.pendingImages];
+    const submittedContent = content || 'Please review the attached screenshot and tell me what matters.';
+    appendMessage('user', submittedContent, state.activeChatId, {
+      attachments: submittedImages.map(({ name, type, size }) => ({ name, type, size })),
+    });
+    state.pendingImages = [];
+    renderAttachmentPreview();
     textarea.value = '';
     autoGrow(textarea);
     setTyping(true);
     renderMessages();
     qs('[data-message-list]').scrollTop = qs('[data-message-list]').scrollHeight;
 
-    await streamAssistantReply(content);
+    await streamAssistantReply(submittedContent, submittedImages);
     render();
   });
 
@@ -172,6 +200,50 @@ function bindEvents() {
   });
 
   qs('[data-chat-input]')?.addEventListener('input', (event) => autoGrow(event.target));
+
+  qs('[data-auth-sign-in]')?.addEventListener('click', async () => {
+    try {
+      await signInWithGoogle();
+    } catch (error) {
+      showToast(error.message || 'Google sign-in is not available yet.');
+    }
+  });
+
+  qs('[data-auth-sign-out]')?.addEventListener('click', async () => {
+    await signOut();
+    state.pendingImages = [];
+    renderAttachmentPreview();
+    showToast('Signed out.');
+  });
+
+  qs('[data-image-attach]')?.addEventListener('click', (event) => {
+    event.stopPropagation();
+    toggleAttachMenu();
+  });
+
+  qs('[data-attach-photo]')?.addEventListener('click', () => {
+    closeAttachMenu();
+    if (!state.auth.signedIn) {
+      showToast('Sign in with Google to attach screenshots.');
+      qs('[data-settings-panel]')?.classList.add('open');
+      return;
+    }
+    qs('[data-image-input]')?.click();
+  });
+
+  document.addEventListener('click', (event) => {
+    const wrap = qs('[data-attach-menu-wrap]');
+    if (wrap && !wrap.contains(event.target)) closeAttachMenu();
+  });
+
+  document.addEventListener('keydown', (event) => {
+    if (event.key === 'Escape') closeAttachMenu();
+  });
+
+  qs('[data-image-input]')?.addEventListener('change', async (event) => {
+    await addImageFiles([...event.target.files]);
+    event.target.value = '';
+  });
 
   // — settings panel —
   populateSettingsPanel();
@@ -365,14 +437,132 @@ function updateMobileChatContext() {
     : destination;
 }
 
+function toggleAttachMenu() {
+  const menu = qs('[data-attach-menu]');
+  const attachBtn = qs('[data-image-attach]');
+  if (!menu || !attachBtn || attachBtn.disabled) return;
+  const isOpen = !menu.hidden;
+  menu.hidden = isOpen;
+  attachBtn.setAttribute('aria-expanded', String(!isOpen));
+}
+
+function closeAttachMenu() {
+  const menu = qs('[data-attach-menu]');
+  const attachBtn = qs('[data-image-attach]');
+  if (menu) menu.hidden = true;
+  if (attachBtn) attachBtn.setAttribute('aria-expanded', 'false');
+}
+
+function updateAuthUi() {
+  const statusEl = qs('[data-auth-status]');
+  const quotaEl = qs('[data-auth-quota-label]');
+  const signInBtn = qs('[data-auth-sign-in]');
+  const signOutBtn = qs('[data-auth-sign-out]');
+  const attachBtn = qs('[data-image-attach]');
+
+  if (!state.auth.enabled) {
+    if (statusEl) statusEl.textContent = 'Sign-in not configured';
+    if (quotaEl) quotaEl.textContent = 'Anonymous quota';
+    if (signInBtn) signInBtn.hidden = true;
+    if (signOutBtn) signOutBtn.hidden = true;
+    if (attachBtn) attachBtn.disabled = true;
+    return;
+  }
+
+  if (state.auth.signedIn) {
+    if (statusEl) statusEl.textContent = state.auth.user?.email || state.auth.user?.name || 'Signed in';
+    if (quotaEl) quotaEl.textContent = 'User quota';
+    if (signInBtn) signInBtn.hidden = true;
+    if (signOutBtn) signOutBtn.hidden = false;
+    if (attachBtn) attachBtn.disabled = false;
+  } else {
+    if (statusEl) statusEl.textContent = 'Not signed in';
+    if (quotaEl) quotaEl.textContent = 'Anonymous quota';
+    if (signInBtn) signInBtn.hidden = false;
+    if (signOutBtn) signOutBtn.hidden = true;
+    if (attachBtn) attachBtn.disabled = false;
+  }
+}
+
+function formatBytes(bytes) {
+  if (!Number.isFinite(bytes)) return '';
+  if (bytes < 1024 * 1024) return `${Math.max(Math.round(bytes / 1024), 1)}KB`;
+  return `${(bytes / (1024 * 1024)).toFixed(1)}MB`;
+}
+
+function readFileAsDataUrl(file) {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = () => resolve(String(reader.result || ''));
+    reader.onerror = () => reject(reader.error || new Error('Could not read image.'));
+    reader.readAsDataURL(file);
+  });
+}
+
+async function addImageFiles(files) {
+  const allowedTypes = new Set(['image/png', 'image/jpeg', 'image/webp']);
+  const maxImages = 1;
+  const maxBytes = 3 * 1024 * 1024;
+
+  for (const file of files) {
+    if (state.pendingImages.length >= maxImages) {
+      showToast(`Attach up to ${maxImages} images at a time.`);
+      break;
+    }
+    if (!allowedTypes.has(file.type)) {
+      showToast('Only PNG, JPEG, and WebP images are supported.');
+      continue;
+    }
+    if (file.size > maxBytes) {
+      showToast('Each image must be 3MB or smaller.');
+      continue;
+    }
+
+    const dataUrl = await readFileAsDataUrl(file);
+    state.pendingImages.push({
+      id: uid('img'),
+      name: file.name || 'screenshot',
+      type: file.type,
+      size: file.size,
+      data: dataUrl,
+    });
+  }
+
+  renderAttachmentPreview();
+}
+
+function renderAttachmentPreview() {
+  const preview = qs('[data-attachment-preview]');
+  if (!preview) return;
+  preview.hidden = state.pendingImages.length === 0;
+  preview.innerHTML = state.pendingImages.map((image) => `
+    <span class="attachment-chip">
+      <span>${escapeHtml(image.name)}</span>
+      <small>${escapeHtml(formatBytes(image.size))}</small>
+      <button type="button" data-remove-image="${image.id}" aria-label="Remove ${escapeHtml(image.name)}">x</button>
+    </span>
+  `).join('');
+
+  qsa('[data-remove-image]', preview).forEach((button) => {
+    button.addEventListener('click', () => {
+      state.pendingImages = state.pendingImages.filter((image) => image.id !== button.dataset.removeImage);
+      renderAttachmentPreview();
+    });
+  });
+}
+
 async function refreshUsage() {
   try {
-    const res = await fetch(`/api/usage?sessionId=${encodeURIComponent(getSessionId())}`, { cache: 'no-store' });
+    const token = await getAccessToken();
+    const headers = token ? { Authorization: `Bearer ${token}` } : {};
+    const res = await fetch(`/api/usage?sessionId=${encodeURIComponent(getSessionId())}`, { cache: 'no-store', headers });
     if (!res.ok) return;
     const payload = await res.json();
     if (payload.usage) {
       state.usage = payload.usage;
+      if (payload.user) state.auth = { ...state.auth, signedIn: true, user: payload.user };
       renderUsagePanel();
+      updateAuthUi();
     }
   } catch {
     renderUsagePanel();
@@ -389,6 +579,11 @@ function formatReset(usage) {
   if (!usage?.resetInMs) return 'soon';
   const totalSeconds = Math.max(Math.ceil(usage.resetInMs / 1000), 0);
   if (totalSeconds < 60) return `${totalSeconds}s`;
+  if (totalSeconds >= 3600) {
+    const hours = Math.floor(totalSeconds / 3600);
+    const minutes = Math.floor((totalSeconds % 3600) / 60);
+    return minutes ? `${hours}h ${minutes}m` : `${hours}h`;
+  }
   const minutes = Math.floor(totalSeconds / 60);
   const seconds = totalSeconds % 60;
   return seconds ? `${minutes}m ${seconds}s` : `${minutes}m`;
@@ -404,7 +599,7 @@ function renderUsagePanel() {
   if (!state.usage) {
     if (percentEl) percentEl.textContent = 'Not available';
     if (meterEl) meterEl.style.width = '0%';
-    if (detailEl) detailEl.textContent = 'Usage is tracked by the server once you send a message.';
+    if (detailEl) detailEl.textContent = 'Anonymous daily usage starts after your first message.';
     return;
   }
 
@@ -412,7 +607,8 @@ function renderUsagePanel() {
   if (percentEl) percentEl.textContent = `${usage.percentUsed}% used`;
   if (meterEl) meterEl.style.width = `${Math.min(Math.max(usage.percentUsed, 0), 100)}%`;
   if (detailEl) {
-    detailEl.textContent = `${usage.remaining} of ${usage.limit} messages left. Resets in ${formatReset(usage)}.`;
+    const quotaType = state.auth.signedIn ? 'signed-in' : 'anonymous';
+    detailEl.textContent = `${usage.remaining} of ${usage.limit} ${quotaType} messages left today. Resets in ${formatReset(usage)}.`;
   }
   panel.classList.toggle('usage-panel-warning', usage.percentUsed >= 80);
 }
@@ -641,6 +837,7 @@ function renderMessages() {
     <article class="message ${message.role}">
       ${message.role === 'assistant' ? renderAnswerStatus(message) : ''}
       <div class="message-bubble">${message.role === 'assistant' ? renderRichText(message.content) : renderUserText(message.content)}</div>
+      ${message.role === 'user' ? renderMessageAttachments(message.attachments) : ''}
       ${message.role === 'assistant' ? renderSources(message.sources) : ''}
       ${message.role === 'assistant' ? renderEscalationCard(message.escalation) : ''}
       <div class="message-meta">
@@ -749,7 +946,7 @@ function getActiveChat() {
   return state.chats.find((chat) => chat.id === state.activeChatId) || state.chats[0];
 }
 
-async function streamAssistantReply(message) {
+async function streamAssistantReply(message, imageAttachments = []) {
   const chat = getActiveChat();
   streamingChatId = chat.id;
   const history = chat.messages
@@ -798,10 +995,25 @@ async function streamAssistantReply(message) {
   }
 
   try {
+    const token = await getAccessToken();
+    const headers = { 'Content-Type': 'application/json' };
+    if (token) headers.Authorization = `Bearer ${token}`;
     const response = await fetch('/api/chat', {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ message, history, model, conciseMode, userContext: profileContext, language, destination: destination || 'auto', webSearch: webSearch !== false, stream: true, sessionId: getSessionId() }),
+      headers,
+      body: JSON.stringify({
+        message,
+        history,
+        model,
+        conciseMode,
+        userContext: profileContext,
+        language,
+        destination: destination || 'auto',
+        webSearch: webSearch !== false,
+        stream: true,
+        sessionId: getSessionId(),
+        attachments: imageAttachments.map(({ name, type, data }) => ({ name, type, data })),
+      }),
     });
 
     if (!response.ok) {
@@ -1209,6 +1421,18 @@ function renderSources(sources) {
     return `<a class="source-chip source-chip-web" href="${escapeHtml(safeUrl)}" target="_blank" rel="noopener noreferrer" title="${escapeHtml(s.title)}">${escapeHtml(s.domain)}</a>`;
   }).join('');
   return `<div class="message-sources"><span class="sources-label">Sources used</span>${chips}</div>`;
+}
+
+function renderMessageAttachments(attachments) {
+  if (!Array.isArray(attachments) || !attachments.length) return '';
+  return `<div class="message-attachments">
+    ${attachments.map((item) => `
+      <span class="message-attachment-chip">
+        <span>${escapeHtml(item.name || 'Image')}</span>
+        <small>${escapeHtml(formatBytes(item.size))}</small>
+      </span>
+    `).join('')}
+  </div>`;
 }
 
 function renderEscalationCard(card) {

@@ -1,8 +1,8 @@
 import { Redis } from "@upstash/redis";
 import crypto from "crypto";
 
-export const RATE_LIMIT_MAX = 20;
-export const RATE_LIMIT_WINDOW_MS = 60_000;
+export const RATE_LIMIT_MAX = Number(process.env.RATE_LIMIT_DAILY_MAX || 20);
+export const RATE_LIMIT_WINDOW_MS = 24 * 60 * 60 * 1000;
 
 const _rateLimitMap = new Map();
 let _redis = null;
@@ -45,24 +45,26 @@ export function getRateLimitKey(req, sessionId = "") {
   return `ip:${getClientIp(req)}`;
 }
 
-function toUsage({ allowed = true, count = 0, resetAt = Date.now() + RATE_LIMIT_WINDOW_MS, source = "memory" } = {}) {
-  const used = Math.min(count, RATE_LIMIT_MAX);
-  const remaining = Math.max(RATE_LIMIT_MAX - count, 0);
+function toUsage({ allowed = true, count = 0, limit = RATE_LIMIT_MAX, resetAt = Date.now() + RATE_LIMIT_WINDOW_MS, source = "memory", window = "day", blockedBy = null } = {}) {
+  const used = Math.min(count, limit);
+  const remaining = Math.max(limit - count, 0);
   return {
     allowed,
-    limit: RATE_LIMIT_MAX,
+    limit,
     used,
     remaining,
-    percentUsed: Math.min(Math.round((used / RATE_LIMIT_MAX) * 100), 100),
+    percentUsed: Math.min(Math.round((used / limit) * 100), 100),
     resetAt,
     resetInMs: Math.max(resetAt - Date.now(), 0),
     source,
+    window,
+    blockedBy,
   };
 }
 
-function memoryUsage(key, { consume = false } = {}) {
+function memoryBucketUsage(key, { consume = false, limit = RATE_LIMIT_MAX, windowMs = RATE_LIMIT_WINDOW_MS, window = "day" } = {}) {
   const now = Date.now();
-  const cutoff = now - RATE_LIMIT_WINDOW_MS;
+  const cutoff = now - windowMs;
   const entry = _rateLimitMap.get(key) || [];
   const hits = entry.filter((ts) => ts > cutoff);
 
@@ -78,52 +80,60 @@ function memoryUsage(key, { consume = false } = {}) {
     }
   }
 
-  const resetAt = hits.length ? Math.min(...hits) + RATE_LIMIT_WINDOW_MS : now + RATE_LIMIT_WINDOW_MS;
+  const resetAt = hits.length ? Math.min(...hits) + windowMs : now + windowMs;
   return toUsage({
-    allowed: hits.length <= RATE_LIMIT_MAX,
+    allowed: hits.length <= limit,
     count: hits.length,
+    limit,
     resetAt,
     source: "memory",
+    window,
   });
 }
 
-async function redisUsage(key, { consume = false } = {}) {
+async function redisBucketUsage(key, { consume = false, limit = RATE_LIMIT_MAX, windowMs = RATE_LIMIT_WINDOW_MS, window = "day" } = {}) {
   const redis = getRedis();
   if (!redis) return null;
 
   const now = Date.now();
   const redisKey = `omanx:usage:${key}`;
-  await redis.zremrangebyscore(redisKey, 0, now - RATE_LIMIT_WINDOW_MS);
+  await redis.zremrangebyscore(redisKey, 0, now - windowMs);
   if (consume) {
     await redis.zadd(redisKey, { score: now, member: `${now}:${crypto.randomUUID()}` });
   }
   const count = await redis.zcard(redisKey);
-  await redis.expire(redisKey, Math.ceil(RATE_LIMIT_WINDOW_MS / 1000) + 5);
+  await redis.expire(redisKey, Math.ceil(windowMs / 1000) + 5);
 
   return toUsage({
-    allowed: count <= RATE_LIMIT_MAX,
+    allowed: count <= limit,
     count,
-    resetAt: now + RATE_LIMIT_WINDOW_MS,
+    limit,
+    resetAt: now + windowMs,
     source: "redis",
+    window,
   });
 }
 
 export async function getUsage(key) {
+  const dailyKey = `daily:${key}`;
   try {
-    const usage = await redisUsage(key, { consume: false });
+    const usage = await redisBucketUsage(dailyKey, { consume: false, limit: RATE_LIMIT_MAX, windowMs: RATE_LIMIT_WINDOW_MS, window: "day" });
     if (usage) return usage;
   } catch (error) {
     console.warn("[OmanX] Redis usage read failed:", error.message);
   }
-  return memoryUsage(key, { consume: false });
+  return memoryBucketUsage(dailyKey, { consume: false, limit: RATE_LIMIT_MAX, windowMs: RATE_LIMIT_WINDOW_MS, window: "day" });
 }
 
 export async function consumeUsage(key) {
+  const dailyKey = `daily:${key}`;
+
   try {
-    const usage = await redisUsage(key, { consume: true });
-    if (usage) return usage;
+    const dailyUsage = await redisBucketUsage(dailyKey, { consume: true, limit: RATE_LIMIT_MAX, windowMs: RATE_LIMIT_WINDOW_MS, window: "day" });
+    if (dailyUsage) return dailyUsage;
   } catch (error) {
     console.warn("[OmanX] Redis usage write failed:", error.message);
   }
-  return memoryUsage(key, { consume: true });
+
+  return memoryBucketUsage(dailyKey, { consume: true, limit: RATE_LIMIT_MAX, windowMs: RATE_LIMIT_WINDOW_MS, window: "day" });
 }

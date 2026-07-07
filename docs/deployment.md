@@ -35,9 +35,17 @@ NODE_ENV=production
 
 Optional:
 
-ALLOWED_ORIGINS  
-RATE_LIMIT_WINDOW_MS  
-RATE_LIMIT_MAX_REQUESTS  
+ALLOWED_ORIGIN  
+TAVILY_API_KEY  
+UPSTASH_REDIS_REST_URL  
+UPSTASH_REDIS_REST_TOKEN  
+RATE_LIMIT_DAILY_MAX  
+SUPABASE_URL  
+SUPABASE_PUBLISHABLE_KEY  
+IMAGE_UPLOAD_MAX_COUNT  
+IMAGE_UPLOAD_MAX_BYTES  
+
+Set `SUPABASE_URL` and `SUPABASE_PUBLISHABLE_KEY` to enable Google OAuth and signed-in image uploads. In Supabase Auth, enable the Google provider and allow both local and production `/workspace` redirect URLs.
 
 Never commit `.env` to version control.
 
