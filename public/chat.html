@@ -95,9 +95,16 @@
             </div>
 
             <div class="settings-panel-body">
+              <div class="settings-tabs" role="navigation" aria-label="Settings sections">
+                <button class="settings-tab" data-settings-jump="account" type="button">Account</button>
+                <button class="settings-tab active" data-settings-jump="profile" type="button">Profile</button>
+                <button class="settings-tab" data-settings-jump="guidance" type="button">Guidance</button>
+                <button class="settings-tab" data-settings-jump="data" type="button">Data</button>
+                <button class="settings-tab" data-settings-jump="help" type="button">Help</button>
+              </div>
 
               <!-- Profile -->
-              <div class="settings-section">
+              <div class="settings-section" data-settings-section="profile">
                 <div class="settings-section-label">Profile</div>
                 <div class="settings-field">
                   <label for="settings-name">Display name</label>
@@ -142,17 +149,17 @@
               <hr class="settings-divider" />
 
               <!-- Guidance -->
-              <div class="settings-section">
+              <div class="settings-section" data-settings-section="guidance">
                 <div class="settings-section-label">Guidance</div>
                 <label class="toggle-row">
                   <input class="toggle-checkbox" type="checkbox" data-setting-concise />
-                  <span class="toggle-track"><span class="toggle-thumb"></span></span>
                   <span class="toggle-label">Concise replies</span>
+                  <span class="toggle-track"><span class="toggle-thumb"></span></span>
                 </label>
                 <label class="toggle-row">
                   <input class="toggle-checkbox" type="checkbox" data-setting-web-search />
-                  <span class="toggle-track"><span class="toggle-thumb"></span></span>
                   <span class="toggle-label">Check current rules</span>
+                  <span class="toggle-track"><span class="toggle-thumb"></span></span>
                 </label>
                 <div class="settings-field">
                   <label for="settings-language">Response language</label>
@@ -204,7 +211,7 @@
               <hr class="settings-divider" />
 
               <!-- Account -->
-              <div class="settings-section">
+              <div class="settings-section" data-settings-section="account">
                 <div class="settings-section-label">Account</div>
                 <div class="settings-info-row">
                   <span data-auth-status>Not signed in</span>
@@ -218,7 +225,7 @@
               <hr class="settings-divider" />
 
               <!-- Usage -->
-              <div class="settings-section">
+              <div class="settings-section" data-settings-section="account">
                 <div class="settings-section-label">Service protection</div>
                 <div class="usage-panel" data-usage-panel>
                   <div class="usage-row">
@@ -236,11 +243,11 @@
               <hr class="settings-divider" />
 
               <!-- Data -->
-              <div class="settings-section">
-                <div class="settings-section-label">Data</div>
+              <div class="settings-section" data-settings-section="data">
+                <div class="settings-section-label">Data &amp; privacy</div>
                 <div class="settings-info-row">
                   <span>History</span>
-                  <strong>Stored on this device</strong>
+                  <strong>Stored locally</strong>
                 </div>
                 <div class="settings-info-row">
                   <span>Sync</span>
@@ -249,16 +256,17 @@
                 <button type="button" class="btn-settings-secondary" data-export-all-chats>Export all conversations</button>
                 <label class="toggle-row">
                   <input class="toggle-checkbox" type="checkbox" data-setting-data-consent />
-                  <span class="toggle-track"><span class="toggle-thumb"></span></span>
                   <span class="toggle-label">Share conversations to improve OmanX</span>
+                  <span class="toggle-track"><span class="toggle-thumb"></span></span>
                 </label>
+                <div class="settings-note">OmanX uses a local-first history model for beta privacy. Export before clearing a device you do not control.</div>
                 <button type="button" class="btn-settings-danger" data-delete-all-chats>Delete all questions</button>
               </div>
 
               <hr class="settings-divider" />
 
               <!-- Help -->
-              <div class="settings-section">
+              <div class="settings-section" data-settings-section="help">
                 <div class="settings-section-label">Help</div>
                 <a class="settings-link-row" href="/contact">
                   <span>Contact support</span>

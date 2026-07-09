@@ -260,11 +260,23 @@ function bindEvents() {
   qsa('[data-settings-toggle]').forEach((button) => {
     button.addEventListener('click', () => {
       qs('[data-settings-panel]').classList.add('open');
+      const settingsBody = qs('.settings-panel-body');
+      if (settingsBody) settingsBody.scrollTop = 0;
+      setSettingsNav('profile');
     });
   });
 
   qs('[data-settings-close]')?.addEventListener('click', () => {
     qs('[data-settings-panel]').classList.remove('open');
+  });
+
+  qsa('[data-settings-jump]').forEach((button) => {
+    button.addEventListener('click', () => {
+      const target = button.dataset.settingsJump;
+      const section = qs(`[data-settings-section="${target}"]`);
+      section?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      setSettingsNav(target);
+    });
   });
 
   // theme picker
@@ -432,6 +444,12 @@ function populateSettingsPanel() {
 function updateThemePicker(active) {
   qsa('[data-set-theme]').forEach((btn) => {
     btn.classList.toggle('active', btn.dataset.setTheme === active);
+  });
+}
+
+function setSettingsNav(active) {
+  qsa('[data-settings-jump]').forEach((btn) => {
+    btn.classList.toggle('active', btn.dataset.settingsJump === active);
   });
 }
 

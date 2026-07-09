@@ -1377,7 +1377,8 @@ select:focus {
   padding: 16px 20px 20px;
   display: grid;
   align-content: start;
-  gap: 20px;
+  gap: 12px;
+  scroll-padding-top: 62px;
 }
 
 .settings-panel-body::-webkit-scrollbar { width: 3px; }
@@ -1387,12 +1388,53 @@ select:focus {
 .settings-divider {
   border: none;
   border-top: 0.5px solid var(--border);
-  margin: 0;
+  margin: 2px 0;
+  opacity: 0;
+}
+
+.settings-tabs {
+  position: sticky;
+  top: 0;
+  z-index: 2;
+  display: flex;
+  gap: 4px;
+  padding: 0 0 8px;
+  margin-bottom: 2px;
+  overflow-x: auto;
+  background: var(--sand);
+}
+
+.settings-tabs::-webkit-scrollbar { display: none; }
+
+.settings-tab {
+  flex: 0 0 auto;
+  min-height: 28px;
+  padding: 0 9px;
+  border: 0.5px solid var(--border);
+  border-radius: 999px;
+  background: var(--white);
+  color: var(--ink-3);
+  font-family: var(--sans);
+  font-size: 0.75rem;
+  font-weight: 400;
+  cursor: pointer;
+  transition: background 0.15s, border-color 0.15s, color 0.15s;
+}
+
+.settings-tab:hover,
+.settings-tab.active {
+  color: var(--ink);
+  border-color: var(--gold);
+  background: var(--gold-dim);
 }
 
 .settings-section {
   display: grid;
   gap: 10px;
+  padding: 12px;
+  border: 0.5px solid var(--border);
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.5);
 }
 
 .settings-section-label {
@@ -1633,6 +1675,7 @@ select:focus {
 .toggle-row {
   display: flex;
   align-items: center;
+  justify-content: space-between;
   gap: 10px;
   cursor: pointer;
   padding: 2px 0;
@@ -1655,7 +1698,7 @@ select:focus {
   transition: background 0.2s;
 }
 
-.toggle-checkbox:checked + .toggle-track {
+.toggle-checkbox:checked ~ .toggle-track {
   background: var(--gold);
 }
 
@@ -1671,7 +1714,7 @@ select:focus {
   box-shadow: 0 1px 3px rgba(0,0,0,0.2);
 }
 
-.toggle-checkbox:checked + .toggle-track .toggle-thumb {
+.toggle-checkbox:checked ~ .toggle-track .toggle-thumb {
   transform: translateX(14px);
 }
 
@@ -3746,6 +3789,28 @@ footer,
 
 .chat-app .settings-divider {
   border-color: #454640;
+}
+
+.chat-app .settings-tabs {
+  background: #2f302c;
+}
+
+.chat-app .settings-tab {
+  background: #242520;
+  border-color: #4d4e48;
+  color: #c9c2b7;
+}
+
+.chat-app .settings-tab:hover,
+.chat-app .settings-tab.active {
+  background: #3d3b31;
+  border-color: #c9a96e;
+  color: #fffaf0;
+}
+
+.chat-app .settings-section {
+  background: rgba(36, 37, 32, 0.72);
+  border-color: #44453f;
 }
 
 .chat-app .settings-section-label,

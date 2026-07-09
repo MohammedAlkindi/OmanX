@@ -6,6 +6,9 @@ let authState = {
   user: null,
   session: null,
 };
+let authConfig = {
+  siteUrl: '',
+};
 const listeners = new Set();
 
 function emit() {
@@ -48,6 +51,9 @@ export async function initAuth() {
     try {
       const res = await fetch('/api/auth/config', { cache: 'no-store' });
       const config = await res.json();
+      authConfig = {
+        siteUrl: typeof config.siteUrl === 'string' ? config.siteUrl.replace(/\/+$/, '') : '',
+      };
       if (!config.enabled || !config.supabaseUrl || !config.supabaseKey) {
         authState = { ready: true, enabled: false, user: null, session: null };
         emit();
@@ -64,6 +70,7 @@ export async function initAuth() {
       });
 
       const { data } = await supabase.auth.getSession();
+      clearEmptyAuthHash();
       authState = {
         ready: true,
         enabled: true,
@@ -72,6 +79,7 @@ export async function initAuth() {
       };
 
       supabase.auth.onAuthStateChange((_event, session) => {
+        clearEmptyAuthHash();
         authState = {
           ready: true,
           enabled: true,
@@ -93,6 +101,16 @@ export async function initAuth() {
   return authInitPromise;
 }
 
+function getAuthRedirectUrl() {
+  const baseUrl = authConfig.siteUrl || window.location.origin;
+  return `${baseUrl}/`;
+}
+
+function clearEmptyAuthHash() {
+  if (window.location.hash !== '#') return;
+  window.history.replaceState(null, '', `${window.location.pathname}${window.location.search}`);
+}
+
 export async function signInWithGoogle() {
   await initAuth();
   if (!supabase) throw new Error('Google sign-in is not configured yet.');
@@ -100,7 +118,7 @@ export async function signInWithGoogle() {
   const { error } = await supabase.auth.signInWithOAuth({
     provider: 'google',
     options: {
-      redirectTo: `${window.location.origin}/`,
+      redirectTo: getAuthRedirectUrl(),
       queryParams: {
         access_type: 'offline',
         prompt: 'select_account',

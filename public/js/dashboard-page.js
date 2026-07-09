@@ -230,7 +230,7 @@ function openModal(alert) {
       <div class="modal-text modal-deadline">${alert.detail.deadline}</div>
     </div>
     <div class="modal-footer">
-      <a class="btn" href="/workspace" target="_blank">Open in scholar workspace</a>
+      <a class="btn" href="/" target="_blank">Open in scholar workspace</a>
       <button class="btn-secondary modal-close-btn" id="modal-close-btn">Close</button>
     </div>
   `;

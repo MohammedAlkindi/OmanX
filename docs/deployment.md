@@ -45,7 +45,7 @@ SUPABASE_PUBLISHABLE_KEY
 IMAGE_UPLOAD_MAX_COUNT  
 IMAGE_UPLOAD_MAX_BYTES  
 
-Set `SUPABASE_URL` and `SUPABASE_PUBLISHABLE_KEY` to enable Google OAuth and signed-in image uploads. In Supabase Auth, enable the Google provider and allow both local and production `/workspace` redirect URLs.
+Set `SUPABASE_URL` and `SUPABASE_PUBLISHABLE_KEY` to enable Google OAuth and signed-in image uploads. In Supabase Auth, enable the Google provider and allow the canonical local and production root redirect URLs.
 
 Never commit `.env` to version control.
 

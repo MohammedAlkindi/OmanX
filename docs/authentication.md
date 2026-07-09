@@ -20,14 +20,16 @@ No chat history is stored in Supabase yet. Conversation history remains localSto
 2. Enable Google as an Auth provider in the Supabase dashboard.
 3. Add OAuth callback URLs for local and production:
    - `http://localhost:3000/`
-   - `http://localhost:3000/workspace`
    - `https://<your-production-domain>/`
-   - `https://<your-production-domain>/workspace`
-4. In Supabase project/Auth branding, set the application name and logo to OmanX.
-5. In Google Cloud OAuth consent screen, set the app name to OmanX and verify the production domain if Google still displays the Supabase project ref.
-6. Add the environment variables to Vercel and local `.env`.
+   - Optional legacy/testing routes: `http://localhost:3000/workspace`, `https://<your-production-domain>/workspace`
+4. Set Supabase Auth Site URL to `https://<your-production-domain>` and keep the production redirect allow-list focused on the canonical domain.
+5. In Supabase project/Auth branding, set the application name and logo to OmanX.
+6. In Google Cloud OAuth consent screen, set the app name to OmanX and verify the production domain if Google still displays the Supabase project ref.
+7. For a fully branded Google screen, configure a Supabase custom domain such as `auth.omanx.org`. Without a custom Supabase auth domain, Google may show `<project-ref>.supabase.co` because the OAuth callback is hosted by Supabase.
+8. Add the environment variables to Vercel and local `.env`.
 
 ```bash
+PUBLIC_SITE_URL=https://omanx.org
 SUPABASE_URL=https://<project-ref>.supabase.co
 SUPABASE_PUBLISHABLE_KEY=<supabase-publishable-or-anon-key>
 ```

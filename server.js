@@ -69,7 +69,7 @@ app.get('/api/metrics', metricsHandler);
 // Canonical redirects from file-based routes
 app.get('/index.html', (req, res) => res.redirect(301, '/product'));
 app.get('/product.html', (req, res) => res.redirect(301, '/product'));
-app.get('/chat.html', (req, res) => res.redirect(301, '/workspace'));
+app.get('/chat.html', (req, res) => res.redirect(301, '/'));
 app.get('/system.html', (req, res) => res.redirect(301, '/system'));
 app.get('/method.html', (req, res) => res.redirect(301, '/method'));
 app.get('/vision.html', (req, res) => res.redirect(301, '/vision'));
@@ -88,9 +88,7 @@ app.get('/product', (req, res) => {
   res.sendFile(path.join(PUBLIC_DIR, 'index.html'));
 });
 
-app.get(['/workspace', '/chat'], (req, res) => {
-  res.sendFile(path.join(PUBLIC_DIR, 'chat.html'));
-});
+app.get(['/workspace', '/chat'], (req, res) => res.redirect(301, '/'));
 
 app.get('/system', (req, res) => {
   res.sendFile(path.join(PUBLIC_DIR, 'system.html'));
