@@ -18,14 +18,14 @@
     <nav>
       <a class="nav-logo" href="/">Oman<span>X</span></a>
       <div class="nav-right">
-        <a class="nav-cta" href="/">&larr; Home</a>
+        <a class="nav-cta" href="/product">Product</a>
         <button class="nav-hamburger" data-mobile-toggle aria-label="Open menu" aria-expanded="false">
           <span></span><span></span><span></span>
         </button>
       </div>
       <div class="nav-drawer" data-mobile-panel>
-        <a href="/">Home</a>
-        <a href="/workspace">Product</a>
+        <a href="/">Chat</a>
+        <a href="/product">Product</a>
         <a href="/system">System</a>
         <a href="/vision">Roadmap</a>
         <a href="/contact">Contact</a>
@@ -102,6 +102,10 @@
                 <div class="settings-field">
                   <label for="settings-name">Display name</label>
                   <input id="settings-name" class="settings-input" type="text" data-setting-name placeholder="Your name" autocomplete="off" />
+                </div>
+                <div class="settings-field">
+                  <label for="settings-campus">University or campus</label>
+                  <input id="settings-campus" class="settings-input" type="text" data-setting-campus placeholder="Example: UC San Diego" autocomplete="organization" />
                 </div>
                 <div class="settings-field">
                   <label for="settings-destination">Study destination</label>
@@ -208,7 +212,7 @@
                 </div>
                 <button type="button" class="btn-settings-secondary" data-auth-sign-in>Continue with Google</button>
                 <button type="button" class="btn-settings-secondary" data-auth-sign-out hidden>Sign out</button>
-                <div class="settings-note">Sign in for durable quotas and image uploads. Chat history still stays on this device.</div>
+                <div class="settings-note">Sign in for durable quotas and image uploads. Chat history stays on this device unless a future sync feature is added.</div>
               </div>
 
               <hr class="settings-divider" />
@@ -240,7 +244,7 @@
                 </div>
                 <div class="settings-info-row">
                   <span>Sync</span>
-                  <strong>Off until sign-in exists</strong>
+                  <strong>Off by design</strong>
                 </div>
                 <button type="button" class="btn-settings-secondary" data-export-all-chats>Export all conversations</button>
                 <label class="toggle-row">
@@ -328,6 +332,13 @@
       <div class="onboarding-card">
         <div class="onboarding-brand">Oman<span>X</span></div>
 
+        <div class="onboarding-step" data-ob-step="auth" hidden>
+          <p class="onboarding-title">Start with your scholar account</p>
+          <p class="onboarding-hint">Google sign-in keeps quotas tied to you and enables screenshot uploads. Your chat history still stays on this device.</p>
+          <button class="btn onboarding-submit" data-onboarding-auth type="button">Continue with Google</button>
+          <button class="onboarding-skip" data-onboarding-skip-auth type="button">Continue without sign-in</button>
+        </div>
+
         <div class="onboarding-step" data-ob-step="1">
           <p class="onboarding-title">Where are you studying?</p>
           <p class="onboarding-hint">This helps OmanX apply the right visa and scholarship rules.</p>
@@ -357,9 +368,10 @@
         </div>
 
         <div class="onboarding-step" data-ob-step="3" hidden>
-          <p class="onboarding-title">What should we call you?</p>
-          <p class="onboarding-hint">Optional. You can change this anytime in settings.</p>
+          <p class="onboarding-title">Set up your scholar profile</p>
+          <p class="onboarding-hint">Optional, but it helps OmanX check the right university and sponsor context.</p>
           <input class="onboarding-name-input" data-onboarding-name type="text" placeholder="Your name" autocomplete="given-name" />
+          <input class="onboarding-name-input" data-onboarding-campus type="text" placeholder="University or campus" autocomplete="organization" />
           <button class="btn onboarding-submit" data-onboarding-submit type="button">Start asking &rarr;</button>
         </div>
       </div>

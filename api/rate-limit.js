@@ -19,6 +19,10 @@ export function getClientIp(req) {
   return req.headers["x-forwarded-for"]?.split(",")[0].trim() || req.socket?.remoteAddress || "unknown";
 }
 
+function hashKeyPart(value) {
+  return crypto.createHash("sha256").update(String(value || "unknown")).digest("hex").slice(0, 24);
+}
+
 export function sanitizeSessionId(sessionId) {
   return typeof sessionId === "string"
     ? sessionId.slice(0, 64).replace(/[^a-z0-9\-]/gi, "")
@@ -41,8 +45,10 @@ export function getRequestSessionId(req, bodySessionId) {
 
 export function getRateLimitKey(req, sessionId = "") {
   const sanitizedSessionId = sanitizeSessionId(sessionId);
+  const ip = getClientIp(req);
+  if (ip && ip !== "unknown") return `ip:${hashKeyPart(ip)}`;
   if (sanitizedSessionId) return `session:${sanitizedSessionId}`;
-  return `ip:${getClientIp(req)}`;
+  return "ip:unknown";
 }
 
 function toUsage({ allowed = true, count = 0, limit = RATE_LIMIT_MAX, resetAt = Date.now() + RATE_LIMIT_WINDOW_MS, source = "memory", window = "day", blockedBy = null } = {}) {

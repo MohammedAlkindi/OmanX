@@ -20,6 +20,7 @@ const app = express();
 const PUBLIC_DIR = path.join(__dirname, 'public');
 const ROUTE_METHODS = new Map([
   ['/', new Set(['GET'])],
+  ['/product', new Set(['GET'])],
   ['/workspace', new Set(['GET'])],
   ['/chat', new Set(['GET'])],
   ['/system', new Set(['GET'])],
@@ -66,7 +67,8 @@ app.get('/api/health', healthHandler);
 app.get('/api/ready', readyHandler);
 app.get('/api/metrics', metricsHandler);
 // Canonical redirects from file-based routes
-app.get('/index.html', (req, res) => res.redirect(301, '/'));
+app.get('/index.html', (req, res) => res.redirect(301, '/product'));
+app.get('/product.html', (req, res) => res.redirect(301, '/product'));
 app.get('/chat.html', (req, res) => res.redirect(301, '/workspace'));
 app.get('/system.html', (req, res) => res.redirect(301, '/system'));
 app.get('/method.html', (req, res) => res.redirect(301, '/method'));
@@ -79,6 +81,10 @@ app.get('/trust.html', (req, res) => res.redirect(301, '/trust'));
 
 // Page routes
 app.get('/', (req, res) => {
+  res.sendFile(path.join(PUBLIC_DIR, 'chat.html'));
+});
+
+app.get('/product', (req, res) => {
   res.sendFile(path.join(PUBLIC_DIR, 'index.html'));
 });
 

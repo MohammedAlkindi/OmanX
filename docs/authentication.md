@@ -10,7 +10,7 @@ OmanX supports optional Google OAuth through Supabase Auth. Anonymous chat still
 - Token verification is exposed by `GET /api/auth/session`.
 - `/api/chat` and `/api/usage` accept `Authorization: Bearer <supabase-access-token>`.
 - If the token is valid, quota keys use `user:<supabase-user-id>`.
-- If no token is present, quota keys fall back to the anonymous browser session id.
+- If no token is present, quota keys use a client IP hash when available, with browser session id as a last fallback.
 
 No chat history is stored in Supabase yet. Conversation history remains localStorage-only.
 
@@ -19,9 +19,13 @@ No chat history is stored in Supabase yet. Conversation history remains localSto
 1. Create a Supabase project.
 2. Enable Google as an Auth provider in the Supabase dashboard.
 3. Add OAuth callback URLs for local and production:
+   - `http://localhost:3000/`
    - `http://localhost:3000/workspace`
+   - `https://<your-production-domain>/`
    - `https://<your-production-domain>/workspace`
-4. Add the environment variables to Vercel and local `.env`.
+4. In Supabase project/Auth branding, set the application name and logo to OmanX.
+5. In Google Cloud OAuth consent screen, set the app name to OmanX and verify the production domain if Google still displays the Supabase project ref.
+6. Add the environment variables to Vercel and local `.env`.
 
 ```bash
 SUPABASE_URL=https://<project-ref>.supabase.co
@@ -36,7 +40,7 @@ Anonymous and signed-in users currently share the same daily message count by de
 RATE_LIMIT_DAILY_MAX=20
 ```
 
-The difference is durability: signed-in quota follows the Supabase user id across refreshes, browsers, and devices. Anonymous quota follows the local browser session id and can still be bypassed by clearing site data.
+The difference is durability: signed-in quota follows the Supabase user id across refreshes, browsers, and devices. Anonymous quota follows a client IP hash when available, which prevents simple refresh or localStorage resets from creating a fresh quota. In production, configure Upstash Redis; without it, Vercel function instances fall back to in-memory state and quotas are not durable across instances.
 
 ## Image Uploads
 

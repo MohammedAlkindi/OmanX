@@ -25,12 +25,13 @@ const state = {
   usage: null,
   auth: { ready: false, enabled: false, signedIn: false, user: null },
   pendingImages: [],
+  searchStatus: '',
 };
 
 const ONBOARDED_KEY = 'omanx.onboarded.v1';
 const DEST_LABEL = { auto: 'Auto', us: 'US', uk: 'UK', au: 'AU' };
 const DEST_FULL_LABEL = { auto: 'Auto-detect', us: 'United States', uk: 'United Kingdom', au: 'Australia' };
-const THINKING_STAGES = ['Checking your question...', 'Reading saved rules...', 'Writing guidance...'];
+const THINKING_STAGES = ['Checking your question...', 'Reading OmanX dataset...', 'Searching official sources...', 'Writing guidance...'];
 
 // Tracks which chatId is actively streaming; null when idle.
 let streamingChatId = null;
@@ -47,13 +48,14 @@ initAuth().then((auth) => {
   state.auth = auth;
   updateAuthUi();
   refreshUsage();
+  maybeShowOnboarding();
 });
 onAuthChange((auth) => {
   state.auth = auth;
   updateAuthUi();
   refreshUsage();
+  if (auth.signedIn) advanceOnboardingFromAuth();
 });
-if (!localStorage.getItem(ONBOARDED_KEY)) showOnboarding();
 
 // init composer height
 const _initTextarea = qs('[data-chat-input]');
@@ -79,6 +81,7 @@ function persist() {
 
 function setTyping(value) {
   state.typing = value;
+  state.searchStatus = '';
   const btn = qs('[data-send-btn]');
   if (btn) btn.disabled = value;
   if (value) {
@@ -86,12 +89,18 @@ function setTyping(value) {
     thinkingTimer = setInterval(() => {
       stage = (stage + 1) % THINKING_STAGES.length;
       const el = qs('[data-thinking-status]');
-      if (el) el.textContent = THINKING_STAGES[stage];
+      if (el && !state.searchStatus) el.textContent = THINKING_STAGES[stage];
     }, 1800);
   } else {
     clearInterval(thinkingTimer);
     thinkingTimer = null;
   }
+}
+
+function setThinkingStatus(label) {
+  state.searchStatus = label || '';
+  const el = qs('[data-thinking-status]');
+  if (el && state.searchStatus) el.textContent = state.searchStatus;
 }
 
 function doRename(chatId, value) {
@@ -275,6 +284,11 @@ function bindEvents() {
     updateUserChip();
   });
 
+  qs('[data-setting-campus]')?.addEventListener('change', (e) => {
+    state.settings.homeCampus = e.target.value.trim();
+    saveSettings(state.settings);
+  });
+
   // context
   qs('[data-setting-context]')?.addEventListener('change', (e) => {
     state.settings.userContext = e.target.value.trim();
@@ -375,10 +389,13 @@ function bindEvents() {
 }
 
 function populateSettingsPanel() {
-  const { studentName, userContext, conciseMode, model, language, destination, situation, scholarshipStatus, dataConsent, webSearch } = state.settings;
+  const { studentName, homeCampus, userContext, conciseMode, model, language, destination, situation, scholarshipStatus, dataConsent, webSearch } = state.settings;
 
   const nameEl = qs('[data-setting-name]');
   if (nameEl) nameEl.value = studentName === 'Student' ? '' : studentName;
+
+  const campusEl = qs('[data-setting-campus]');
+  if (campusEl) campusEl.value = homeCampus === 'University partner' ? '' : homeCampus || '';
 
   const ctxEl = qs('[data-setting-context]');
   if (ctxEl) ctxEl.value = userContext || '';
@@ -613,21 +630,50 @@ function renderUsagePanel() {
   panel.classList.toggle('usage-panel-warning', usage.percentUsed >= 80);
 }
 
+function maybeShowOnboarding() {
+  if (!localStorage.getItem(ONBOARDED_KEY)) showOnboarding();
+}
+
+function showOnboardingStep(overlay, step) {
+  qsa('[data-ob-step]', overlay).forEach((el) => {
+    el.hidden = el.dataset.obStep !== step;
+  });
+}
+
+function advanceOnboardingFromAuth() {
+  const overlay = qs('[data-onboarding]');
+  if (!overlay || overlay.hidden) return;
+  const authStep = qs('[data-ob-step="auth"]', overlay);
+  if (authStep && !authStep.hidden) showOnboardingStep(overlay, '1');
+}
+
 function showOnboarding() {
   const overlay = qs('[data-onboarding]');
   if (!overlay) return;
   overlay.hidden = false;
+  showOnboardingStep(overlay, state.auth.enabled && !state.auth.signedIn ? 'auth' : '1');
 
   let selectedDest = 'auto';
   let selectedSituation = state.settings.situation || 'Current student';
+
+  qs('[data-onboarding-auth]', overlay)?.addEventListener('click', async () => {
+    try {
+      await signInWithGoogle();
+    } catch (error) {
+      showToast(error.message || 'Google sign-in is not available yet.');
+    }
+  });
+
+  qs('[data-onboarding-skip-auth]', overlay)?.addEventListener('click', () => {
+    showOnboardingStep(overlay, '1');
+  }, { once: true });
 
   qsa('[data-dest]', overlay).forEach((btn) => {
     btn.addEventListener('click', () => {
       qsa('[data-dest]', overlay).forEach((b) => b.classList.remove('selected'));
       btn.classList.add('selected');
       selectedDest = btn.dataset.dest;
-      qs('[data-ob-step="1"]', overlay).hidden = true;
-      qs('[data-ob-step="2"]', overlay).hidden = false;
+      showOnboardingStep(overlay, '2');
     });
   });
 
@@ -636,16 +682,19 @@ function showOnboarding() {
       qsa('[data-situation]', overlay).forEach((b) => b.classList.remove('selected'));
       btn.classList.add('selected');
       selectedSituation = btn.dataset.situation;
-      qs('[data-ob-step="2"]', overlay).hidden = true;
-      qs('[data-ob-step="3"]', overlay).hidden = false;
+      showOnboardingStep(overlay, '3');
       qs('[data-onboarding-name]', overlay)?.focus();
     });
   });
 
   function completeOnboarding() {
     const name = (qs('[data-onboarding-name]', overlay)?.value || '').trim();
+    const campus = (qs('[data-onboarding-campus]', overlay)?.value || '').trim();
     if (name) {
       state.settings.studentName = name;
+    }
+    if (campus) {
+      state.settings.homeCampus = campus;
     }
     state.settings.destination = selectedDest;
     state.settings.situation = selectedSituation;
@@ -868,7 +917,7 @@ function renderMessages() {
     typing.innerHTML = `
       <div class="message-bubble">
         <div class="typing"><span></span><span></span><span></span></div>
-        <div class="thinking-status" data-thinking-status>Checking...</div>
+        <div class="thinking-status" data-thinking-status>${escapeHtml(state.searchStatus || THINKING_STAGES[0])}</div>
       </div>
       <div class="message-meta"><span>OmanX</span></div>
     `;
@@ -1038,6 +1087,7 @@ async function streamAssistantReply(message, imageAttachments = []) {
           try {
             const data = JSON.parse(line.slice(6));
             if (data.error) { fullText = `**Error:** ${data.error}`; break; }
+            if (data.status) setThinkingStatus(data.status);
             if (data.t) { fullText += data.t; scheduleRender(); }
             if (data.done) { if (data.webSearched) didWebSearch = true; if (data.sources) didSources = data.sources; if (data.escalation) didEscalation = data.escalation; if (data.destination) didDestination = data.destination; if (data.usage) didUsage = data.usage; }
           } catch { /* malformed SSE line */ }
@@ -1073,6 +1123,9 @@ function autoGrow(textarea) {
 
 function buildProfileContext(userContext = '') {
   const parts = [];
+  if (state.settings.homeCampus && state.settings.homeCampus !== 'University partner') {
+    parts.push(`University or campus: ${state.settings.homeCampus}.`);
+  }
   if (state.settings.situation) parts.push(`Student situation: ${state.settings.situation}.`);
   if (state.settings.scholarshipStatus) parts.push(`Scholarship status: ${state.settings.scholarshipStatus}.`);
   if (state.settings.destination && state.settings.destination !== 'auto') {
@@ -1415,12 +1468,12 @@ function renderSources(sources) {
   if (!sources?.length) return '';
   const chips = sources.map(s => {
     if (s.type === 'kb') {
-      return `<span class="source-chip source-chip-kb" title="${escapeHtml(s.id)}">${escapeHtml(s.title || s.id)}</span>`;
+      return `<span class="source-chip source-chip-kb" title="${escapeHtml(s.id)}"><span class="source-kind">${escapeHtml(s.category || 'OmanX dataset')}</span>${escapeHtml(s.title || s.id)}</span>`;
     }
     const safeUrl = /^https?:\/\//i.test(s.url) ? s.url : '#';
-    return `<a class="source-chip source-chip-web" href="${escapeHtml(safeUrl)}" target="_blank" rel="noopener noreferrer" title="${escapeHtml(s.title)}">${escapeHtml(s.domain)}</a>`;
+    return `<a class="source-chip source-chip-web" href="${escapeHtml(safeUrl)}" target="_blank" rel="noopener noreferrer" title="${escapeHtml(s.title || s.url)}"><span class="source-kind">${escapeHtml(s.category || 'Official web')}</span>${escapeHtml(s.domain || s.url)}</a>`;
   }).join('');
-  return `<div class="message-sources"><span class="sources-label">Sources used</span>${chips}</div>`;
+  return `<div class="message-sources"><span class="sources-label">Verified sources</span><div class="source-chip-list">${chips}</div></div>`;
 }
 
 function renderMessageAttachments(attachments) {

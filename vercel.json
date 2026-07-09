@@ -8,7 +8,8 @@
   },
   "routes": [
     { "src": "/api/(.*)", "dest": "/api/$1" },
-    { "src": "/", "dest": "/index.html" },
+    { "src": "/", "dest": "/chat.html" },
+    { "src": "/product", "dest": "/index.html" },
     { "src": "/(chat|workspace)", "dest": "/chat.html" },
     { "src": "/dashboard", "dest": "/dashboard.html" },
     { "src": "/system", "dest": "/system.html" },
@@ -19,7 +20,8 @@
     { "src": "/trust", "dest": "/trust.html" },
     { "src": "/settings", "dest": "/settings.html" },
     { "src": "/collaboration", "dest": "/collaboration.html" },
-    { "src": "/(index|chat|system|method|vision|contact|examples|settings|collaboration|trust|dashboard)\\.html", "status": 301, "headers": { "Location": "/$1" } },
+    { "src": "/index\\.html", "status": 301, "headers": { "Location": "/product" } },
+    { "src": "/(chat|system|method|vision|contact|examples|settings|collaboration|trust|dashboard)\\.html", "status": 301, "headers": { "Location": "/$1" } },
     { "src": "/(.*)", "dest": "/$1" }
   ]
 }

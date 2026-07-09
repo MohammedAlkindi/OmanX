@@ -44,7 +44,7 @@ Supabase is optional.
 - The browser stores the Supabase session using Supabase's client-side auth storage.
 - API requests send `Authorization: Bearer <supabase-access-token>`.
 - The API validates tokens with Supabase before trusting the user id.
-- If auth is absent, OmanX falls back to anonymous browser-session quotas.
+- If auth is absent, OmanX falls back to anonymous client IP-hash quotas when available.
 
 ## Quotas
 
@@ -57,8 +57,8 @@ RATE_LIMIT_DAILY_MAX=20
 Quota keys:
 
 - Signed in: `user:<supabase-user-id>`
-- Anonymous: `session:<browser-session-id>`
-- Fallback: `ip:<client-ip>`
+- Anonymous: `ip:<client-ip-hash>`
+- Fallback: `session:<browser-session-id>`
 
 Upstash Redis is used when configured. Without Upstash, quotas fall back to in-memory process state and are not durable across serverless instances.
 

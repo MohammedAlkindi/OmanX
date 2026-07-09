@@ -453,7 +453,7 @@ async function webSearch(query) {
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
         api_key: key,
-        query,
+        query: `${query} official government university MoHE source`,
         search_depth: "basic",
         include_answer: false,
         include_domains: TRUSTED_DOMAINS,
@@ -477,6 +477,42 @@ async function webSearch(query) {
     console.warn("[OmanX] Web search error:", err.message);
     return [];
   }
+}
+
+function sourceCategory(url = "") {
+  try {
+    const hostname = new URL(url).hostname.replace(/^www\./, "");
+    if (hostname.endsWith(".gov") || hostname.includes("gov.uk") || hostname.includes("homeaffairs.gov.au")) return "Government";
+    if (hostname.includes("mohe") || hostname.endsWith(".edu.om")) return "MoHE";
+    if (hostname.endsWith(".edu") || hostname.includes(".ac.uk") || hostname.includes(".edu.au")) return "University";
+    return "Official web";
+  } catch {
+    return "Official web";
+  }
+}
+
+function buildSources(kbResults = [], webResults = []) {
+  return [
+    ...kbResults.map(r => ({
+      type: "kb",
+      id: r.id,
+      title: r.doc.title || r.doc.topic || r.id,
+      category: "OmanX dataset",
+      verified: true,
+    })),
+    ...webResults.map(r => {
+      let domain = r.url;
+      try { domain = new URL(r.url).hostname.replace(/^www\./, ""); } catch {}
+      return {
+        type: "web",
+        title: r.title,
+        url: r.url,
+        domain,
+        category: sourceCategory(r.url),
+        verified: true,
+      };
+    }),
+  ];
 }
 
 const BASE_SYSTEM = `You are OmanX, a warm and knowledgeable AI assistant built for Omani scholars studying abroad — in the United States, United Kingdom, or Australia. OmanX was founded by Mohammed Alkindi.
@@ -716,15 +752,43 @@ export default async function handler(req, res) {
     return res.json({ text: cached, cached: true, usage });
   }
 
+  let streamStarted = false;
+  function ensureStream() {
+    if (!wantsStream || streamStarted) return;
+    res.setHeader('Content-Type', 'text/event-stream');
+    res.setHeader('Cache-Control', 'no-cache');
+    res.setHeader('Connection', 'keep-alive');
+    res.flushHeaders();
+    streamStarted = true;
+  }
+
+  function writeStatus(label, stage) {
+    if (!wantsStream) return;
+    ensureStream();
+    res.write(`data: ${JSON.stringify({ status: label, stage })}\n\n`);
+  }
+
   // Run KB lookup and web search in parallel
   let kbResults = [];
   let webResults = [];
   const allowWebSearch = clientWebSearch !== false;
   if (compliance) {
+    writeStatus("Checking OmanX dataset...", "kb");
+    if (allowWebSearch) writeStatus("Searching official sources...", "web");
     [kbResults, webResults] = await Promise.all([
       getKB(destination).then((kb) => (kb ? searchKB(kb, sanitizedMessage) : [])),
-      allowWebSearch ? webSearch(sanitizedMessage) : Promise.resolve([]),
+      allowWebSearch ? webSearch(`${sanitizedMessage}\n${sanitizedUserContext}`.slice(0, 2000)) : Promise.resolve([]),
     ]);
+    if (allowWebSearch) {
+      writeStatus(
+        webResults.length
+          ? `Verified ${webResults.length} official source${webResults.length === 1 ? "" : "s"}.`
+          : "No official web result found; using saved rules.",
+        "sources"
+      );
+    } else {
+      writeStatus("Web search is off; using saved rules.", "sources");
+    }
   }
 
   const systemPrompt = buildSystemPrompt(kbResults, webResults, { conciseMode: useConcise, userContext: sanitizedUserContext, language: responseLanguage });
@@ -753,10 +817,8 @@ export default async function handler(req, res) {
   });
 
   if (wantsStream) {
-    res.setHeader('Content-Type', 'text/event-stream');
-    res.setHeader('Cache-Control', 'no-cache');
-    res.setHeader('Connection', 'keep-alive');
-    res.flushHeaders();
+    ensureStream();
+    writeStatus("Writing guidance...", "answer");
 
     let fullText = '';
     try {
@@ -768,14 +830,7 @@ export default async function handler(req, res) {
         }
       }
       if (cacheKey) cacheSet(cacheKey, fullText.trim());
-      const sources = [
-        ...kbResults.map(r => ({ type: 'kb', id: r.id, title: r.doc.title || r.doc.topic || r.id })),
-        ...webResults.map(r => {
-          let domain = r.url;
-          try { domain = new URL(r.url).hostname.replace(/^www\./, ''); } catch {}
-          return { type: 'web', title: r.title, url: r.url, domain };
-        }),
-      ];
+      const sources = buildSources(kbResults, webResults);
       const escalation = compliance && isUrgent(sanitizedMessage) ? buildEscalationCard(sanitizedMessage, destination) : null;
       res.write(`data: ${JSON.stringify({ done: true, compliance, webSearched: webResults.length > 0, sources, escalation, destination, usage })}\n\n`);
       res.end();
@@ -796,7 +851,7 @@ export default async function handler(req, res) {
     const response = await client.messages.create(requestParams);
     const text = response.content?.[0]?.text?.trim() || "No response generated.";
     if (cacheKey) cacheSet(cacheKey, text);
-    return res.json({ text, cached: false, compliance, webSearched: webResults.length > 0, usage });
+    return res.json({ text, cached: false, compliance, webSearched: webResults.length > 0, sources: buildSources(kbResults, webResults), usage });
   } catch (err) {
     console.error("[OmanX] Anthropic error:", err?.message, err?.stack);
     if (err?.status === 429) {
