@@ -3762,11 +3762,6 @@ footer,
 .chat-app .settings-panel {
   background: #2f302c;
   color: #e7e2d8;
-  transform: translateY(100%);
-}
-
-.chat-app .settings-panel.open {
-  transform: translateY(0);
 }
 
 .chat-app .settings-panel-header {
