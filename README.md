@@ -19,7 +19,7 @@ POST /api/chat
   │
   ├─ sanitize + validate (length caps, control-char strip, image MIME/size checks)
   ├─ auth check (optional — Supabase bearer token; required only for image uploads)
-  ├─ rate limit consume (Upstash Redis sliding window, per-IP or per-user)
+  ├─ rate limit consume (Upstash Redis sliding window, per-session or per-user)
   ├─ isCompliance(message)?
   │     no  → skip KB + search, answer conversationally, cacheable
   │     yes → detectDestination(message, context) → us | uk | au
@@ -54,7 +54,7 @@ Tavily queries are constrained to an explicit allowlist of ~15 government and un
 Only non-compliance, single-turn, no-attachment requests get a response cache entry (SHA-256 of model + prompt + context, 10-minute TTL, capped at 500 entries). Compliance responses are never cached, because policy pages change and a stale visa answer is worse than a slow one.
 
 **Auth is additive, not required**
-The product is usable anonymously — anonymous sessions get rate-limited by IP-derived key and keep chat history on the device. Google OAuth via Supabase ([api/auth-utils.js](api/auth-utils.js)) gates image uploads, keys rate limits by user, and syncs chat history through the RLS-protected `public.omanx_chat_sync` table once signed in. There's no account-gated content.
+The product is usable anonymously — anonymous sessions get rate-limited by browser session and keep chat history on the device. Google OAuth via Supabase ([api/auth-utils.js](api/auth-utils.js)) gates image uploads, keys rate limits by user, and syncs chat history through the RLS-protected `public.omanx_chat_sync` table once signed in. There's no account-gated content.
 
 ---
 

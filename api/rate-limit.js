@@ -69,8 +69,8 @@ export function getRequestSessionId(req, bodySessionId) {
 export function getRateLimitKey(req, sessionId = "") {
   const sanitizedSessionId = sanitizeSessionId(sessionId);
   const ip = getClientIp(req);
-  if (ip && ip !== "unknown") return `ip:${hashKeyPart(ip)}`;
   if (sanitizedSessionId) return `session:${sanitizedSessionId}`;
+  if (ip && ip !== "unknown") return `ip:${hashKeyPart(ip)}`;
   return "ip:unknown";
 }
 

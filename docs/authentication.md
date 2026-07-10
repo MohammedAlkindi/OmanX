@@ -11,7 +11,7 @@ OmanX supports optional Google OAuth through Supabase Auth. Anonymous chat still
 - `/api/chat` and `/api/usage` accept `Authorization: Bearer <supabase-access-token>`.
 - `/api/chats` accepts the same bearer token and stores one sanitized chat-history snapshot per signed-in user.
 - If the token is valid, quota keys use `user:<supabase-user-id>`.
-- If no token is present, quota keys use a client IP hash when available, with browser session id as a last fallback.
+- If no token is present, quota keys use the browser session id, with a client IP hash as a last fallback.
 
 Chat history is local-first. The browser always saves to `localStorage`; after sign-in it pulls the user's Supabase snapshot, merges it with local history, and pushes future changes. Anonymous history remains on the device unless the user signs in and the local history is not already owned by a different signed-in account.
 
@@ -55,7 +55,7 @@ Anonymous and signed-in users currently share the same daily message count by de
 RATE_LIMIT_DAILY_MAX=20
 ```
 
-The difference is durability: signed-in quota follows the Supabase user id across refreshes, browsers, and devices. Anonymous quota follows a client IP hash when available, which prevents simple refresh or localStorage resets from creating a fresh quota. In production, configure Upstash Redis; without it, `/api/ready` returns 503 and chat requests fail closed instead of using non-durable serverless memory.
+The difference is durability: signed-in quota follows the Supabase user id across refreshes, browsers, and devices. Anonymous quota follows the browser session id so separate devices do not share one IP bucket; clearing site data can create a fresh anonymous quota. In production, configure Upstash Redis; without it, `/api/ready` returns 503 and chat requests fail closed instead of using non-durable serverless memory.
 
 ## Image Uploads
 
