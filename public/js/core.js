@@ -1,5 +1,23 @@
 const THEME_KEY = 'omanx.theme';
 const TOAST_TIMEOUT = 3200;
+let fallbackTheme = 'light';
+
+function safeGetItem(key) {
+  try {
+    return localStorage.getItem(key);
+  } catch {
+    return null;
+  }
+}
+
+function safeSetItem(key, value) {
+  try {
+    localStorage.setItem(key, value);
+    return true;
+  } catch {
+    return false;
+  }
+}
 
 export function initCore({ page } = {}) {
   applyStoredTheme();
@@ -69,12 +87,13 @@ export function copyText(text, successMessage = 'Copied to clipboard.') {
 }
 
 export function getTheme() {
-  return localStorage.getItem(THEME_KEY) || 'light';
+  return safeGetItem(THEME_KEY) || fallbackTheme;
 }
 
 export function setTheme(theme) {
+  fallbackTheme = theme || 'light';
   document.documentElement.dataset.theme = theme;
-  localStorage.setItem(THEME_KEY, theme);
+  safeSetItem(THEME_KEY, theme);
 }
 
 function applyStoredTheme() {
