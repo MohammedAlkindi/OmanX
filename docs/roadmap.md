@@ -1,5 +1,7 @@
 # OmanX Roadmap (Enterprise Track)
 
+> **Note:** This describes an aspirational institutional/MoHE deployment vision, separate from the currently shipped product (vanilla JS, localStorage-based, single-tenant — see `CLAUDE.md`). `public/js/dashboard-page.js` is a mocked preview of this vision, not a live feature. Treat items here as pitch material, not in-progress work, unless confirmed against actual commits.
+
 This roadmap aligns OmanX with institutional deployment requirements and audit-grade decisioning.
 
 ## Phase 1 — MVP Stabilization (0–8 weeks)

@@ -1,6 +1,6 @@
 # OmanX Authentication
 
-OmanX supports optional Google OAuth through Supabase Auth. Anonymous chat still works, but signed-in users get durable per-user daily quotas and can attach screenshots/images to chat requests.
+OmanX supports optional Google OAuth through Supabase Auth. Anonymous chat still works, but signed-in users get durable per-user daily quotas, screenshot/image attachments, and synced chat history.
 
 ## Architecture
 
@@ -9,10 +9,11 @@ OmanX supports optional Google OAuth through Supabase Auth. Anonymous chat still
 - Public Supabase config is exposed by `GET /api/auth/config`.
 - Token verification is exposed by `GET /api/auth/session`.
 - `/api/chat` and `/api/usage` accept `Authorization: Bearer <supabase-access-token>`.
+- `/api/chats` accepts the same bearer token and stores one sanitized chat-history snapshot per signed-in user.
 - If the token is valid, quota keys use `user:<supabase-user-id>`.
 - If no token is present, quota keys use a client IP hash when available, with browser session id as a last fallback.
 
-No chat history is stored in Supabase yet. Conversation history remains localStorage-only.
+Chat history is local-first. The browser always saves to `localStorage`; after sign-in it pulls the user's Supabase snapshot, merges it with local history, and pushes future changes. Anonymous history remains on the device unless the user signs in and the local history is not already owned by a different signed-in account.
 
 ## Supabase Setup
 
@@ -27,12 +28,24 @@ No chat history is stored in Supabase yet. Conversation history remains localSto
 6. In Google Cloud OAuth consent screen, set the app name to OmanX and verify the production domain if Google still displays the Supabase project ref.
 7. For a fully branded Google screen, configure a Supabase custom domain such as `auth.omanx.org`. Without a custom Supabase auth domain, Google may show `<project-ref>.supabase.co` because the OAuth callback is hosted by Supabase.
 8. Add the environment variables to Vercel and local `.env`.
+9. Run the chat sync migration in `supabase/migrations/20260710000000_create_omanx_chat_sync.sql`.
 
 ```bash
 PUBLIC_SITE_URL=https://omanx.org
 SUPABASE_URL=https://<project-ref>.supabase.co
 SUPABASE_PUBLISHABLE_KEY=<supabase-publishable-or-anon-key>
 ```
+
+## Chat History Sync
+
+The sync table is `public.omanx_chat_sync`. It stores:
+
+- `user_id` — the Supabase Auth user id, primary key.
+- `chats` — sanitized JSON chat snapshot.
+- `active_chat_id` — the active conversation id.
+- `updated_at` — conflict marker used by the client to merge before retrying.
+
+RLS policies in the migration allow authenticated users to read and write only their own row. The app does not need a service-role key for chat sync.
 
 ## Quotas
 

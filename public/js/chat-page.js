@@ -1,5 +1,5 @@
 import { initCore, qs, qsa, formatDateTime, formatRelative, showToast, uid, downloadFile, copyText, setTheme, getTheme } from './core.js';
-import { loadChats, saveChats, getActiveChatId, setActiveChatId, createChat, updateChat, deleteChat, loadSettings, saveSettings, getSessionId } from './chat-store.js';
+import { loadChats, saveChats, getActiveChatId, setActiveChatId, createChat, updateChat, deleteChat, loadSettings, saveSettings, getSessionId, getSyncUserId, setSyncUserId } from './chat-store.js';
 import { getAccessToken, initAuth, onAuthChange, signInWithGoogle, signOut } from './auth-client.js';
 
 const prompts = [
@@ -24,6 +24,7 @@ const state = {
   confirmDeleteId: null,
   usage: null,
   auth: { ready: false, enabled: false, signedIn: false, user: null },
+  sync: { status: 'local', readyForUserId: '', remoteUpdatedAt: null, saving: false, queued: false, warned: false },
   pendingImages: [],
   searchStatus: '',
 };
@@ -32,10 +33,12 @@ const ONBOARDED_KEY = 'omanx.onboarded.v1';
 const DEST_LABEL = { auto: 'Auto', us: 'US', uk: 'UK', au: 'AU' };
 const DEST_FULL_LABEL = { auto: 'Auto-detect', us: 'United States', uk: 'United Kingdom', au: 'Australia' };
 const THINKING_STAGES = ['Checking your question...', 'Reading OmanX dataset...', 'Searching official sources...', 'Writing guidance...'];
+const SYNC_SAVE_DELAY_MS = 900;
 
 // Tracks which chatId is actively streaming; null when idle.
 let streamingChatId = null;
 let thinkingTimer = null;
+let syncSaveTimer = null;
 
 const feedbackState = new Map(); // messageId -> 'up' | 'down'
 let storageWarningShown = false;
@@ -49,12 +52,14 @@ initAuth().then((auth) => {
   state.auth = auth;
   updateAuthUi();
   refreshUsage();
+  handleAuthSync(auth);
   maybeShowOnboarding();
 });
 onAuthChange((auth) => {
   state.auth = auth;
   updateAuthUi();
   refreshUsage();
+  handleAuthSync(auth);
   if (auth.signedIn) advanceOnboardingFromAuth();
 });
 
@@ -74,10 +79,11 @@ function ensureActiveChat() {
   persist();
 }
 
-function persist() {
+function persist({ sync = true } = {}) {
   const chatsSaved = saveChats(state.chats);
   const activeSaved = setActiveChatId(state.activeChatId);
   if (!chatsSaved || !activeSaved) showStorageWarning();
+  if (sync) queueChatSyncSave();
 }
 
 function persistSettings() {
@@ -88,6 +94,267 @@ function showStorageWarning() {
   if (storageWarningShown) return;
   storageWarningShown = true;
   showToast('Could not save locally. Your device storage may be full or private browsing may be blocking it.');
+}
+
+function getSyncUser() {
+  return state.auth.signedIn ? state.auth.user?.id || '' : '';
+}
+
+function resetSyncState(status = 'local') {
+  clearTimeout(syncSaveTimer);
+  syncSaveTimer = null;
+  state.sync = { status, readyForUserId: '', remoteUpdatedAt: null, saving: false, queued: false, warned: state.sync.warned };
+  updateSyncUi();
+}
+
+function hasMeaningfulChats(chats) {
+  return chats.some((chat) => (
+    chat.pinned ||
+    (chat.title && chat.title !== 'New chat') ||
+    (chat.messages || []).some((message) => message.role === 'user') ||
+    (chat.messages || []).length > 1
+  ));
+}
+
+function normalizeIncomingChats(chats) {
+  if (!Array.isArray(chats) || !chats.length) return [];
+  return chats.map((chat) => ({
+    ...chat,
+    title: typeof chat.title === 'string' && chat.title.trim() ? chat.title : 'New chat',
+    category: typeof chat.category === 'string' && chat.category.trim() ? chat.category : 'General',
+    pinned: chat.pinned === true,
+    messages: (chat.messages || []).map((msg) => ({
+      ...msg,
+      content: typeof msg.content === 'string' ? msg.content : String(msg.content ?? ''),
+    })),
+  })).filter((chat) => chat.id);
+}
+
+function chatTime(chat) {
+  const value = Date.parse(chat?.updatedAt || chat?.createdAt || '');
+  return Number.isFinite(value) ? value : 0;
+}
+
+function chooseNewerChat(a, b) {
+  if (!a) return b;
+  if (!b) return a;
+  const diff = chatTime(a) - chatTime(b);
+  if (diff > 0) return a;
+  if (diff < 0) return b;
+  return (a.messages?.length || 0) >= (b.messages?.length || 0) ? a : b;
+}
+
+function snapshotFingerprint(chats, activeChatId) {
+  return JSON.stringify({ activeChatId, chats });
+}
+
+function mergeChatSnapshots(localChats, localActiveId, remoteChats, remoteActiveId) {
+  const byId = new Map();
+  for (const chat of remoteChats) byId.set(chat.id, chat);
+  for (const chat of localChats) {
+    const existing = byId.get(chat.id);
+    byId.set(chat.id, existing ? chooseNewerChat(existing, chat) : chat);
+  }
+
+  let chats = [...byId.values()].sort((a, b) => chatTime(b) - chatTime(a));
+  if (!chats.length) chats = [createChat({ seed: true })];
+
+  const localActive = chats.find((chat) => chat.id === localActiveId);
+  const remoteActive = chats.find((chat) => chat.id === remoteActiveId);
+  const activeChatId = chooseNewerChat(localActive, remoteActive)?.id || localActive?.id || remoteActive?.id || chats[0].id;
+
+  return { chats, activeChatId };
+}
+
+async function requestChatSnapshot(method, body) {
+  const token = await getAccessToken();
+  if (!token) {
+    const error = new Error('Sign in to sync chat history.');
+    error.code = 'auth_required';
+    throw error;
+  }
+
+  const response = await fetch('/api/chats', {
+    method,
+    headers: {
+      Authorization: `Bearer ${token}`,
+      ...(body ? { 'Content-Type': 'application/json' } : {}),
+    },
+    body: body ? JSON.stringify(body) : undefined,
+    cache: 'no-store',
+  });
+
+  const payload = await response.json().catch(() => ({}));
+  if (!response.ok) {
+    const error = new Error(payload.error || 'Could not sync chat history.');
+    error.status = response.status;
+    error.code = payload.code;
+    error.snapshot = payload.snapshot;
+    throw error;
+  }
+
+  return payload;
+}
+
+function updateSyncUi() {
+  const historyLabel = qs('[data-history-storage-label]');
+  const syncStatus = qs('[data-sync-status]');
+  const syncNote = qs('[data-sync-note]');
+
+  if (!state.auth.enabled) {
+    if (historyLabel) historyLabel.textContent = 'Stored locally';
+    if (syncStatus) syncStatus.textContent = 'Unavailable';
+    if (syncNote) syncNote.textContent = 'Google sign-in is not configured, so history remains on this device.';
+    return;
+  }
+
+  if (!state.auth.signedIn) {
+    if (historyLabel) historyLabel.textContent = 'Stored locally';
+    if (syncStatus) syncStatus.textContent = 'Sign in to sync';
+    if (syncNote) syncNote.textContent = 'Sign in to sync conversations across your devices. Anonymous history stays local.';
+    return;
+  }
+
+  const labels = {
+    syncing: 'Syncing',
+    saving: 'Saving',
+    synced: 'Synced',
+    unavailable: 'Setup needed',
+    error: 'Local backup',
+    local: 'Local backup',
+  };
+
+  if (historyLabel) historyLabel.textContent = state.sync.status === 'synced' ? 'Local + cloud' : 'Stored locally';
+  if (syncStatus) syncStatus.textContent = labels[state.sync.status] || 'Syncing';
+  if (syncNote) {
+    syncNote.textContent = state.sync.status === 'unavailable'
+      ? 'Chat sync needs the Supabase history table. Your device copy is still saved locally.'
+      : 'Signed-in conversations sync through Supabase. Anonymous use stays local to this device.';
+  }
+}
+
+async function handleAuthSync(auth) {
+  const userId = auth?.signedIn ? auth.user?.id || '' : '';
+  if (!userId) {
+    resetSyncState('local');
+    return;
+  }
+
+  if (state.sync.readyForUserId === userId || state.sync.status === 'syncing') {
+    updateSyncUi();
+    return;
+  }
+
+  state.sync.status = 'syncing';
+  updateSyncUi();
+
+  try {
+    const remote = await requestChatSnapshot('GET');
+    const remoteChats = normalizeIncomingChats(remote.chats);
+    const localOwnerId = getSyncUserId();
+    let next;
+
+    if (localOwnerId && localOwnerId !== userId) {
+      const replacementChats = remoteChats.length ? remoteChats : [createChat({ seed: true })];
+      next = {
+        chats: replacementChats,
+        activeChatId: replacementChats.some((chat) => chat.id === remote.activeChatId) ? remote.activeChatId : replacementChats[0].id,
+      };
+    } else {
+      const localChats = !hasMeaningfulChats(state.chats) && hasMeaningfulChats(remoteChats) ? [] : state.chats;
+      next = mergeChatSnapshots(localChats, state.activeChatId, remoteChats, remote.activeChatId);
+    }
+
+    const remoteFingerprint = snapshotFingerprint(remoteChats, remote.activeChatId || '');
+    const nextFingerprint = snapshotFingerprint(next.chats, next.activeChatId);
+    state.chats = next.chats;
+    state.activeChatId = next.activeChatId;
+    state.sync.readyForUserId = userId;
+    state.sync.remoteUpdatedAt = remote.updatedAt || null;
+    state.sync.status = 'synced';
+    setSyncUserId(userId);
+    persist({ sync: false });
+    render();
+    updateAuthUi();
+
+    if (remoteFingerprint !== nextFingerprint && hasMeaningfulChats(next.chats)) {
+      queueChatSyncSave({ immediate: true });
+    }
+  } catch (error) {
+    state.sync.status = error.code === 'chat_sync_not_configured' ? 'unavailable' : 'error';
+    state.sync.readyForUserId = '';
+    updateSyncUi();
+
+    if (!state.sync.warned) {
+      state.sync.warned = true;
+      showToast(state.sync.status === 'unavailable'
+        ? 'Chat sync needs Supabase setup. Saving locally for now.'
+        : 'Could not sync chat history. Saving locally for now.');
+    }
+  }
+}
+
+function queueChatSyncSave({ immediate = false } = {}) {
+  const userId = getSyncUser();
+  if (!userId || state.sync.readyForUserId !== userId || state.sync.status === 'unavailable') return;
+
+  clearTimeout(syncSaveTimer);
+  syncSaveTimer = setTimeout(() => {
+    syncSaveTimer = null;
+    saveChatSnapshot();
+  }, immediate ? 0 : SYNC_SAVE_DELAY_MS);
+}
+
+async function saveChatSnapshot() {
+  const userId = getSyncUser();
+  if (!userId || state.sync.readyForUserId !== userId || state.sync.status === 'unavailable') return;
+
+  if (state.sync.saving) {
+    state.sync.queued = true;
+    return;
+  }
+
+  state.sync.saving = true;
+  state.sync.status = 'saving';
+  updateSyncUi();
+
+  try {
+    const payload = await requestChatSnapshot('PUT', {
+      chats: state.chats,
+      activeChatId: state.activeChatId,
+      baseUpdatedAt: state.sync.remoteUpdatedAt,
+    });
+    state.sync.remoteUpdatedAt = payload.updatedAt || null;
+    state.sync.status = 'synced';
+    setSyncUserId(userId);
+  } catch (error) {
+    if (error.status === 409 && error.snapshot) {
+      const remoteChats = normalizeIncomingChats(error.snapshot.chats);
+      const merged = mergeChatSnapshots(state.chats, state.activeChatId, remoteChats, error.snapshot.activeChatId);
+      state.chats = merged.chats;
+      state.activeChatId = merged.activeChatId;
+      state.sync.remoteUpdatedAt = error.snapshot.updatedAt || null;
+      state.sync.status = 'synced';
+      persist({ sync: false });
+      render();
+      state.sync.queued = true;
+    } else {
+      state.sync.status = error.code === 'chat_sync_not_configured' ? 'unavailable' : 'error';
+      state.sync.queued = false;
+      if (!state.sync.warned) {
+        state.sync.warned = true;
+        showToast(state.sync.status === 'unavailable'
+          ? 'Chat sync needs Supabase setup. Saving locally for now.'
+          : 'Could not sync chat history. Saving locally for now.');
+      }
+    }
+  } finally {
+    state.sync.saving = false;
+    const shouldSaveAgain = state.sync.queued && state.sync.status !== 'unavailable';
+    state.sync.queued = false;
+    updateSyncUi();
+    if (shouldSaveAgain) queueChatSyncSave({ immediate: true });
+  }
 }
 
 function hasCompletedOnboarding() {
@@ -528,6 +795,7 @@ function updateAuthUi() {
     if (signInBtn) signInBtn.hidden = true;
     if (signOutBtn) signOutBtn.hidden = true;
     if (attachBtn) attachBtn.disabled = true;
+    updateSyncUi();
     return;
   }
 
@@ -544,6 +812,7 @@ function updateAuthUi() {
     if (signOutBtn) signOutBtn.hidden = true;
     if (attachBtn) attachBtn.disabled = false;
   }
+  updateSyncUi();
 }
 
 function formatBytes(bytes) {

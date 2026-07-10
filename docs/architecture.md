@@ -4,9 +4,9 @@ This document describes the system as it actually runs today.
 
 ## Summary
 
-OmanX is a no-build vanilla JavaScript chat app backed by Anthropic Claude. Compliance-sensitive questions can use the local knowledge bases plus optional Tavily web search. Users can chat anonymously, or sign in with Google through Supabase for durable per-user daily quotas and signed-in image upload.
+OmanX is a no-build vanilla JavaScript chat app backed by Anthropic Claude. Compliance-sensitive questions can use the local knowledge bases plus optional Tavily web search. Users can chat anonymously, or sign in with Google through Supabase for durable per-user daily quotas, signed-in image upload, and chat history sync.
 
-Chat history and settings remain localStorage-only. There is no server-side conversation database yet.
+Chat history is local-first. Anonymous history stays in `localStorage`; signed-in history syncs through one Supabase RLS-protected snapshot row per user.
 
 ## Directory Layout
 
@@ -16,6 +16,7 @@ api/
     config.js        # Public Supabase browser config
     session.js       # Bearer-token session check
   auth-utils.js      # Supabase token verification helpers
+  chats.js           # Signed-in chat history sync snapshot API
   chat.js            # Chat, RAG, Tavily, SSE, quota, image input
   usage.js           # Daily quota status
   feedback.js
@@ -45,6 +46,7 @@ Supabase is optional.
 - API requests send `Authorization: Bearer <supabase-access-token>`.
 - The API validates tokens with Supabase before trusting the user id.
 - If auth is absent, OmanX falls back to anonymous client IP-hash quotas when available.
+- `/api/chats` uses the user bearer token with Supabase RLS, so users can read and write only their own `public.omanx_chat_sync` row.
 
 ## Quotas
 
@@ -81,6 +83,18 @@ Supported types:
 
 Images are sent ephemerally to Anthropic with the current message. The local chat history stores only attachment metadata, not the image bytes.
 
+## Chat History Sync
+
+Signed-in sync flow:
+
+1. Browser signs in with Google via Supabase.
+2. Browser calls `GET /api/chats` with the Supabase access token.
+3. Local chats and the remote snapshot are merged by chat id and `updatedAt`.
+4. Future local changes are debounced and saved with `PUT /api/chats`.
+5. If another device updated the snapshot first, `/api/chats` returns `409`; the browser merges that remote snapshot and retries.
+
+The Supabase migration lives at `supabase/migrations/20260710000000_create_omanx_chat_sync.sql`.
+
 ## Chat Flow
 
 Everyday question:
@@ -108,6 +122,7 @@ Signed-in screenshot question:
 | Route | Method | Purpose |
 |---|---|---|
 | `/api/chat` | POST | Main chat endpoint. Optional Supabase bearer token. |
+| `/api/chats` | GET, PUT | Signed-in chat history snapshot sync. Requires Supabase bearer token. |
 | `/api/usage` | GET | Daily quota state. Optional Supabase bearer token. |
 | `/api/auth/config` | GET | Public Supabase config for the browser. |
 | `/api/auth/session` | GET | Validates current Supabase token. |
@@ -120,6 +135,5 @@ Signed-in screenshot question:
 
 - PDF upload.
 - Saved document history.
-- Server-side chat sync.
 - Role-based admin dashboard.
 - Deterministic rule engine or audit log.

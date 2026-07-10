@@ -47,7 +47,7 @@ IMAGE_UPLOAD_MAX_BYTES
 
 Upstash Redis is required in production so anonymous and signed-in daily quotas are shared across Vercel serverless instances. Without it, `/api/ready` returns 503 and `/api/chat` fails closed instead of running with per-instance memory limits.
 
-Set `SUPABASE_URL` and `SUPABASE_PUBLISHABLE_KEY` to enable Google OAuth and signed-in image uploads. In Supabase Auth, enable the Google provider and allow the canonical local and production root redirect URLs.
+Set `SUPABASE_URL` and `SUPABASE_PUBLISHABLE_KEY` to enable Google OAuth, signed-in image uploads, and chat history sync. In Supabase Auth, enable the Google provider, allow the canonical local and production root redirect URLs, and run `supabase/migrations/20260710000000_create_omanx_chat_sync.sql` against the Supabase project.
 
 Never commit `.env` to version control.
 

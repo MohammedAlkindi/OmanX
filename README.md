@@ -54,7 +54,7 @@ Tavily queries are constrained to an explicit allowlist of ~15 government and un
 Only non-compliance, single-turn, no-attachment requests get a response cache entry (SHA-256 of model + prompt + context, 10-minute TTL, capped at 500 entries). Compliance responses are never cached, because policy pages change and a stale visa answer is worse than a slow one.
 
 **Auth is additive, not required**
-The product is usable anonymously — anonymous sessions get rate-limited by IP-derived key. Google OAuth via Supabase ([api/auth-utils.js](api/auth-utils.js)) exists solely to gate image uploads (a scholar photographing a form or notice) behind a real identity, and to key rate limits by user instead of IP once signed in. There's no account-gated content and no server-side chat history — see **Long-term goals** below for what auth eventually unlocks.
+The product is usable anonymously — anonymous sessions get rate-limited by IP-derived key and keep chat history on the device. Google OAuth via Supabase ([api/auth-utils.js](api/auth-utils.js)) gates image uploads, keys rate limits by user, and syncs chat history through the RLS-protected `public.omanx_chat_sync` table once signed in. There's no account-gated content.
 
 ---
 
@@ -66,9 +66,9 @@ The product is usable anonymously — anonymous sessions get rate-limited by IP-
 | Live search | Tavily API | Domain-restricted, optional — degrades to KB-only silently if `TAVILY_API_KEY` absent |
 | Knowledge base | `data/{us,uk,au,mohe}.json` | Hot-reloaded on file mtime change, TF-IDF-indexed |
 | Rate limiting | Upstash Redis (sorted-set sliding window) | Local dev can fall back to memory; production/Vercel requires Upstash and fails closed if it is missing |
-| Auth | Supabase (Google OAuth) | Optional; only required for image attachments |
+| Auth | Supabase (Google OAuth) | Optional; enables image attachments, durable user quotas, and signed-in chat sync |
 | Frontend | Vanilla JS ES modules, no bundler, no framework | `public/js/chat-page.js`, `chat-store.js`, `core.js` |
-| Persistence | `localStorage` | All chat history and settings client-side — see architecture note below |
+| Persistence | `localStorage` + Supabase | Local-first chat history; signed-in users sync snapshots through `/api/chats` |
 | Hosting | Vercel — serverless functions + static frontend | `vercel.json` maps `/api/*`, canonical redirects for legacy `.html` routes |
 | Streaming | SSE (`text/event-stream`) | Token deltas, then a final event carrying sources, escalation card, destination, and usage |
 | Analytics | `@vercel/analytics` | Page-level only — no per-message tracking (see Long-term goals) |
@@ -81,6 +81,7 @@ The product is usable anonymously — anonymous sessions get rate-limited by IP-
 .
 ├── api/
 │   ├── chat.js           # Core pipeline: routing, KB search, Tavily, streaming, escalation
+│   ├── chats.js          # Signed-in chat history sync snapshot API
 │   ├── rate-limit.js      # Upstash sliding-window limiter + local memory fallback
 │   ├── auth-utils.js      # Supabase bearer-token verification
 │   ├── auth/
@@ -95,7 +96,7 @@ The product is usable anonymously — anonymous sessions get rate-limited by IP-
 ├── public/
 │   ├── js/
 │   │   ├── chat-page.js   # Workspace UI — sidebar, composer, streaming render loop
-│   │   ├── chat-store.js  # localStorage abstraction for chats + settings
+│   │   ├── chat-store.js  # localStorage abstraction for chats, settings, sync owner
 │   │   └── core.js        # Theme engine, toast, shared utilities
 │   ├── styles.css         # Design tokens + dark mode via [data-theme]
 │   ├── chat.html          # Workspace (served at `/`)
@@ -126,7 +127,7 @@ ANTHROPIC_API_KEY=sk-ant-...
 |---|---|
 | `TAVILY_API_KEY` | Live web search disabled; compliance answers use KB only |
 | `UPSTASH_REDIS_REST_URL` / `UPSTASH_REDIS_REST_TOKEN` | Required in production; local dev falls back to memory if unset |
-| `SUPABASE_URL` / `SUPABASE_PUBLISHABLE_KEY` | Google sign-in and image uploads disabled |
+| `SUPABASE_URL` / `SUPABASE_PUBLISHABLE_KEY` | Google sign-in, image uploads, and chat sync disabled |
 | `ALLOWED_ORIGIN` | CORS is unrestricted (fine for local dev) |
 | `ANTHROPIC_MODEL` | Overrides the default model |
 
@@ -136,13 +137,13 @@ ANTHROPIC_API_KEY=sk-ant-...
 vercel --prod
 ```
 
-Set the environment variables above in the Vercel project. In production, set both Upstash variables; without them `/api/ready` returns 503 and `/api/chat` refuses requests. `vercel.json` maps `/api/*` to serverless functions and serves everything else statically from `public/`.
+Set the environment variables above in the Vercel project. In production, set both Upstash variables; without them `/api/ready` returns 503 and `/api/chat` refuses requests. For signed-in history sync, run `supabase/migrations/20260710000000_create_omanx_chat_sync.sql` in the Supabase project. `vercel.json` maps `/api/*` to serverless functions and serves everything else statically from `public/`.
 
 ---
 
 ## Architecture decisions worth knowing
 
-- **No server-side chat history, on purpose.** All conversation state lives in `localStorage`. This isn't a missing feature — it's the current privacy posture. Auth exists only for image uploads today. See Long-term goals for the trigger conditions to change this.
+- **Local-first chat history.** Anonymous conversations stay in `localStorage`. Signed-in conversations sync through Supabase after the RLS migration is applied, with `localStorage` still acting as the immediate device copy.
 - **No build step.** Frontend is plain ES modules loaded directly by the browser — no bundler, no JSX, no framework. Keep it that way unless there's a concrete reason to introduce one.
 - **Deterministic safety logic stays out of the model.** Destination detection, compliance/urgency classification, and escalation card content are all plain functions, not LLM calls — they're the parts that must not vary between two identical inputs.
 
@@ -150,10 +151,8 @@ Set the environment variables above in the Vercel project. In production, set bo
 
 ## Long-term goals
 
-- **Accounts + server-side sync** — once scholars are actually losing history across devices, not before. Auth infra already exists (Supabase); this is a scope decision, not a technical blocker.
 - **Usage analytics** — track question categories, destinations, and unanswered queries once there's a real signed-in user base, to drive KB expansion instead of guessing.
 - **Structured escalation follow-through** — today's escalation card is informational; a next step is letting a scholar mark a case as ongoing and surface it to an advisor.
-- **Markdown/PDF conversation export** — current export is plain `.txt`. Markdown would preserve compliance formatting; PDF would make sharing with an advisor practical.
 - **Arabic language support.**
 
 Validate demand before building any of the above — five to ten real scholars returning is worth more than any infrastructure investment made speculatively.

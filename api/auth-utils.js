@@ -29,6 +29,24 @@ export function getBearerToken(req) {
   return match ? match[1].trim() : "";
 }
 
+export function createSupabaseUserClient(token) {
+  const config = getSupabasePublicConfig();
+  if (!config || !token) return null;
+
+  return createClient(config.url, config.key, {
+    auth: {
+      autoRefreshToken: false,
+      detectSessionInUrl: false,
+      persistSession: false,
+    },
+    global: {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    },
+  });
+}
+
 export function publicUser(user) {
   if (!user) return null;
   const meta = user.user_metadata || {};

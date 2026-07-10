@@ -11,6 +11,7 @@ import readyHandler from './api/ready.js';
 import metricsHandler from './api/metrics.js';
 import feedbackHandler from './api/feedback.js';
 import usageHandler from './api/usage.js';
+import chatsHandler from './api/chats.js';
 import authConfigHandler from './api/auth/config.js';
 import authSessionHandler from './api/auth/session.js';
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
@@ -31,6 +32,7 @@ const ROUTE_METHODS = new Map([
   ['/trust', new Set(['GET'])],
   ['/collaboration', new Set(['GET'])],
   ['/api/chat', new Set(['POST'])],
+  ['/api/chats', new Set(['GET', 'PUT', 'OPTIONS'])],
   ['/api/auth/config', new Set(['GET'])],
   ['/api/auth/session', new Set(['GET'])],
   ['/api/feedback', new Set(['POST'])],
@@ -58,6 +60,9 @@ app.use((req, res, next) => {
 
 // API Routes
 app.post('/api/chat', chatHandler);
+app.options('/api/chats', chatsHandler);
+app.get('/api/chats', chatsHandler);
+app.put('/api/chats', chatsHandler);
 app.get('/api/auth/config', authConfigHandler);
 app.get('/api/auth/session', authSessionHandler);
 app.post('/api/feedback', feedbackHandler);

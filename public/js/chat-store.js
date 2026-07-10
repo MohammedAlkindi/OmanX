@@ -33,6 +33,7 @@ export function getSessionId() {
 }
 const ACTIVE_KEY = 'omanx.mindspace.active.v1';
 const SETTINGS_KEY = 'omanx.settings.v1';
+const SYNC_USER_KEY = 'omanx.mindspace.syncUser.v1';
 
 const STARTER_CONTENT = 'Welcome to OmanX. Ask about visas, work rules, housing, insurance, scholarship rules, or first-week setup. For risky questions, OmanX will show sources and the next people to contact before you act.';
 
@@ -68,6 +69,14 @@ export function getActiveChatId() {
 
 export function setActiveChatId(id) {
   return safeSetItem(ACTIVE_KEY, id);
+}
+
+export function getSyncUserId() {
+  return safeGetItem(SYNC_USER_KEY);
+}
+
+export function setSyncUserId(id) {
+  return safeSetItem(SYNC_USER_KEY, id || '');
 }
 
 export function createChat({ title = 'New chat', category = 'General', seed = false } = {}) {

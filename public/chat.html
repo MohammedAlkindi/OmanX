@@ -112,7 +112,7 @@
                 </div>
                 <div class="settings-field">
                   <label for="settings-campus">University or campus</label>
-                  <input id="settings-campus" class="settings-input" type="text" data-setting-campus placeholder="Example: UC San Diego" autocomplete="organization" />
+                  <input id="settings-campus" class="settings-input" type="text" data-setting-campus placeholder="Your university or campus" autocomplete="organization" />
                 </div>
                 <div class="settings-field">
                   <label for="settings-destination">Study destination</label>
@@ -217,9 +217,12 @@
                   <span data-auth-status>Not signed in</span>
                   <strong data-auth-quota-label>Anonymous quota</strong>
                 </div>
-                <button type="button" class="btn-settings-secondary" data-auth-sign-in>Continue with Google</button>
+                <button type="button" class="btn-settings-secondary" data-auth-sign-in>
+                  <svg class="google-icon" width="16" height="16" viewBox="0 0 18 18" aria-hidden="true"><path fill="#4285F4" d="M17.64 9.2c0-.637-.057-1.251-.164-1.84H9v3.481h4.844a4.14 4.14 0 0 1-1.796 2.716v2.259h2.908c1.702-1.567 2.684-3.874 2.684-6.615z"/><path fill="#34A853" d="M9 18c2.43 0 4.467-.806 5.956-2.18l-2.908-2.259c-.806.54-1.837.86-3.048.86-2.344 0-4.328-1.584-5.036-3.711H.957v2.332A8.997 8.997 0 0 0 9 18z"/><path fill="#FBBC05" d="M3.964 10.71A5.41 5.41 0 0 1 3.682 9c0-.593.102-1.17.282-1.71V4.958H.957A8.996 8.996 0 0 0 0 9c0 1.452.348 2.827.957 4.042l3.007-2.332z"/><path fill="#EA4335" d="M9 3.58c1.321 0 2.508.454 3.44 1.345l2.582-2.58C13.463.891 11.426 0 9 0A8.997 8.997 0 0 0 .957 4.958L3.964 7.29C4.672 5.163 6.656 3.58 9 3.58z"/></svg>
+                  Continue with Google
+                </button>
                 <button type="button" class="btn-settings-secondary" data-auth-sign-out hidden>Sign out</button>
-                <div class="settings-note">Sign in for durable quotas and image uploads. Chat history stays on this device unless a future sync feature is added.</div>
+                <div class="settings-note">Sign in for durable quotas, image uploads, and synced chat history.</div>
 
                 <hr class="settings-divider" />
 
@@ -244,11 +247,11 @@
                 <div class="settings-section-label">Data &amp; privacy</div>
                 <div class="settings-info-row">
                   <span>History</span>
-                  <strong>Stored locally</strong>
+                  <strong data-history-storage-label>Stored locally</strong>
                 </div>
                 <div class="settings-info-row">
                   <span>Sync</span>
-                  <strong>Off by design</strong>
+                  <strong data-sync-status>Sign in to sync</strong>
                 </div>
                 <button type="button" class="btn-settings-secondary" data-export-all-chats>Export all conversations</button>
                 <label class="toggle-row">
@@ -256,7 +259,7 @@
                   <span class="toggle-label">Share conversations to improve OmanX</span>
                   <span class="toggle-track"><span class="toggle-thumb"></span></span>
                 </label>
-                <div class="settings-note">OmanX uses a local-first history model for beta privacy. Export before clearing a device you do not control.</div>
+                <div class="settings-note" data-sync-note>Sign in to sync conversations across your devices. Anonymous history stays local.</div>
                 <button type="button" class="btn-settings-danger" data-delete-all-chats>Delete all questions</button>
               </div>
 
@@ -339,8 +342,11 @@
 
         <div class="onboarding-step" data-ob-step="auth" hidden>
           <p class="onboarding-title">Start with your scholar account</p>
-          <p class="onboarding-hint">Google sign-in keeps quotas tied to you and enables screenshot uploads. Your chat history still stays on this device.</p>
-          <button class="btn onboarding-submit" data-onboarding-auth type="button">Continue with Google</button>
+          <p class="onboarding-hint">Google sign-in keeps quotas tied to you, enables screenshot uploads, and syncs chat history across devices.</p>
+          <button class="btn onboarding-submit" data-onboarding-auth type="button">
+            <svg class="google-icon" width="18" height="18" viewBox="0 0 18 18" aria-hidden="true"><path fill="#4285F4" d="M17.64 9.2c0-.637-.057-1.251-.164-1.84H9v3.481h4.844a4.14 4.14 0 0 1-1.796 2.716v2.259h2.908c1.702-1.567 2.684-3.874 2.684-6.615z"/><path fill="#34A853" d="M9 18c2.43 0 4.467-.806 5.956-2.18l-2.908-2.259c-.806.54-1.837.86-3.048.86-2.344 0-4.328-1.584-5.036-3.711H.957v2.332A8.997 8.997 0 0 0 9 18z"/><path fill="#FBBC05" d="M3.964 10.71A5.41 5.41 0 0 1 3.682 9c0-.593.102-1.17.282-1.71V4.958H.957A8.996 8.996 0 0 0 0 9c0 1.452.348 2.827.957 4.042l3.007-2.332z"/><path fill="#EA4335" d="M9 3.58c1.321 0 2.508.454 3.44 1.345l2.582-2.58C13.463.891 11.426 0 9 0A8.997 8.997 0 0 0 .957 4.958L3.964 7.29C4.672 5.163 6.656 3.58 9 3.58z"/></svg>
+            Continue with Google
+          </button>
           <button class="onboarding-skip" data-onboarding-skip-auth type="button">Continue without sign-in</button>
         </div>
 
