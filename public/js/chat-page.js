@@ -38,6 +38,7 @@ let streamingChatId = null;
 let thinkingTimer = null;
 
 const feedbackState = new Map(); // messageId -> 'up' | 'down'
+let storageWarningShown = false;
 
 initCore({ page: 'chat' });
 ensureActiveChat();
@@ -70,13 +71,39 @@ function ensureActiveChat() {
     state.chats = [chat];
     state.activeChatId = chat.id;
   }
-  setActiveChatId(state.activeChatId);
   persist();
 }
 
 function persist() {
-  saveChats(state.chats);
-  setActiveChatId(state.activeChatId);
+  const chatsSaved = saveChats(state.chats);
+  const activeSaved = setActiveChatId(state.activeChatId);
+  if (!chatsSaved || !activeSaved) showStorageWarning();
+}
+
+function persistSettings() {
+  if (!saveSettings(state.settings)) showStorageWarning();
+}
+
+function showStorageWarning() {
+  if (storageWarningShown) return;
+  storageWarningShown = true;
+  showToast('Could not save locally. Your device storage may be full or private browsing may be blocking it.');
+}
+
+function hasCompletedOnboarding() {
+  try {
+    return localStorage.getItem(ONBOARDED_KEY) === '1';
+  } catch {
+    return true;
+  }
+}
+
+function markOnboarded() {
+  try {
+    localStorage.setItem(ONBOARDED_KEY, '1');
+  } catch {
+    showStorageWarning();
+  }
 }
 
 function setTyping(value) {
@@ -292,55 +319,55 @@ function bindEvents() {
   // name
   qs('[data-setting-name]')?.addEventListener('change', (e) => {
     state.settings.studentName = e.target.value.trim() || 'Student';
-    saveSettings(state.settings);
+    persistSettings();
     updateUserChip();
   });
 
   qs('[data-setting-campus]')?.addEventListener('change', (e) => {
     state.settings.homeCampus = e.target.value.trim();
-    saveSettings(state.settings);
+    persistSettings();
   });
 
   // context
   qs('[data-setting-context]')?.addEventListener('change', (e) => {
     state.settings.userContext = e.target.value.trim();
-    saveSettings(state.settings);
+    persistSettings();
   });
 
   qs('[data-setting-situation]')?.addEventListener('change', (e) => {
     state.settings.situation = e.target.value;
-    saveSettings(state.settings);
+    persistSettings();
   });
 
   qs('[data-setting-scholarship]')?.addEventListener('change', (e) => {
     state.settings.scholarshipStatus = e.target.value;
-    saveSettings(state.settings);
+    persistSettings();
   });
 
   // concise mode
   qs('[data-setting-concise]')?.addEventListener('change', (e) => {
     state.settings.conciseMode = e.target.checked;
-    saveSettings(state.settings);
+    persistSettings();
   });
 
   // model
   qs('[data-setting-model]')?.addEventListener('change', (e) => {
     state.settings.model = e.target.value;
-    saveSettings(state.settings);
+    persistSettings();
     showToast('Model updated.');
   });
 
   // web search
   qs('[data-setting-web-search]')?.addEventListener('change', (e) => {
     state.settings.webSearch = e.target.checked;
-    saveSettings(state.settings);
+    persistSettings();
     populateSettingsPanel();
   });
 
   // destination
   qs('[data-setting-destination]')?.addEventListener('change', (e) => {
     state.settings.destination = e.target.value;
-    saveSettings(state.settings);
+    persistSettings();
     populateSettingsPanel();
     updateMobileChatContext();
   });
@@ -348,13 +375,13 @@ function bindEvents() {
   // language
   qs('[data-setting-language]')?.addEventListener('change', (e) => {
     state.settings.language = e.target.value;
-    saveSettings(state.settings);
+    persistSettings();
   });
 
   // data consent
   qs('[data-setting-data-consent]')?.addEventListener('change', (e) => {
     state.settings.dataConsent = e.target.checked;
-    saveSettings(state.settings);
+    persistSettings();
   });
 
   // delete all chats
@@ -649,7 +676,7 @@ function renderUsagePanel() {
 }
 
 function maybeShowOnboarding() {
-  if (!localStorage.getItem(ONBOARDED_KEY)) showOnboarding();
+  if (!hasCompletedOnboarding()) showOnboarding();
 }
 
 function showOnboardingStep(overlay, step) {
@@ -716,8 +743,8 @@ function showOnboarding() {
     }
     state.settings.destination = selectedDest;
     state.settings.situation = selectedSituation;
-    saveSettings(state.settings);
-    localStorage.setItem(ONBOARDED_KEY, '1');
+    persistSettings();
+    markOnboarded();
     overlay.hidden = true;
     updateUserChip();
     populateSettingsPanel();

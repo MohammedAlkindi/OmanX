@@ -32,18 +32,20 @@ Required:
 ANTHROPIC_API_KEY  
 ANTHROPIC_MODEL (default: claude-sonnet-4-6)  
 NODE_ENV=production  
+UPSTASH_REDIS_REST_URL
+UPSTASH_REDIS_REST_TOKEN
 
 Optional:
 
 ALLOWED_ORIGIN  
 TAVILY_API_KEY  
-UPSTASH_REDIS_REST_URL  
-UPSTASH_REDIS_REST_TOKEN  
 RATE_LIMIT_DAILY_MAX  
 SUPABASE_URL  
 SUPABASE_PUBLISHABLE_KEY  
 IMAGE_UPLOAD_MAX_COUNT  
 IMAGE_UPLOAD_MAX_BYTES  
+
+Upstash Redis is required in production so anonymous and signed-in daily quotas are shared across Vercel serverless instances. Without it, `/api/ready` returns 503 and `/api/chat` fails closed instead of running with per-instance memory limits.
 
 Set `SUPABASE_URL` and `SUPABASE_PUBLISHABLE_KEY` to enable Google OAuth and signed-in image uploads. In Supabase Auth, enable the Google provider and allow the canonical local and production root redirect URLs.
 

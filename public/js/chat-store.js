@@ -2,12 +2,32 @@ import { uid } from './core.js';
 
 const CHATS_KEY = 'omanx.mindspace.chats.v1';
 const SESSION_KEY = 'omanx.session.id.v1';
+let fallbackSessionId = '';
+
+function safeGetItem(key) {
+  try {
+    return localStorage.getItem(key);
+  } catch {
+    return null;
+  }
+}
+
+function safeSetItem(key, value) {
+  try {
+    localStorage.setItem(key, value);
+    return true;
+  } catch (err) {
+    console.error('Failed to save browser data:', err);
+    return false;
+  }
+}
 
 export function getSessionId() {
-  let id = localStorage.getItem(SESSION_KEY);
+  let id = safeGetItem(SESSION_KEY) || fallbackSessionId;
   if (!id) {
     id = `anon-${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 9)}`;
-    localStorage.setItem(SESSION_KEY, id);
+    fallbackSessionId = id;
+    safeSetItem(SESSION_KEY, id);
   }
   return id;
 }
@@ -22,7 +42,7 @@ function makeStarterReply() {
 
 export function loadChats() {
   try {
-    const raw = localStorage.getItem(CHATS_KEY);
+    const raw = safeGetItem(CHATS_KEY);
     if (!raw) return [createChat({ seed: true })];
     const chats = JSON.parse(raw);
     if (!Array.isArray(chats) || !chats.length) return [createChat({ seed: true })];
@@ -39,15 +59,15 @@ export function loadChats() {
 }
 
 export function saveChats(chats) {
-  localStorage.setItem(CHATS_KEY, JSON.stringify(chats));
+  return safeSetItem(CHATS_KEY, JSON.stringify(chats));
 }
 
 export function getActiveChatId() {
-  return localStorage.getItem(ACTIVE_KEY);
+  return safeGetItem(ACTIVE_KEY);
 }
 
 export function setActiveChatId(id) {
-  localStorage.setItem(ACTIVE_KEY, id);
+  return safeSetItem(ACTIVE_KEY, id);
 }
 
 export function createChat({ title = 'New chat', category = 'General', seed = false } = {}) {
@@ -89,7 +109,7 @@ const SETTINGS_DEFAULTS = {
 
 export function loadSettings() {
   try {
-    const stored = JSON.parse(localStorage.getItem(SETTINGS_KEY));
+    const stored = JSON.parse(safeGetItem(SETTINGS_KEY));
     return stored ? { ...SETTINGS_DEFAULTS, ...stored } : { ...SETTINGS_DEFAULTS };
   } catch {
     return { ...SETTINGS_DEFAULTS };
@@ -97,5 +117,5 @@ export function loadSettings() {
 }
 
 export function saveSettings(settings) {
-  localStorage.setItem(SETTINGS_KEY, JSON.stringify(settings));
+  return safeSetItem(SETTINGS_KEY, JSON.stringify(settings));
 }

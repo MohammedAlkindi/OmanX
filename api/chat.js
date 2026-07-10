@@ -682,6 +682,14 @@ export default async function handler(req, res) {
   res.setHeader("X-RateLimit-Reset", String(Math.ceil(usage.resetAt / 1000)));
 
   if (!usage.allowed) {
+    if (usage.blockedBy === "rate_limit_store") {
+      return res.status(503).json({
+        error: "Usage protection is not configured.",
+        text: "OmanX is temporarily unavailable because production rate limiting is not configured.",
+        usage,
+      });
+    }
+
     return res.status(429).json({
       error: "Daily message limit reached.",
       text: "You've reached today's anonymous message limit. Please come back tomorrow.",

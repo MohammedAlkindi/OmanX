@@ -42,7 +42,7 @@ Anonymous and signed-in users currently share the same daily message count by de
 RATE_LIMIT_DAILY_MAX=20
 ```
 
-The difference is durability: signed-in quota follows the Supabase user id across refreshes, browsers, and devices. Anonymous quota follows a client IP hash when available, which prevents simple refresh or localStorage resets from creating a fresh quota. In production, configure Upstash Redis; without it, Vercel function instances fall back to in-memory state and quotas are not durable across instances.
+The difference is durability: signed-in quota follows the Supabase user id across refreshes, browsers, and devices. Anonymous quota follows a client IP hash when available, which prevents simple refresh or localStorage resets from creating a fresh quota. In production, configure Upstash Redis; without it, `/api/ready` returns 503 and chat requests fail closed instead of using non-durable serverless memory.
 
 ## Image Uploads
 

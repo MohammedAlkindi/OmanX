@@ -1,55 +1,77 @@
 # OmanX
 
-AI-powered guidance platform for Omani students navigating life in the United States — visa compliance, arrival setup, housing, academic planning, and high-stakes escalation.
+AI guidance system for Omani scholars studying abroad — the United States, United Kingdom, and Australia — covering both everyday campus questions and compliance-critical ones: visa status, work authorization, insurance, academic standing, and government paperwork.
 
-Built on Claude Sonnet, grounded in live government sources, and designed to handle questions that actually matter.
+Built by [Mohammed Alkindi](https://github.com/alkindi-m).
 
 ---
 
-## What it does
+## Why this exists
 
-Omani students on US campuses face a category of questions that generic AI gets wrong: immigration status, OPT/CPT deadlines, SEVIS compliance, insurance requirements, DSO escalation. The cost of a wrong answer is a visa violation.
+A generic chatbot will happily hallucinate an OPT deadline or a SEVIS reinstatement procedure. For a scholar on an F-1, Student Route, or Subclass 500 visa, a wrong answer isn't a bad UX — it's a status violation. OmanX is built around that constraint: compliance questions are routed differently than "where's good food near campus," get grounded in curated + live sources, get cited, and get escalation guidance when the situation is time-critical.
 
-OmanX is a structured guidance workspace that:
+---
 
-- Routes compliance questions through **live web search**, restricted to authoritative government domains (`uscis.gov`, `ice.gov`, `state.gov`, `dhs.gov`, and 5 others)
-- Falls back to a **curated knowledge base** for context-specific Omani program details
-- Runs on **Claude Sonnet 4.6** with optional **Haiku 4.5** for faster, lower-cost interactions
-- Keeps all conversations **local-first** — no account required, no data leaves the browser until a message is sent
+## How a request is handled
+
+```
+POST /api/chat
+  │
+  ├─ sanitize + validate (length caps, control-char strip, image MIME/size checks)
+  ├─ auth check (optional — Supabase bearer token; required only for image uploads)
+  ├─ rate limit consume (Upstash Redis sliding window, per-IP or per-user)
+  ├─ isCompliance(message)?
+  │     no  → skip KB + search, answer conversationally, cacheable
+  │     yes → detectDestination(message, context) → us | uk | au
+  │           ├─ getKB(destination)  — destination doc set + shared MoHE rules, hot-reloaded from disk
+  │           ├─ searchKB()          — keyword pass over COMPLIANCE_TRIGGERS, TF-IDF cosine fallback for paraphrases
+  │           └─ webSearch()         — Tavily, domain-restricted to government sources for that destination
+  │           (KB lookup and web search run concurrently via Promise.all)
+  ├─ isUrgent(message)? → buildEscalationCard() — structured steps, DSO note, embassy contact, relevant form numbers
+  ├─ build system prompt (KB entries + citable web results + student context + language + concise mode)
+  └─ stream response over SSE, with source list and escalation card in the final event
+```
+
+This is not a single-shot RAG call — it's a small pipeline of independent, cheap decisions (regex/keyword triggers, not model calls) that determine *how much* grounding a given message needs before the model ever runs, and route the same conversation to different rules depending on destination.
+
+---
+
+## What makes the assistant layer non-trivial
+
+**Multi-destination knowledge bases, composed at request time**
+`data/us.json`, `data/uk.json`, `data/au.json` hold destination-specific compliance content (visa categories, work authorization rules, insurance requirements). `data/mohe.json` holds Omani Ministry of Higher Education rules shared across all three — scholarship terms, MoHE notification requirements — and is merged into whichever destination KB is active on every request. Destination is inferred from message + student-provided context (`detectDestination()` in [api/chat.js](api/chat.js)) unless the client passes one explicitly.
+
+**Hybrid KB search, not a vector DB**
+`searchKB()` runs a keyword pass first — matching `COMPLIANCE_TRIGGERS` terms that appear in both the query and the document — because for compliance content, exact terminology (SEVIS, OPT, CAS, Subclass 500) should always beat incidental similarity. If nothing matches, it falls back to TF-IDF cosine similarity over tokenized document text, so paraphrased questions ("my school kicked me out, what happens to my visa") still surface relevant entries. TF-IDF vectors are cached per KB fingerprint and rebuilt automatically when the underlying JSON file changes (mtime-checked, hot-reloaded — no restart needed to update compliance content).
+
+**Escalation detection is a second, independent classifier**
+`isCompliance()` and `isUrgent()` fire on separate trigger lists — a message can be compliance-relevant without being urgent, or urgent without extra compliance vocabulary. When both fire, `buildEscalationCard()` returns a structured object (severity level, numbered action steps, DSO contact note, embassy info, applicable form numbers) tailored to the situation type — legal emergency, SEVIS termination, medical emergency, eviction, academic dismissal, funding loss — and localized per destination (911 vs 999 vs 000, I-539 vs a UK reinstatement process, etc.). This is deterministic, not model-generated, so it's identical every time and can't drift or omit a step under model variance.
+
+**Live search is domain-restricted, not open web search**
+Tavily queries are constrained to an explicit allowlist of ~15 government and university-oversight domains per destination (`uscis.gov`, `gov.uk`, `homeaffairs.gov.au`, etc.). Compliance answers cite the specific KB entry ID or source URL used — never an unattributed claim — and the model is instructed to say "I don't know, ask your DSO" rather than fill gaps.
+
+**Caching is compliance-aware**
+Only non-compliance, single-turn, no-attachment requests get a response cache entry (SHA-256 of model + prompt + context, 10-minute TTL, capped at 500 entries). Compliance responses are never cached, because policy pages change and a stale visa answer is worse than a slow one.
+
+**Auth is additive, not required**
+The product is usable anonymously — anonymous sessions get rate-limited by IP-derived key. Google OAuth via Supabase ([api/auth-utils.js](api/auth-utils.js)) exists solely to gate image uploads (a scholar photographing a form or notice) behind a real identity, and to key rate limits by user instead of IP once signed in. There's no account-gated content and no server-side chat history — see **Long-term goals** below for what auth eventually unlocks.
 
 ---
 
 ## Stack
 
-| Layer | Technology |
-|---|---|
-| AI | Anthropic Claude (Sonnet 4.6 / Haiku 4.5) |
-| Live search | Tavily API — domain-restricted to 9 government sources |
-| Knowledge base | Structured `data/knowledge.json`, hot-reloaded on file change |
-| Frontend | Vanilla JS (ES modules), single shared CSS design system |
-| Persistence | `localStorage` — full chat history, settings, pinned state |
-| Hosting | Vercel (serverless API routes + static frontend) |
-| Rate limiting | Token bucket — 10 req/min per IP, enforced at the API layer |
-| CORS | Locked to production origin; `localhost` allowed in development |
-
----
-
-## Workspace features
-
-**Conversations**
-- Persistent chat history with inline rename, delete, pin, search, copy, and export
-- Per-item `···` context menu — no separate settings page needed
-- Auto-derived titles from the first user message
-
-**Settings panel** (bottom-left sidebar)
-- Theme: Light / Dark / System (follows `prefers-color-scheme`)
-- Display name, custom assistant context, concise mode toggle
-- Model selector: Sonnet (recommended) or Haiku (faster)
-
-**Assistant**
-- Compliance-triggered live search — detects 50+ keywords (visa, OPT, SEVIS, DSO, tax, etc.)
-- KB + web search run in parallel; live results take precedence with source citations
-- Response caching disabled for compliance queries — stale policy data is worse than no data
+| Layer | Technology | Notes |
+|---|---|---|
+| AI | Anthropic Claude — `claude-sonnet-4-6` (default), `claude-haiku-4-5-20251001` (opt-in) | Model allowlist enforced server-side; client can't request an arbitrary model string |
+| Live search | Tavily API | Domain-restricted, optional — degrades to KB-only silently if `TAVILY_API_KEY` absent |
+| Knowledge base | `data/{us,uk,au,mohe}.json` | Hot-reloaded on file mtime change, TF-IDF-indexed |
+| Rate limiting | Upstash Redis (sorted-set sliding window) | Local dev can fall back to memory; production/Vercel requires Upstash and fails closed if it is missing |
+| Auth | Supabase (Google OAuth) | Optional; only required for image attachments |
+| Frontend | Vanilla JS ES modules, no bundler, no framework | `public/js/chat-page.js`, `chat-store.js`, `core.js` |
+| Persistence | `localStorage` | All chat history and settings client-side — see architecture note below |
+| Hosting | Vercel — serverless functions + static frontend | `vercel.json` maps `/api/*`, canonical redirects for legacy `.html` routes |
+| Streaming | SSE (`text/event-stream`) | Token deltas, then a final event carrying sources, escalation card, destination, and usage |
+| Analytics | `@vercel/analytics` | Page-level only — no per-message tracking (see Long-term goals) |
 
 ---
 
@@ -58,24 +80,28 @@ OmanX is a structured guidance workspace that:
 ```
 .
 ├── api/
-│   ├── chat.js          # Claude + Tavily handler, rate limiting, KB search
-│   ├── health.js
-│   ├── metrics.js
-│   └── ready.js
+│   ├── chat.js           # Core pipeline: routing, KB search, Tavily, streaming, escalation
+│   ├── rate-limit.js      # Upstash sliding-window limiter + local memory fallback
+│   ├── auth-utils.js      # Supabase bearer-token verification
+│   ├── auth/
+│   │   ├── config.js      # Public Supabase config for the client
+│   │   └── session.js
+│   ├── feedback.js
+│   ├── usage.js
+│   ├── health.js / ready.js / metrics.js
 ├── data/
-│   └── knowledge.json   # Curated guidance content, hot-reloaded
+│   ├── us.json / uk.json / au.json   # Destination-specific compliance KB
+│   └── mohe.json                     # Shared Omani MoHE rules, merged into all destinations
 ├── public/
 │   ├── js/
-│   │   ├── core.js          # Theme engine, toast, shared utilities
-│   │   ├── chat-store.js    # localStorage abstraction for chats + settings
-│   │   └── chat-page.js     # Workspace UI — sidebar, composer, message rendering
-│   ├── styles.css           # Full design system: tokens, dark mode, components
-│   ├── chat.html            # Workspace
-│   ├── index.html           # Landing page
-│   ├── collaboration.html
-│   ├── vision.html
-│   └── settings.html
-├── server.js            # Express server for local dev
+│   │   ├── chat-page.js   # Workspace UI — sidebar, composer, streaming render loop
+│   │   ├── chat-store.js  # localStorage abstraction for chats + settings
+│   │   └── core.js        # Theme engine, toast, shared utilities
+│   ├── styles.css         # Design tokens + dark mode via [data-theme]
+│   ├── chat.html          # Workspace (served at `/`)
+│   ├── index.html, system.html, method.html, vision.html, contact.html,
+│   │   examples.html, trust.html, collaboration.html, dashboard.html
+├── server.js              # Express entry point for local dev — mirrors vercel.json routing
 ├── vercel.json
 └── package.json
 ```
@@ -86,8 +112,8 @@ OmanX is a structured guidance workspace that:
 
 ```bash
 npm install
-cp .env.example .env   # add your API keys
-npm start              # http://localhost:3000
+cp .env.example .env    # add your keys
+npm run dev              # node --watch server.js → http://localhost:3000
 ```
 
 **Required**
@@ -95,40 +121,42 @@ npm start              # http://localhost:3000
 ANTHROPIC_API_KEY=sk-ant-...
 ```
 
-**Optional — enables live policy search**
-```
-TAVILY_API_KEY=tvly-...
-```
+**Optional**
+| Var | Effect if unset |
+|---|---|
+| `TAVILY_API_KEY` | Live web search disabled; compliance answers use KB only |
+| `UPSTASH_REDIS_REST_URL` / `UPSTASH_REDIS_REST_TOKEN` | Required in production; local dev falls back to memory if unset |
+| `SUPABASE_URL` / `SUPABASE_PUBLISHABLE_KEY` | Google sign-in and image uploads disabled |
+| `ALLOWED_ORIGIN` | CORS is unrestricted (fine for local dev) |
+| `ANTHROPIC_MODEL` | Overrides the default model |
 
-Get a Tavily key at [app.tavily.com](https://app.tavily.com) — 1,000 free searches/month. Without it, the assistant falls back to the local knowledge base silently.
-
----
-
-## Deploying to Vercel
+## Deploying
 
 ```bash
 vercel --prod
 ```
 
-Set `ANTHROPIC_API_KEY` and `TAVILY_API_KEY` in your Vercel project environment variables. The `vercel.json` routes all API traffic through serverless functions and serves the frontend as static files.
+Set the environment variables above in the Vercel project. In production, set both Upstash variables; without them `/api/ready` returns 503 and `/api/chat` refuses requests. `vercel.json` maps `/api/*` to serverless functions and serves everything else statically from `public/`.
 
 ---
 
-## Design system
+## Architecture decisions worth knowing
 
-OmanX uses a single `styles.css` with CSS custom properties for every token — palette, typography, spacing, surface elevation, shadows. Dark mode is implemented as a full token override under `[data-theme="dark"]` and respects `prefers-color-scheme` when set to System.
-
-Typefaces: DM Serif Display (headings), DM Sans (body), DM Mono (metadata/labels).
+- **No server-side chat history, on purpose.** All conversation state lives in `localStorage`. This isn't a missing feature — it's the current privacy posture. Auth exists only for image uploads today. See Long-term goals for the trigger conditions to change this.
+- **No build step.** Frontend is plain ES modules loaded directly by the browser — no bundler, no JSX, no framework. Keep it that way unless there's a concrete reason to introduce one.
+- **Deterministic safety logic stays out of the model.** Destination detection, compliance/urgency classification, and escalation card content are all plain functions, not LLM calls — they're the parts that must not vary between two identical inputs.
 
 ---
 
-## What's next
+## Long-term goals
 
-- Authenticated profiles with cross-device sync
-- Advisor dashboard — view flagged student conversations, assign case status
-- Structured escalation flows for visa violations, medical emergencies, legal issues
-- Push notifications for deadline proximity (OPT application windows, I-20 expiry)
-- Arabic language support
+- **Accounts + server-side sync** — once scholars are actually losing history across devices, not before. Auth infra already exists (Supabase); this is a scope decision, not a technical blocker.
+- **Usage analytics** — track question categories, destinations, and unanswered queries once there's a real signed-in user base, to drive KB expansion instead of guessing.
+- **Structured escalation follow-through** — today's escalation card is informational; a next step is letting a scholar mark a case as ongoing and surface it to an advisor.
+- **Markdown/PDF conversation export** — current export is plain `.txt`. Markdown would preserve compliance formatting; PDF would make sharing with an advisor practical.
+- **Arabic language support.**
+
+Validate demand before building any of the above — five to ten real scholars returning is worth more than any infrastructure investment made speculatively.
 
 ---
 

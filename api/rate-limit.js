@@ -6,11 +6,34 @@ export const RATE_LIMIT_WINDOW_MS = 24 * 60 * 60 * 1000;
 
 const _rateLimitMap = new Map();
 let _redis = null;
+let _warnedNoRedis = false;
+
+export function hasPersistentRateLimitStore() {
+  const { UPSTASH_REDIS_REST_URL: url, UPSTASH_REDIS_REST_TOKEN: token } = process.env;
+  return Boolean(url && token);
+}
+
+export function requiresPersistentRateLimitStore() {
+  return process.env.VERCEL === "1" || process.env.NODE_ENV === "production";
+}
+
+function warnMissingPersistentRateLimitStore() {
+  if (!requiresPersistentRateLimitStore() || _warnedNoRedis) return;
+  _warnedNoRedis = true;
+  console.error(
+    "[OmanX] UPSTASH_REDIS_REST_URL/UPSTASH_REDIS_REST_TOKEN are not set. " +
+    "Persistent rate limiting is unavailable, so production chat requests fail closed. " +
+    "Set both env vars before onboarding real users."
+  );
+}
 
 function getRedis() {
   if (_redis) return _redis;
   const { UPSTASH_REDIS_REST_URL: url, UPSTASH_REDIS_REST_TOKEN: token } = process.env;
-  if (!url || !token) return null;
+  if (!url || !token) {
+    warnMissingPersistentRateLimitStore();
+    return null;
+  }
   _redis = new Redis({ url, token });
   return _redis;
 }
@@ -68,6 +91,19 @@ function toUsage({ allowed = true, count = 0, limit = RATE_LIMIT_MAX, resetAt = 
   };
 }
 
+function missingPersistentStoreUsage({ window = "day" } = {}) {
+  warnMissingPersistentRateLimitStore();
+  return toUsage({
+    allowed: false,
+    count: RATE_LIMIT_MAX,
+    limit: RATE_LIMIT_MAX,
+    resetAt: Date.now() + RATE_LIMIT_WINDOW_MS,
+    source: "missing-persistent-store",
+    window,
+    blockedBy: "rate_limit_store",
+  });
+}
+
 function memoryBucketUsage(key, { consume = false, limit = RATE_LIMIT_MAX, windowMs = RATE_LIMIT_WINDOW_MS, window = "day" } = {}) {
   const now = Date.now();
   const cutoff = now - windowMs;
@@ -122,6 +158,10 @@ async function redisBucketUsage(key, { consume = false, limit = RATE_LIMIT_MAX, 
 
 export async function getUsage(key) {
   const dailyKey = `daily:${key}`;
+  if (requiresPersistentRateLimitStore() && !hasPersistentRateLimitStore()) {
+    return missingPersistentStoreUsage({ window: "day" });
+  }
+
   try {
     const usage = await redisBucketUsage(dailyKey, { consume: false, limit: RATE_LIMIT_MAX, windowMs: RATE_LIMIT_WINDOW_MS, window: "day" });
     if (usage) return usage;
@@ -133,6 +173,9 @@ export async function getUsage(key) {
 
 export async function consumeUsage(key) {
   const dailyKey = `daily:${key}`;
+  if (requiresPersistentRateLimitStore() && !hasPersistentRateLimitStore()) {
+    return missingPersistentStoreUsage({ window: "day" });
+  }
 
   try {
     const dailyUsage = await redisBucketUsage(dailyKey, { consume: true, limit: RATE_LIMIT_MAX, windowMs: RATE_LIMIT_WINDOW_MS, window: "day" });

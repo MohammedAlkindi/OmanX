@@ -49,7 +49,7 @@ OmanX is an AI-powered guidance assistant for Omani scholars studying abroad (US
 | `UPSTASH_REDIS_REST_URL` | No* | Upstash Redis URL for distributed rate limiting |
 | `UPSTASH_REDIS_REST_TOKEN` | No* | Upstash Redis token for distributed rate limiting |
 
-\* Required in production (Vercel). Without these, rate limiting falls back to in-memory (ineffective across instances).
+\* Required in production (Vercel). Without these, `/api/ready` returns 503 and chat requests fail closed; local development can still use the in-memory fallback.
 
 ## Running locally
 ```

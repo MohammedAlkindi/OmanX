@@ -1397,10 +1397,13 @@ select:focus {
   top: 0;
   z-index: 2;
   display: flex;
-  gap: 4px;
-  padding: 0 0 8px;
-  margin-bottom: 2px;
+  align-items: center;
+  gap: 6px;
+  min-height: 44px;
+  padding: 0 0 12px;
+  margin-bottom: 4px;
   overflow-x: auto;
+  overflow-y: visible;
   background: var(--sand);
 }
 
@@ -1408,8 +1411,12 @@ select:focus {
 
 .settings-tab {
   flex: 0 0 auto;
-  min-height: 28px;
-  padding: 0 9px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: max-content;
+  min-height: 32px;
+  padding: 0 10px;
   border: 0.5px solid var(--border);
   border-radius: 999px;
   background: var(--white);
@@ -1417,6 +1424,8 @@ select:focus {
   font-family: var(--sans);
   font-size: 0.75rem;
   font-weight: 400;
+  line-height: 1;
+  white-space: nowrap;
   cursor: pointer;
   transition: background 0.15s, border-color 0.15s, color 0.15s;
 }
@@ -1430,7 +1439,7 @@ select:focus {
 
 .settings-section {
   display: grid;
-  gap: 10px;
+  gap: 12px;
   padding: 12px;
   border: 0.5px solid var(--border);
   border-radius: 8px;
@@ -1481,7 +1490,7 @@ select:focus {
 /* settings fields */
 .settings-field {
   display: grid;
-  gap: 5px;
+  gap: 6px;
 }
 
 .settings-field label {
@@ -1503,7 +1512,15 @@ select:focus {
   font-weight: 300;
   color: var(--ink);
   width: 100%;
+  min-height: 34px;
   transition: border-color 0.15s;
+}
+
+.settings-input::placeholder,
+.settings-textarea::placeholder {
+  color: #9c9a91;
+  font-style: italic;
+  opacity: 1;
 }
 
 .settings-input:focus,
@@ -3822,6 +3839,13 @@ footer,
   background-color: #242520;
   border-color: #4d4e48;
   color: #f0ece4;
+}
+
+.chat-app .settings-input::placeholder,
+.chat-app .settings-textarea::placeholder {
+  color: #817b70;
+  font-style: italic;
+  opacity: 1;
 }
 
 .chat-app .settings-input:focus,

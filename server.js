@@ -29,7 +29,6 @@ const ROUTE_METHODS = new Map([
   ['/contact', new Set(['GET'])],
   ['/examples', new Set(['GET'])],
   ['/trust', new Set(['GET'])],
-  ['/settings', new Set(['GET'])],
   ['/collaboration', new Set(['GET'])],
   ['/api/chat', new Set(['POST'])],
   ['/api/auth/config', new Set(['GET'])],
@@ -75,7 +74,7 @@ app.get('/method.html', (req, res) => res.redirect(301, '/method'));
 app.get('/vision.html', (req, res) => res.redirect(301, '/vision'));
 app.get('/contact.html', (req, res) => res.redirect(301, '/contact'));
 app.get('/examples.html', (req, res) => res.redirect(301, '/examples'));
-app.get('/settings.html', (req, res) => res.redirect(301, '/settings'));
+app.get('/settings.html', (req, res) => res.redirect(301, '/'));
 app.get('/collaboration.html', (req, res) => res.redirect(301, '/collaboration'));
 app.get('/trust.html', (req, res) => res.redirect(301, '/trust'));
 
@@ -114,9 +113,7 @@ app.get('/trust', (req, res) => {
   res.sendFile(path.join(PUBLIC_DIR, 'trust.html'));
 });
 
-app.get('/settings', (req, res) => {
-  res.sendFile(path.join(PUBLIC_DIR, 'settings.html'));
-});
+app.get('/settings', (req, res) => res.redirect(301, '/'));
 
 app.get('/collaboration', (req, res) => {
   res.sendFile(path.join(PUBLIC_DIR, 'collaboration.html'));

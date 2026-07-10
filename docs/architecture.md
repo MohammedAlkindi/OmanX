@@ -60,7 +60,7 @@ Quota keys:
 - Anonymous: `ip:<client-ip-hash>`
 - Fallback: `session:<browser-session-id>`
 
-Upstash Redis is used when configured. Without Upstash, quotas fall back to in-memory process state and are not durable across serverless instances.
+Upstash Redis is used for production quota state. Without Upstash, local development can use in-memory process state, but production readiness fails and chat requests are rejected instead of relying on non-durable serverless memory.
 
 ## Image Upload
 
