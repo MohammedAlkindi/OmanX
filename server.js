@@ -31,6 +31,7 @@ const ROUTE_METHODS = new Map([
   ['/examples', new Set(['GET'])],
   ['/trust', new Set(['GET'])],
   ['/collaboration', new Set(['GET'])],
+  ['/dashboard', new Set(['GET'])],
   ['/api/chat', new Set(['POST'])],
   ['/api/chats', new Set(['GET', 'PUT', 'OPTIONS'])],
   ['/api/auth/config', new Set(['GET'])],
@@ -82,6 +83,7 @@ app.get('/examples.html', (req, res) => res.redirect(301, '/examples'));
 app.get('/settings.html', (req, res) => res.redirect(301, '/'));
 app.get('/collaboration.html', (req, res) => res.redirect(301, '/collaboration'));
 app.get('/trust.html', (req, res) => res.redirect(301, '/trust'));
+app.get('/dashboard.html', (req, res) => res.redirect(301, '/dashboard'));
 
 // Page routes
 app.get('/', (req, res) => {
@@ -122,6 +124,10 @@ app.get('/settings', (req, res) => res.redirect(301, '/'));
 
 app.get('/collaboration', (req, res) => {
   res.sendFile(path.join(PUBLIC_DIR, 'collaboration.html'));
+});
+
+app.get('/dashboard', (req, res) => {
+  res.sendFile(path.join(PUBLIC_DIR, 'dashboard.html'));
 });
 
 // Legacy redirects
