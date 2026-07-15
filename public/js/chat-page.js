@@ -35,7 +35,7 @@ const DEST_LABEL = { auto: 'Auto', us: 'US', uk: 'UK', au: 'AU' };
 const DEST_FULL_LABEL = { auto: 'Auto-detect', us: 'United States', uk: 'United Kingdom', au: 'Australia' };
 const THINKING_STAGES = ['Checking your question...', 'Reading OmanX dataset...', 'Searching official sources...', 'Writing guidance...'];
 const SYNC_SAVE_DELAY_MS = 900;
-const AUTH_GATE_MESSAGE = "You've used your 3 free preview messages. Sign in with Google or send yourself a secure sign-in link to continue with 50 messages each day.";
+const AUTH_GATE_MESSAGE = "You've used your 3 guest questions. Sign in with Google or send yourself a secure sign-in link to keep asking.";
 
 // Tracks which chatId is actively streaming; null when idle.
 let streamingChatId = null;
@@ -205,13 +205,8 @@ function updateSyncUi() {
 
   if (!state.auth.enabled) {
     if (historyLabel) historyLabel.textContent = 'Stored locally';
-<<<<<<< HEAD
     if (syncStatus) syncStatus.textContent = 'Not available';
     if (syncNote) syncNote.textContent = 'Google sign-in is not ready yet, so chats stay on this device.';
-=======
-    if (syncStatus) syncStatus.textContent = 'Unavailable';
-    if (syncNote) syncNote.textContent = 'Sign-in is not configured, so history remains on this device.';
->>>>>>> a036d86ba418cb7318b8b8d8d41d9a46b7af31b4
     return;
   }
 
@@ -1491,18 +1486,10 @@ async function streamAssistantReply(message, imageAttachments = []) {
     if (!response.ok) {
       const payload = await response.json().catch(() => ({}));
       if (payload.usage) didUsage = payload.usage;
-<<<<<<< HEAD
-      if (payload.code === 'sign_in_required') {
-        fullText = `**Sign in to keep asking.** ${payload.text || 'You have used your guest questions.'}`;
-        showToast('Sign in with Google to keep asking.');
-        qs('[data-settings-panel]')?.classList.add('open');
-        qs('[data-settings-section="account"]')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
-        setSettingsNav('account');
-=======
       if (response.status === 429 && payload.authRequired) {
         shouldAppendAssistant = false;
         showAuthGate({ message: payload.text || AUTH_GATE_MESSAGE });
->>>>>>> a036d86ba418cb7318b8b8d8d41d9a46b7af31b4
+        showToast('Sign in with Google to keep asking.');
       } else {
         fullText = `**Error:** ${payload.error || payload.text || `Server error (HTTP ${response.status})`}`;
       }

@@ -57,7 +57,7 @@ RATE_LIMIT_ANONYMOUS_DAILY_MAX=3
 RATE_LIMIT_AUTHENTICATED_DAILY_MAX=50
 ```
 
-Signed-in quota follows the Supabase user id across refreshes, browsers, and devices. Anonymous quota follows the browser session id hash, with client IP hash fallback when the browser session id is absent. In production, configure Upstash Redis; without it, `/api/ready` returns 503 and chat requests fail closed. If Redis is configured but unavailable, both anonymous and signed-in tiers also fail closed instead of using non-durable serverless memory.
+Signed-in question limits follow the Supabase user id across refreshes, browsers, and devices. Guest limits follow the browser session id hash, with client IP hash fallback when the browser session id is absent. In production, configure Upstash Redis; without it, `/api/ready` returns 503 and chat requests fail closed. If Redis is configured but unavailable, both guest and signed-in tiers also fail closed instead of using non-durable serverless memory.
 
 ## Image Uploads
 
