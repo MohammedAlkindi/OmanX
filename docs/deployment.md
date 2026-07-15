@@ -12,7 +12,7 @@ OmanX uses:
 
 - Express application (server.js)
 - Serverless wrappers in /api
-- Static frontend (index.html, styles.css, app.js)
+- Static frontend (public HTML files, styles.css, and ES modules in public/js)
 - Vercel serverless runtime
 
 Request Flow:

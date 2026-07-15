@@ -11,6 +11,7 @@
     { "src": "/", "dest": "/chat.html" },
     { "src": "/(chat|workspace)", "status": 301, "headers": { "Location": "/" } },
     { "src": "/product", "dest": "/index.html" },
+    { "src": "/product\\.html", "status": 301, "headers": { "Location": "/product" } },
     { "src": "/dashboard", "dest": "/dashboard.html" },
     { "src": "/system", "dest": "/system.html" },
     { "src": "/method", "dest": "/method.html" },
