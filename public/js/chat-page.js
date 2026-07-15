@@ -453,7 +453,6 @@ function bindEvents() {
       const activeChat = state.chats.find((chat) => chat.id === state.activeChatId);
       const alreadyEmpty = activeChat && activeChat.title === 'New chat' && activeChat.messages.length === 0;
       if (alreadyEmpty) {
-        showToast('Already on a new chat.');
         return;
       }
 
@@ -837,6 +836,7 @@ function updateAuthUi() {
     if (attachBtn) attachBtn.disabled = true;
     updateSyncUi();
     renderAuthGate();
+    renderComposerUsageNote();
     return;
   }
 
@@ -856,6 +856,7 @@ function updateAuthUi() {
     renderAuthGate();
   }
   updateSyncUi();
+  renderComposerUsageNote();
 }
 
 function shouldOpenAuthGateFromUsage(usage) {
@@ -1036,6 +1037,7 @@ function formatReset(usage) {
 
 function renderUsagePanel() {
   const panel = qs('[data-usage-panel]');
+  renderComposerUsageNote();
   if (!panel) return;
   const percentEl = qs('[data-usage-percent]', panel);
   const meterEl = qs('[data-usage-meter]', panel);
@@ -1057,14 +1059,43 @@ function renderUsagePanel() {
   if (meterEl) meterEl.style.width = `${Math.min(Math.max(usage.percentUsed, 0), 100)}%`;
   if (detailEl) {
     if (!state.auth.signedIn) {
+      const questionWord = remaining === 1 ? 'question' : 'questions';
       detailEl.textContent = remaining > 0
-        ? `${remaining} of ${limit} guest questions left today. Sign in to keep asking after that.`
+        ? `${remaining} guest ${questionWord} left today. Sign in to keep asking after that.`
         : 'You have used your guest questions. Sign in with Google to keep asking.';
     } else {
       detailEl.textContent = `${remaining} of ${limit} questions left today. Resets in ${formatReset(usage)}.`;
     }
   }
   panel.classList.toggle('usage-panel-warning', usage.percentUsed >= 80);
+  renderComposerUsageNote();
+}
+
+function renderComposerUsageNote() {
+  const note = qs('[data-composer-usage-note]');
+  if (!note) return;
+
+  const shouldShow = state.auth.enabled && !state.auth.signedIn;
+  note.hidden = !shouldShow;
+  note.classList.remove('composer-guest-note-warning');
+
+  if (!shouldShow) {
+    note.textContent = '';
+    return;
+  }
+
+  const usage = state.usage?.tier === 'anonymous' ? state.usage : null;
+  if (!usage) {
+    note.textContent = '3 guest questions available before signing in.';
+    return;
+  }
+
+  const remaining = Math.max(Number(usage.remaining || 0), 0);
+  const questionWord = remaining === 1 ? 'question' : 'questions';
+  note.classList.toggle('composer-guest-note-warning', remaining <= 1);
+  note.textContent = remaining > 0
+    ? `${remaining} guest ${questionWord} left today.`
+    : 'Sign in to keep asking OmanX.';
 }
 
 function maybeShowOnboarding() {
@@ -1773,21 +1804,43 @@ function applyInline(text) {
 
 function splitTableRow(line) {
   const trimmed = line.trim().replace(/^\|/, '').replace(/\|$/, '');
-  return trimmed.split('|').map((cell) => cell.trim());
+  const cells = [];
+  let current = '';
+  let escaped = false;
+
+  for (const char of trimmed) {
+    if (char === '|' && !escaped) {
+      cells.push(current.trim());
+      current = '';
+    } else {
+      current += char;
+    }
+    escaped = char === '\\' && !escaped;
+    if (char !== '\\') escaped = false;
+  }
+
+  cells.push(current.trim());
+  return cells;
 }
 
 function isTableSeparator(line) {
   const cells = splitTableRow(line);
-  return cells.length > 1 && cells.every((cell) => /^:?-{3,}:?$/.test(cell));
+  return cells.length > 1 && cells.every((cell) => /^:?-{2,}:?$/.test(cell));
+}
+
+function isTableRow(line) {
+  if (!line?.includes('|') || /^\s*$/.test(line)) return false;
+  const cells = splitTableRow(line);
+  return cells.length > 1 && cells.some((cell) => cell.trim());
 }
 
 function isTableStart(lines, index) {
-  return lines[index]?.includes('|') && isTableSeparator(lines[index + 1] || '');
+  return isTableRow(lines[index]) && isTableSeparator(lines[index + 1] || '');
 }
 
 function renderMarkdownTable(rows) {
   const header = splitTableRow(rows[0]);
-  const bodyRows = rows.slice(2).map(splitTableRow);
+  const bodyRows = rows.slice(2).filter((row) => isTableRow(row) && !isTableSeparator(row)).map(splitTableRow);
   const width = header.length;
 
   const headHtml = header
@@ -1839,7 +1892,7 @@ function renderRichText(content) {
       closeList();
       const tableRows = [raw, lines[index + 1]];
       index += 2;
-      while (index < lines.length && lines[index].includes('|') && !/^\s*$/.test(lines[index])) {
+      while (index < lines.length && isTableRow(lines[index]) && !isTableSeparator(lines[index])) {
         tableRows.push(lines[index]);
         index += 1;
       }
