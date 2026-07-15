@@ -965,10 +965,12 @@ function showOnboarding() {
   const overlay = qs('[data-onboarding]');
   if (!overlay) return;
   overlay.hidden = false;
-  showOnboardingStep(overlay, state.auth.enabled && !state.auth.signedIn ? 'auth' : '1');
+  showOnboardingStep(overlay, '1');
 
   let selectedDest = 'auto';
   let selectedSituation = state.settings.situation || 'Current student';
+  const optionalAuthBtn = qs('[data-onboarding-show-auth]', overlay);
+  if (optionalAuthBtn) optionalAuthBtn.hidden = !state.auth.enabled || state.auth.signedIn;
 
   qs('[data-onboarding-auth]', overlay)?.addEventListener('click', async () => {
     try {
@@ -979,8 +981,12 @@ function showOnboarding() {
   });
 
   qs('[data-onboarding-skip-auth]', overlay)?.addEventListener('click', () => {
-    showOnboardingStep(overlay, '1');
+    showOnboardingStep(overlay, '3');
   }, { once: true });
+
+  optionalAuthBtn?.addEventListener('click', () => {
+    showOnboardingStep(overlay, 'auth');
+  });
 
   qsa('[data-dest]', overlay).forEach((btn) => {
     btn.addEventListener('click', () => {
