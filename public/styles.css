@@ -692,6 +692,15 @@ input[type="email"] {
   transition: border-color 0.15s;
 }
 
+.form-input::placeholder,
+.sidebar-search::placeholder,
+input[type="text"]::placeholder,
+input[type="search"]::placeholder,
+input[type="email"]::placeholder {
+  color: var(--ink-4);
+  font-style: italic;
+}
+
 .form-input:focus,
 .sidebar-search:focus,
 input[type="text"]:focus,
@@ -1526,7 +1535,7 @@ select:focus {
 
 .settings-input::placeholder,
 .settings-textarea::placeholder {
-  color: #9c9a91;
+  color: var(--ink-4);
   font-style: italic;
   opacity: 1;
 }
@@ -2467,6 +2476,7 @@ select:focus {
 
 .composer-box textarea::placeholder {
   color: var(--ink-3);
+  font-style: italic;
 }
 
 .composer-actions {
@@ -3122,6 +3132,15 @@ footer,
   padding: 3px 8px;
 }
 
+.activity-table-wrap {
+  max-width: 100%;
+  overflow-x: auto;
+}
+
+.activity-table {
+  min-width: 640px;
+}
+
 /* mobile bottom nav (preserved for legacy pages) */
 .mobile-bottom-nav {
   display: none;
@@ -3712,6 +3731,7 @@ footer,
 
 .chat-app .sidebar-search::placeholder {
   color: #858077;
+  font-style: italic;
 }
 
 .chat-app .chat-list {
@@ -4611,6 +4631,7 @@ footer,
 
 .onboarding-name-input::placeholder {
   color: var(--ink-4);
+  font-style: italic;
 }
 
 .onboarding-submit {
@@ -4618,6 +4639,11 @@ footer,
   justify-content: center;
   height: 42px;
   font-size: 0.9375rem;
+}
+
+.onboarding-auth-secondary {
+  width: 100%;
+  height: 40px;
 }
 
 .google-icon {
