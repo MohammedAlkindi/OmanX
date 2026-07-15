@@ -12,8 +12,10 @@
     { "src": "/(chat|workspace)", "status": 301, "headers": { "Location": "/" } },
     { "src": "/product", "dest": "/index.html" },
     { "src": "/product\\.html", "status": 301, "headers": { "Location": "/product" } },
+    { "src": "/trust(\\.html)?", "status": 301, "headers": { "Location": "/system" } },
     { "src": "/dashboard", "dest": "/dashboard.html" },
-    { "src": "/about", "dest": "/about.html" },
+    { "src": "/meet", "dest": "/meet.html" },
+    { "src": "/system", "dest": "/system.html" },
     { "src": "/method", "dest": "/method.html" },
     { "src": "/vision", "dest": "/vision.html" },
     { "src": "/contact", "dest": "/contact.html" },
@@ -21,8 +23,7 @@
     { "src": "/collaboration", "dest": "/collaboration.html" },
     { "src": "/settings(\\.html)?", "status": 301, "headers": { "Location": "/" } },
     { "src": "/index\\.html", "status": 301, "headers": { "Location": "/product" } },
-    { "src": "/(system|trust)(\\.html)?", "status": 301, "headers": { "Location": "/about" } },
-    { "src": "/(chat|method|vision|contact|examples|collaboration|about|dashboard)\\.html", "status": 301, "headers": { "Location": "/$1" } },
+    { "src": "/(chat|meet|system|method|vision|contact|examples|collaboration|dashboard)\\.html", "status": 301, "headers": { "Location": "/$1" } },
     { "src": "/(.*)", "dest": "/$1" }
   ]
 }

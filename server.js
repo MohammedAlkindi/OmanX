@@ -24,7 +24,12 @@ const ROUTE_METHODS = new Map([
   ['/product', new Set(['GET'])],
   ['/workspace', new Set(['GET'])],
   ['/chat', new Set(['GET'])],
+<<<<<<< HEAD
+  ['/meet', new Set(['GET'])],
+  ['/system', new Set(['GET'])],
+=======
   ['/about', new Set(['GET'])],
+>>>>>>> a036d86ba418cb7318b8b8d8d41d9a46b7af31b4
   ['/method', new Set(['GET'])],
   ['/vision', new Set(['GET'])],
   ['/contact', new Set(['GET'])],
@@ -74,13 +79,22 @@ app.get('/api/metrics', metricsHandler);
 app.get('/index.html', (req, res) => res.redirect(301, '/product'));
 app.get('/product.html', (req, res) => res.redirect(301, '/product'));
 app.get('/chat.html', (req, res) => res.redirect(301, '/'));
+<<<<<<< HEAD
+app.get('/meet.html', (req, res) => res.redirect(301, '/meet'));
+app.get('/system.html', (req, res) => res.redirect(301, '/system'));
+=======
 app.get('/about.html', (req, res) => res.redirect(301, '/about'));
+>>>>>>> a036d86ba418cb7318b8b8d8d41d9a46b7af31b4
 app.get('/method.html', (req, res) => res.redirect(301, '/method'));
 app.get('/vision.html', (req, res) => res.redirect(301, '/vision'));
 app.get('/contact.html', (req, res) => res.redirect(301, '/contact'));
 app.get('/examples.html', (req, res) => res.redirect(301, '/examples'));
 app.get('/settings.html', (req, res) => res.redirect(301, '/'));
 app.get('/collaboration.html', (req, res) => res.redirect(301, '/collaboration'));
+<<<<<<< HEAD
+app.get('/trust.html', (req, res) => res.redirect(301, '/system'));
+=======
+>>>>>>> a036d86ba418cb7318b8b8d8d41d9a46b7af31b4
 app.get('/dashboard.html', (req, res) => res.redirect(301, '/dashboard'));
 
 // Legacy pages merged into /about
@@ -97,8 +111,17 @@ app.get('/product', (req, res) => {
 
 app.get(['/workspace', '/chat'], (req, res) => res.redirect(301, '/'));
 
+<<<<<<< HEAD
+app.get('/meet', (req, res) => {
+  res.sendFile(path.join(PUBLIC_DIR, 'meet.html'));
+});
+
+app.get('/system', (req, res) => {
+  res.sendFile(path.join(PUBLIC_DIR, 'system.html'));
+=======
 app.get('/about', (req, res) => {
   res.sendFile(path.join(PUBLIC_DIR, 'about.html'));
+>>>>>>> a036d86ba418cb7318b8b8d8d41d9a46b7af31b4
 });
 
 app.get('/method', (req, res) => {
@@ -117,6 +140,11 @@ app.get('/examples', (req, res) => {
   res.sendFile(path.join(PUBLIC_DIR, 'examples.html'));
 });
 
+<<<<<<< HEAD
+app.get('/trust', (req, res) => res.redirect(301, '/system'));
+
+=======
+>>>>>>> a036d86ba418cb7318b8b8d8d41d9a46b7af31b4
 app.get('/settings', (req, res) => res.redirect(301, '/'));
 
 app.get('/collaboration', (req, res) => {

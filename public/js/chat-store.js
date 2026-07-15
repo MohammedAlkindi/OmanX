@@ -106,7 +106,6 @@ const SETTINGS_DEFAULTS = {
   priority: 'Arrival readiness',
   notifications: true,
   conciseMode: false,
-  model: 'claude-sonnet-4-6',
   userContext: '',
   situation: '',
   scholarshipStatus: '',

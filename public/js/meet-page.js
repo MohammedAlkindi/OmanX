@@ -1,3 +1,2 @@
 import { initCore } from './core.js';
-
-initCore({ page: 'about' });
+initCore({ page: 'meet' });

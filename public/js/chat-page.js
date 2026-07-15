@@ -171,7 +171,7 @@ function mergeChatSnapshots(localChats, localActiveId, remoteChats, remoteActive
 async function requestChatSnapshot(method, body) {
   const token = await getAccessToken();
   if (!token) {
-    const error = new Error('Sign in to sync chat history.');
+    const error = new Error('Sign in to save chat history.');
     error.code = 'auth_required';
     throw error;
   }
@@ -188,7 +188,7 @@ async function requestChatSnapshot(method, body) {
 
   const payload = await response.json().catch(() => ({}));
   if (!response.ok) {
-    const error = new Error(payload.error || 'Could not sync chat history.');
+    const error = new Error(payload.error || 'Could not save chat history.');
     error.status = response.status;
     error.code = payload.code;
     error.snapshot = payload.snapshot;
@@ -205,33 +205,38 @@ function updateSyncUi() {
 
   if (!state.auth.enabled) {
     if (historyLabel) historyLabel.textContent = 'Stored locally';
+<<<<<<< HEAD
+    if (syncStatus) syncStatus.textContent = 'Not available';
+    if (syncNote) syncNote.textContent = 'Google sign-in is not ready yet, so chats stay on this device.';
+=======
     if (syncStatus) syncStatus.textContent = 'Unavailable';
     if (syncNote) syncNote.textContent = 'Sign-in is not configured, so history remains on this device.';
+>>>>>>> a036d86ba418cb7318b8b8d8d41d9a46b7af31b4
     return;
   }
 
   if (!state.auth.signedIn) {
     if (historyLabel) historyLabel.textContent = 'Stored locally';
-    if (syncStatus) syncStatus.textContent = 'Sign in to sync';
-    if (syncNote) syncNote.textContent = 'Sign in to sync conversations across your devices. Anonymous history stays local.';
+    if (syncStatus) syncStatus.textContent = 'Sign in to save';
+    if (syncNote) syncNote.textContent = 'Your chats stay on this device until you sign in.';
     return;
   }
 
   const labels = {
-    syncing: 'Syncing',
+    syncing: 'Saving',
     saving: 'Saving',
-    synced: 'Synced',
-    unavailable: 'Setup needed',
-    error: 'Local backup',
-    local: 'Local backup',
+    synced: 'Saved',
+    unavailable: 'Needs setup',
+    error: 'Saved on device',
+    local: 'Saved on device',
   };
 
-  if (historyLabel) historyLabel.textContent = state.sync.status === 'synced' ? 'Local + cloud' : 'Stored locally';
-  if (syncStatus) syncStatus.textContent = labels[state.sync.status] || 'Syncing';
+  if (historyLabel) historyLabel.textContent = state.sync.status === 'synced' ? 'Device + account' : 'Stored locally';
+  if (syncStatus) syncStatus.textContent = labels[state.sync.status] || 'Saving';
   if (syncNote) {
     syncNote.textContent = state.sync.status === 'unavailable'
-      ? 'Chat sync needs the Supabase history table. Your device copy is still saved locally.'
-      : 'Signed-in conversations sync through Supabase. Anonymous use stays local to this device.';
+      ? 'Account backup is not ready yet. Your chats are still saved on this device.'
+      : 'Signed-in chats are saved to your account. Guest chats stay on this device.';
   }
 }
 
@@ -290,8 +295,8 @@ async function handleAuthSync(auth) {
     if (!state.sync.warned) {
       state.sync.warned = true;
       showToast(state.sync.status === 'unavailable'
-        ? 'Chat sync needs Supabase setup. Saving locally for now.'
-        : 'Could not sync chat history. Saving locally for now.');
+        ? 'Account backup is not ready yet. Saving on this device for now.'
+        : 'Could not save to your account. Saving on this device for now.');
     }
   }
 }
@@ -346,8 +351,8 @@ async function saveChatSnapshot() {
       if (!state.sync.warned) {
         state.sync.warned = true;
         showToast(state.sync.status === 'unavailable'
-          ? 'Chat sync needs Supabase setup. Saving locally for now.'
-          : 'Could not sync chat history. Saving locally for now.');
+          ? 'Account backup is not ready yet. Saving on this device for now.'
+          : 'Could not save to your account. Saving on this device for now.');
       }
     }
   } finally {
@@ -667,13 +672,6 @@ function bindEvents() {
     persistSettings();
   });
 
-  // model
-  qs('[data-setting-model]')?.addEventListener('change', (e) => {
-    state.settings.model = e.target.value;
-    persistSettings();
-    showToast('Model updated.');
-  });
-
   // web search
   qs('[data-setting-web-search]')?.addEventListener('change', (e) => {
     state.settings.webSearch = e.target.checked;
@@ -745,7 +743,7 @@ function bindEvents() {
 }
 
 function populateSettingsPanel() {
-  const { studentName, homeCampus, userContext, conciseMode, model, language, destination, situation, scholarshipStatus, dataConsent, webSearch } = state.settings;
+  const { studentName, homeCampus, userContext, conciseMode, language, destination, situation, scholarshipStatus, dataConsent, webSearch } = state.settings;
 
   const nameEl = qs('[data-setting-name]');
   if (nameEl) nameEl.value = studentName === 'Student' ? '' : studentName;
@@ -758,9 +756,6 @@ function populateSettingsPanel() {
 
   const conciseEl = qs('[data-setting-concise]');
   if (conciseEl) conciseEl.checked = !!conciseMode;
-
-  const modelEl = qs('[data-setting-model]');
-  if (modelEl) modelEl.value = model;
 
   const destEl = qs('[data-setting-destination]');
   if (destEl) destEl.value = destination || 'auto';
@@ -834,14 +829,14 @@ function closeAttachMenu() {
 
 function updateAuthUi() {
   const statusEl = qs('[data-auth-status]');
-  const quotaEl = qs('[data-auth-quota-label]');
+  const accessEl = qs('[data-auth-access-label]');
   const signInBtn = qs('[data-auth-sign-in]');
   const signOutBtn = qs('[data-auth-sign-out]');
   const attachBtn = qs('[data-image-attach]');
 
   if (!state.auth.enabled) {
     if (statusEl) statusEl.textContent = 'Sign-in not configured';
-    if (quotaEl) quotaEl.textContent = 'Anonymous quota';
+    if (accessEl) accessEl.textContent = 'Guest access';
     if (signInBtn) signInBtn.hidden = true;
     if (signOutBtn) signOutBtn.hidden = true;
     if (attachBtn) attachBtn.disabled = true;
@@ -852,14 +847,14 @@ function updateAuthUi() {
 
   if (state.auth.signedIn) {
     if (statusEl) statusEl.textContent = state.auth.user?.email || state.auth.user?.name || 'Signed in';
-    if (quotaEl) quotaEl.textContent = 'User quota';
+    if (accessEl) accessEl.textContent = 'Signed in';
     if (signInBtn) signInBtn.hidden = true;
     if (signOutBtn) signOutBtn.hidden = false;
     if (attachBtn) attachBtn.disabled = false;
     hideAuthGate();
   } else {
     if (statusEl) statusEl.textContent = 'Not signed in';
-    if (quotaEl) quotaEl.textContent = 'Anonymous quota';
+    if (accessEl) accessEl.textContent = '3 guest questions';
     if (signInBtn) signInBtn.hidden = false;
     if (signOutBtn) signOutBtn.hidden = true;
     if (attachBtn) attachBtn.disabled = false;
@@ -1052,18 +1047,27 @@ function renderUsagePanel() {
   const detailEl = qs('[data-usage-detail]', panel);
 
   if (!state.usage) {
-    if (percentEl) percentEl.textContent = 'Not available';
+    if (percentEl) percentEl.textContent = state.auth.signedIn ? 'Checking' : '3 free';
     if (meterEl) meterEl.style.width = '0%';
-    if (detailEl) detailEl.textContent = 'Anonymous daily usage starts after your first message.';
+    if (detailEl) detailEl.textContent = state.auth.signedIn
+      ? 'Checking how many questions are left today.'
+      : 'Guests can ask 3 questions before signing in.';
     return;
   }
 
   const usage = state.usage;
-  if (percentEl) percentEl.textContent = `${usage.percentUsed}% used`;
+  const remaining = Math.max(Number(usage.remaining || 0), 0);
+  const limit = Number(usage.limit || 0);
+  if (percentEl) percentEl.textContent = `${remaining} left`;
   if (meterEl) meterEl.style.width = `${Math.min(Math.max(usage.percentUsed, 0), 100)}%`;
   if (detailEl) {
-    const quotaType = state.auth.signedIn ? 'signed-in' : 'anonymous';
-    detailEl.textContent = `${usage.remaining} of ${usage.limit} ${quotaType} messages left today. Resets in ${formatReset(usage)}.`;
+    if (!state.auth.signedIn) {
+      detailEl.textContent = remaining > 0
+        ? `${remaining} of ${limit} guest questions left today. Sign in to keep asking after that.`
+        : 'You have used your guest questions. Sign in with Google to keep asking.';
+    } else {
+      detailEl.textContent = `${remaining} of ${limit} questions left today. Resets in ${formatReset(usage)}.`;
+    }
   }
   panel.classList.toggle('usage-panel-warning', usage.percentUsed >= 80);
 }
@@ -1383,7 +1387,6 @@ function renderMessages() {
             chatId: chat.id,
             sessionId: getSessionId(),
             rating,
-            model: state.settings.model,
             compliance: message?.content?.includes('DSO') || message?.content?.includes('SEVIS') || false,
           }),
         });
@@ -1423,7 +1426,7 @@ async function streamAssistantReply(message, imageAttachments = []) {
     .slice(-20)
     .map(({ role, content }) => ({ role, content }));
 
-  const { model, conciseMode, userContext, language, destination, webSearch } = state.settings;
+  const { conciseMode, userContext, language, destination, webSearch } = state.settings;
   const profileContext = buildProfileContext(userContext);
 
   let fullText = '';
@@ -1474,7 +1477,6 @@ async function streamAssistantReply(message, imageAttachments = []) {
       body: JSON.stringify({
         message,
         history,
-        model,
         conciseMode,
         userContext: profileContext,
         language,
@@ -1489,9 +1491,18 @@ async function streamAssistantReply(message, imageAttachments = []) {
     if (!response.ok) {
       const payload = await response.json().catch(() => ({}));
       if (payload.usage) didUsage = payload.usage;
+<<<<<<< HEAD
+      if (payload.code === 'sign_in_required') {
+        fullText = `**Sign in to keep asking.** ${payload.text || 'You have used your guest questions.'}`;
+        showToast('Sign in with Google to keep asking.');
+        qs('[data-settings-panel]')?.classList.add('open');
+        qs('[data-settings-section="account"]')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        setSettingsNav('account');
+=======
       if (response.status === 429 && payload.authRequired) {
         shouldAppendAssistant = false;
         showAuthGate({ message: payload.text || AUTH_GATE_MESSAGE });
+>>>>>>> a036d86ba418cb7318b8b8d8d41d9a46b7af31b4
       } else {
         fullText = `**Error:** ${payload.error || payload.text || `Server error (HTTP ${response.status})`}`;
       }
@@ -1773,9 +1784,45 @@ function applyInline(text) {
     .replace(/`([^`]+)`/g, '<span class="code-inline">$1</span>');
 }
 
+function splitTableRow(line) {
+  const trimmed = line.trim().replace(/^\|/, '').replace(/\|$/, '');
+  return trimmed.split('|').map((cell) => cell.trim());
+}
+
+function isTableSeparator(line) {
+  const cells = splitTableRow(line);
+  return cells.length > 1 && cells.every((cell) => /^:?-{3,}:?$/.test(cell));
+}
+
+function isTableStart(lines, index) {
+  return lines[index]?.includes('|') && isTableSeparator(lines[index + 1] || '');
+}
+
+function renderMarkdownTable(rows) {
+  const header = splitTableRow(rows[0]);
+  const bodyRows = rows.slice(2).map(splitTableRow);
+  const width = header.length;
+
+  const headHtml = header
+    .map((cell) => `<th scope="col">${applyInline(cell)}</th>`)
+    .join('');
+
+  const bodyHtml = bodyRows
+    .filter((cells) => cells.some(Boolean))
+    .map((cells) => {
+      const padded = [...cells, ...Array(Math.max(0, width - cells.length)).fill('')].slice(0, width);
+      return `<tr>${padded.map((cell) => `<td>${applyInline(cell)}</td>`).join('')}</tr>`;
+    })
+    .join('');
+
+  return `<div class="message-table-wrap"><table class="message-table"><thead><tr>${headHtml}</tr></thead><tbody>${bodyHtml}</tbody></table></div>`;
+}
+
 function stripMarkdown(text) {
   return text
     .replace(/\[([^\]]+)\]\([^)]+\)/g, '$1')
+    .replace(/^\s*\|?\s*:?-{3,}:?\s*(\|\s*:?-{3,}:?\s*)+\|?\s*$/gm, '')
+    .replace(/\|/g, ' ')
     .replace(/\*\*(.*?)\*\*/g, '$1')
     .replace(/\*(.*?)\*/g, '$1')
     .replace(/`([^`]+)`/g, '$1')
@@ -1794,13 +1841,24 @@ function renderRichText(content) {
     if (listType) { out.push(`</${listType}>`); listType = null; }
   }
 
-  for (const raw of lines) {
+  for (let index = 0; index < lines.length; index += 1) {
+    const raw = lines[index];
     if (/^\s*$/.test(raw)) {
       closeList();
       out.push('<br>');
       continue;
     }
-    if (/^#{2,}\s+/.test(raw)) {
+    if (isTableStart(lines, index)) {
+      closeList();
+      const tableRows = [raw, lines[index + 1]];
+      index += 2;
+      while (index < lines.length && lines[index].includes('|') && !/^\s*$/.test(lines[index])) {
+        tableRows.push(lines[index]);
+        index += 1;
+      }
+      index -= 1;
+      out.push(renderMarkdownTable(tableRows));
+    } else if (/^#{2,}\s+/.test(raw)) {
       closeList();
       out.push(`<h4>${applyInline(raw.replace(/^#+\s+/, ''))}</h4>`);
     } else if (/^#\s+/.test(raw)) {
