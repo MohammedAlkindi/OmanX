@@ -1,6 +1,6 @@
 import { initCore, qs, qsa, formatDateTime, formatRelative, showToast, uid, downloadFile, copyText, setTheme, getTheme } from './core.js';
 import { loadChats, saveChats, getActiveChatId, setActiveChatId, createChat, updateChat, deleteChat, loadSettings, saveSettings, getSessionId, getSyncUserId, setSyncUserId } from './chat-store.js';
-import { getAccessToken, initAuth, onAuthChange, signInWithGoogle, signOut } from './auth-client.js';
+import { getAccessToken, initAuth, onAuthChange, signInWithGoogle, signInWithMagicLink, signOut } from './auth-client.js';
 
 const prompts = [
   { label: 'Arrival', text: 'What do I need to complete in my first 72 hours on campus?' },
@@ -24,6 +24,7 @@ const state = {
   confirmDeleteId: null,
   usage: null,
   auth: { ready: false, enabled: false, signedIn: false, user: null },
+  authGate: { visible: false, message: '', status: '', statusTone: '', sending: false },
   sync: { status: 'local', readyForUserId: '', remoteUpdatedAt: null, saving: false, queued: false, warned: false },
   pendingImages: [],
   searchStatus: '',
@@ -34,6 +35,7 @@ const DEST_LABEL = { auto: 'Auto', us: 'US', uk: 'UK', au: 'AU' };
 const DEST_FULL_LABEL = { auto: 'Auto-detect', us: 'United States', uk: 'United Kingdom', au: 'Australia' };
 const THINKING_STAGES = ['Checking your question...', 'Reading OmanX dataset...', 'Searching official sources...', 'Writing guidance...'];
 const SYNC_SAVE_DELAY_MS = 900;
+const AUTH_GATE_MESSAGE = "You've used your 3 free preview messages. Sign in with Google or send yourself a secure sign-in link to continue with 50 messages each day.";
 
 // Tracks which chatId is actively streaming; null when idle.
 let streamingChatId = null;
@@ -57,10 +59,10 @@ initAuth().then((auth) => {
 });
 onAuthChange((auth) => {
   state.auth = auth;
+  if (auth.signedIn) hideAuthGate();
   updateAuthUi();
   refreshUsage();
   handleAuthSync(auth);
-  if (auth.signedIn) advanceOnboardingFromAuth();
 });
 
 // init composer height
@@ -204,7 +206,7 @@ function updateSyncUi() {
   if (!state.auth.enabled) {
     if (historyLabel) historyLabel.textContent = 'Stored locally';
     if (syncStatus) syncStatus.textContent = 'Unavailable';
-    if (syncNote) syncNote.textContent = 'Google sign-in is not configured, so history remains on this device.';
+    if (syncNote) syncNote.textContent = 'Sign-in is not configured, so history remains on this device.';
     return;
   }
 
@@ -478,6 +480,12 @@ function bindEvents() {
     const hasImages = state.pendingImages.length > 0;
     if ((!content && !hasImages) || state.typing) return;
 
+    if (shouldOpenAuthGateFromUsage(state.usage)) {
+      showAuthGate();
+      qs('[data-auth-gate-email]')?.focus();
+      return;
+    }
+
     const submittedImages = [...state.pendingImages];
     const submittedContent = content || 'Please review the attached screenshot and tell me what matters.';
     appendMessage('user', submittedContent, state.activeChatId, {
@@ -519,6 +527,48 @@ function bindEvents() {
     showToast('Signed out.');
   });
 
+  qs('[data-auth-gate-google]')?.addEventListener('click', async () => {
+    if (!state.auth.enabled) {
+      setAuthGateStatus('Sign-in is not available right now.', 'error');
+      return;
+    }
+    try {
+      await signInWithGoogle();
+    } catch (error) {
+      setAuthGateStatus(error.message || 'Google sign-in is not available yet.', 'error');
+    }
+  });
+
+  qs('[data-auth-gate-magic-link]')?.addEventListener('submit', async (event) => {
+    event.preventDefault();
+    if (!state.auth.enabled) {
+      setAuthGateStatus('Sign-in is not available right now.', 'error');
+      return;
+    }
+
+    const input = qs('[data-auth-gate-email]');
+    const email = input?.value.trim() || '';
+    if (!email) {
+      setAuthGateStatus('Enter your email to get a secure sign-in link.', 'error');
+      input?.focus();
+      return;
+    }
+
+    state.authGate.sending = true;
+    setAuthGateStatus('', '');
+    renderAuthGate();
+    try {
+      await signInWithMagicLink(email);
+      if (input) input.value = '';
+      setAuthGateStatus('Check your email for a secure sign-in link. You can return here after verification.', 'success');
+    } catch (error) {
+      setAuthGateStatus(error.message || 'Could not send the sign-in link. Try again.', 'error');
+    } finally {
+      state.authGate.sending = false;
+      renderAuthGate();
+    }
+  });
+
   qs('[data-image-attach]')?.addEventListener('click', (event) => {
     event.stopPropagation();
     toggleAttachMenu();
@@ -527,7 +577,7 @@ function bindEvents() {
   qs('[data-attach-photo]')?.addEventListener('click', () => {
     closeAttachMenu();
     if (!state.auth.signedIn) {
-      showToast('Sign in with Google to attach screenshots.');
+      showToast('Sign in to attach screenshots.');
       qs('[data-settings-panel]')?.classList.add('open');
       return;
     }
@@ -796,6 +846,7 @@ function updateAuthUi() {
     if (signOutBtn) signOutBtn.hidden = true;
     if (attachBtn) attachBtn.disabled = true;
     updateSyncUi();
+    renderAuthGate();
     return;
   }
 
@@ -805,14 +856,85 @@ function updateAuthUi() {
     if (signInBtn) signInBtn.hidden = true;
     if (signOutBtn) signOutBtn.hidden = false;
     if (attachBtn) attachBtn.disabled = false;
+    hideAuthGate();
   } else {
     if (statusEl) statusEl.textContent = 'Not signed in';
     if (quotaEl) quotaEl.textContent = 'Anonymous quota';
     if (signInBtn) signInBtn.hidden = false;
     if (signOutBtn) signOutBtn.hidden = true;
     if (attachBtn) attachBtn.disabled = false;
+    renderAuthGate();
   }
   updateSyncUi();
+}
+
+function shouldOpenAuthGateFromUsage(usage) {
+  return Boolean(
+    usage &&
+    !usage.blockedBy &&
+    usage.tier === 'anonymous' &&
+    usage.remaining <= 0 &&
+    !state.auth.signedIn
+  );
+}
+
+function syncAuthGateWithUsage() {
+  if (state.auth.signedIn) {
+    hideAuthGate();
+    return;
+  }
+  if (shouldOpenAuthGateFromUsage(state.usage)) showAuthGate();
+  else renderAuthGate();
+}
+
+function showAuthGate({ message = AUTH_GATE_MESSAGE, status = '', statusTone = '' } = {}) {
+  state.authGate.visible = true;
+  state.authGate.message = message || AUTH_GATE_MESSAGE;
+  state.authGate.status = status;
+  state.authGate.statusTone = statusTone;
+  renderAuthGate();
+}
+
+function hideAuthGate() {
+  if (!state.authGate.visible && !state.authGate.status && !state.authGate.sending) return;
+  state.authGate = { visible: false, message: '', status: '', statusTone: '', sending: false };
+  renderAuthGate();
+}
+
+function setAuthGateStatus(status, statusTone = '') {
+  state.authGate.visible = true;
+  state.authGate.status = status || '';
+  state.authGate.statusTone = statusTone || '';
+  renderAuthGate();
+}
+
+function renderAuthGate() {
+  const gate = qs('[data-auth-gate]');
+  if (!gate) return;
+
+  const visible = state.authGate.visible && !state.auth.signedIn;
+  gate.hidden = !visible;
+  if (!visible) return;
+
+  const messageEl = qs('[data-auth-gate-message]', gate);
+  const statusEl = qs('[data-auth-gate-status]', gate);
+  const googleBtn = qs('[data-auth-gate-google]', gate);
+  const emailInput = qs('[data-auth-gate-email]', gate);
+  const emailSubmit = qs('[data-auth-gate-magic-submit]', gate);
+  const controlsDisabled = !state.auth.enabled || state.authGate.sending;
+
+  if (messageEl) messageEl.textContent = state.authGate.message || AUTH_GATE_MESSAGE;
+  if (googleBtn) googleBtn.disabled = controlsDisabled;
+  if (emailInput) emailInput.disabled = controlsDisabled;
+  if (emailSubmit) {
+    emailSubmit.disabled = controlsDisabled;
+    emailSubmit.textContent = state.authGate.sending ? 'Sending...' : 'Send sign-in link';
+  }
+  if (statusEl) {
+    const fallback = state.auth.enabled ? '' : 'Sign-in is not available right now.';
+    statusEl.textContent = state.authGate.status || fallback;
+    statusEl.dataset.tone = state.authGate.statusTone || (!state.auth.enabled ? 'error' : '');
+  }
 }
 
 function formatBytes(bytes) {
@@ -893,6 +1015,7 @@ async function refreshUsage() {
       state.usage = payload.usage;
       if (payload.user) state.auth = { ...state.auth, signedIn: true, user: payload.user };
       renderUsagePanel();
+      syncAuthGateWithUsage();
       updateAuthUi();
     }
   } catch {
@@ -904,6 +1027,7 @@ function setUsage(usage) {
   if (!usage) return;
   state.usage = usage;
   renderUsagePanel();
+  syncAuthGateWithUsage();
 }
 
 function formatReset(usage) {
@@ -954,33 +1078,14 @@ function showOnboardingStep(overlay, step) {
   });
 }
 
-function advanceOnboardingFromAuth() {
-  const overlay = qs('[data-onboarding]');
-  if (!overlay || overlay.hidden) return;
-  const authStep = qs('[data-ob-step="auth"]', overlay);
-  if (authStep && !authStep.hidden) showOnboardingStep(overlay, '1');
-}
-
 function showOnboarding() {
   const overlay = qs('[data-onboarding]');
   if (!overlay) return;
   overlay.hidden = false;
-  showOnboardingStep(overlay, state.auth.enabled && !state.auth.signedIn ? 'auth' : '1');
+  showOnboardingStep(overlay, '1');
 
   let selectedDest = 'auto';
   let selectedSituation = state.settings.situation || 'Current student';
-
-  qs('[data-onboarding-auth]', overlay)?.addEventListener('click', async () => {
-    try {
-      await signInWithGoogle();
-    } catch (error) {
-      showToast(error.message || 'Google sign-in is not available yet.');
-    }
-  });
-
-  qs('[data-onboarding-skip-auth]', overlay)?.addEventListener('click', () => {
-    showOnboardingStep(overlay, '1');
-  }, { once: true });
 
   qsa('[data-dest]', overlay).forEach((btn) => {
     btn.addEventListener('click', () => {
@@ -1029,6 +1134,7 @@ function showOnboarding() {
 function render() {
   renderSidebar();
   updateMobileChatContext();
+  renderAuthGate();
   // Skip message-list rebuild while the stream bubble is live on the active chat.
   // If the user switched to a different chat, render their messages normally.
   if (!streamingChatId || streamingChatId !== state.activeChatId) renderMessages();
@@ -1326,6 +1432,7 @@ async function streamAssistantReply(message, imageAttachments = []) {
   let didEscalation = null;
   let didDestination = null;
   let didUsage = null;
+  let shouldAppendAssistant = true;
   let bubbleEl = null;
   let rafPending = false;
 
@@ -1382,7 +1489,12 @@ async function streamAssistantReply(message, imageAttachments = []) {
     if (!response.ok) {
       const payload = await response.json().catch(() => ({}));
       if (payload.usage) didUsage = payload.usage;
-      fullText = `**Error:** ${payload.error || payload.text || `Server error (HTTP ${response.status})`}`;
+      if (response.status === 429 && payload.authRequired) {
+        shouldAppendAssistant = false;
+        showAuthGate({ message: payload.text || AUTH_GATE_MESSAGE });
+      } else {
+        fullText = `**Error:** ${payload.error || payload.text || `Server error (HTTP ${response.status})`}`;
+      }
     } else {
       const reader = response.body.getReader();
       const decoder = new TextDecoder();
@@ -1419,7 +1531,9 @@ async function streamAssistantReply(message, imageAttachments = []) {
   // even if the user switched conversations mid-stream.
   qs('[data-stream-bubble]')?.remove();
   setUsage(didUsage);
-  appendMessage('assistant', fullText.trim() || 'No response generated.', chat.id, { webSearched: didWebSearch, sources: didSources, escalation: didEscalation, destination: didDestination });
+  if (shouldAppendAssistant) {
+    appendMessage('assistant', fullText.trim() || 'No response generated.', chat.id, { webSearched: didWebSearch, sources: didSources, escalation: didEscalation, destination: didDestination });
+  }
   setTyping(false);
 }
 

@@ -82,8 +82,28 @@ export function downloadFile(filename, content, type = 'text/plain;charset=utf-8
   URL.revokeObjectURL(url);
 }
 
-export function copyText(text, successMessage = 'Copied to clipboard.') {
-  return navigator.clipboard.writeText(text).then(() => showToast(successMessage));
+export async function copyText(text, successMessage = 'Copied to clipboard.') {
+  try {
+    if (navigator.clipboard?.writeText) {
+      await navigator.clipboard.writeText(text);
+    } else {
+      const textarea = document.createElement('textarea');
+      textarea.value = text;
+      textarea.setAttribute('readonly', '');
+      textarea.style.position = 'fixed';
+      textarea.style.left = '-9999px';
+      document.body.appendChild(textarea);
+      textarea.select();
+      const copied = document.execCommand('copy');
+      textarea.remove();
+      if (!copied) throw new Error('copy command failed');
+    }
+    showToast(successMessage);
+    return true;
+  } catch {
+    showToast('Copy is unavailable in this browser context.');
+    return false;
+  }
 }
 
 export function getTheme() {

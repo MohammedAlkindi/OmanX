@@ -12,7 +12,7 @@ OmanX uses:
 
 - Express application (server.js)
 - Serverless wrappers in /api
-- Static frontend (index.html, styles.css, app.js)
+- Static frontend (public HTML files, styles.css, and ES modules in public/js)
 - Vercel serverless runtime
 
 Request Flow:
@@ -39,15 +39,16 @@ Optional:
 
 ALLOWED_ORIGIN  
 TAVILY_API_KEY  
-RATE_LIMIT_DAILY_MAX  
+RATE_LIMIT_ANONYMOUS_DAILY_MAX
+RATE_LIMIT_AUTHENTICATED_DAILY_MAX
 SUPABASE_URL  
 SUPABASE_PUBLISHABLE_KEY  
 IMAGE_UPLOAD_MAX_COUNT  
 IMAGE_UPLOAD_MAX_BYTES  
 
-Upstash Redis is required in production so anonymous and signed-in daily quotas are shared across Vercel serverless instances. Without it, `/api/ready` returns 503 and `/api/chat` fails closed instead of running with per-instance memory limits.
+Upstash Redis is required in production so anonymous and signed-in daily quotas are shared across Vercel serverless instances. Without it, `/api/ready` returns 503 and `/api/chat` fails closed instead of running with per-instance memory limits. If Redis is configured but unavailable, all quota tiers also fail closed.
 
-Set `SUPABASE_URL` and `SUPABASE_PUBLISHABLE_KEY` to enable Google OAuth, signed-in image uploads, and chat history sync. In Supabase Auth, enable the Google provider, allow the canonical local and production root redirect URLs, and run `supabase/migrations/20260710000000_create_omanx_chat_sync.sql` against the Supabase project.
+Set `SUPABASE_URL` and `SUPABASE_PUBLISHABLE_KEY` to enable Google OAuth, passwordless email-link sign-in, signed-in image uploads, and chat history sync. In Supabase Auth, enable the Google provider, keep email OTP enabled, allow the canonical local and production root redirect URLs, and run `supabase/migrations/20260710000000_create_omanx_chat_sync.sql` against the Supabase project.
 
 Never commit `.env` to version control.
 

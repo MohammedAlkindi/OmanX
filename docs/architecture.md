@@ -26,7 +26,7 @@ api/
 public/
   chat.html
   js/
-    auth-client.js   # Browser Supabase Google OAuth flow
+    auth-client.js   # Browser Supabase OAuth and email-link auth flow
     chat-page.js
     chat-store.js
     core.js
@@ -41,19 +41,20 @@ data/
 
 Supabase is optional.
 
-- If `SUPABASE_URL` and `SUPABASE_PUBLISHABLE_KEY` are configured, the browser enables "Continue with Google".
+- If `SUPABASE_URL` and `SUPABASE_PUBLISHABLE_KEY` are configured, the browser enables Google OAuth and passwordless email-link sign-in.
 - The browser stores the Supabase session using Supabase's client-side auth storage.
 - API requests send `Authorization: Bearer <supabase-access-token>`.
 - The API validates tokens with Supabase before trusting the user id.
-- If auth is absent, OmanX falls back to anonymous browser-session quotas, with client IP as a last fallback.
+- If auth is absent, OmanX falls back to anonymous browser-session-hash quotas, with client IP hash as a last fallback.
 - `/api/chats` uses the user bearer token with Supabase RLS, so users can read and write only their own `public.omanx_chat_sync` row.
 
 ## Quotas
 
-Daily quota defaults to 20 messages:
+Daily quota defaults:
 
 ```bash
-RATE_LIMIT_DAILY_MAX=20
+RATE_LIMIT_ANONYMOUS_DAILY_MAX=3
+RATE_LIMIT_AUTHENTICATED_DAILY_MAX=50
 ```
 
 Quota keys:
@@ -62,7 +63,7 @@ Quota keys:
 - Anonymous: `session:<browser-session-id>`
 - Fallback: `ip:<client-ip-hash>`
 
-Upstash Redis is used for production quota state. Without Upstash, local development can use in-memory process state, but production readiness fails and chat requests are rejected instead of relying on non-durable serverless memory.
+Upstash Redis is used for production quota state. Without Upstash, local development can use in-memory process state, but production readiness fails and chat requests are rejected instead of relying on non-durable serverless memory. If Redis is configured but unavailable, all tiers fail closed instead of falling back to memory.
 
 ## Image Upload
 
@@ -87,7 +88,7 @@ Images are sent ephemerally to Anthropic with the current message. The local cha
 
 Signed-in sync flow:
 
-1. Browser signs in with Google via Supabase.
+1. Browser signs in with Google or passwordless email link via Supabase.
 2. Browser calls `GET /api/chats` with the Supabase access token.
 3. Local chats and the remote snapshot are merged by chat id and `updatedAt`.
 4. Future local changes are debounced and saved with `PUT /api/chats`.
@@ -113,7 +114,7 @@ Compliance question:
 
 Signed-in screenshot question:
 
-1. Browser signs in with Google via Supabase.
+1. Browser signs in with Google or passwordless email link via Supabase.
 2. Browser sends token plus image data to `/api/chat`.
 3. API validates the token, applies `user:<id>` quota, validates the image, and sends it to Claude.
 

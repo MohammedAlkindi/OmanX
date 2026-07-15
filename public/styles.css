@@ -692,6 +692,15 @@ input[type="email"] {
   transition: border-color 0.15s;
 }
 
+.form-input::placeholder,
+.sidebar-search::placeholder,
+input[type="text"]::placeholder,
+input[type="search"]::placeholder,
+input[type="email"]::placeholder {
+  color: var(--ink-4);
+  font-style: italic;
+}
+
 .form-input:focus,
 .sidebar-search:focus,
 input[type="text"]:focus,
@@ -1526,7 +1535,7 @@ select:focus {
 
 .settings-input::placeholder,
 .settings-textarea::placeholder {
-  color: #9c9a91;
+  color: var(--ink-4);
   font-style: italic;
   opacity: 1;
 }
@@ -2003,7 +2012,7 @@ select:focus {
   background: var(--white);
   padding: 24px;
   display: grid;
-  grid-template-rows: 1fr auto;
+  grid-template-rows: 1fr auto auto;
   gap: 16px;
   min-height: 0;
   overflow: hidden;
@@ -2423,6 +2432,141 @@ select:focus {
 /* composer */
 .composer { margin-top: 0; }
 
+.auth-gate {
+  max-width: 720px;
+  width: 100%;
+  margin: 0 auto;
+}
+
+.auth-gate[hidden] {
+  display: none;
+}
+
+.auth-gate-card {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(260px, 0.9fr);
+  gap: 16px;
+  align-items: start;
+  padding: 14px;
+  border: 0.5px solid var(--border-strong);
+  border-radius: var(--radius);
+  background: var(--sand);
+}
+
+.auth-gate-copy {
+  display: grid;
+  gap: 4px;
+  min-width: 0;
+}
+
+.auth-gate-kicker {
+  font-family: var(--mono);
+  font-size: 0.5625rem;
+  font-weight: 500;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--gold);
+}
+
+.auth-gate h2 {
+  margin: 0;
+  color: var(--ink);
+  font-family: var(--sans);
+  font-size: 0.9375rem;
+  font-weight: 500;
+  line-height: 1.3;
+  letter-spacing: 0;
+}
+
+.auth-gate p {
+  margin: 0;
+  color: var(--ink-3);
+  font-size: 0.8125rem;
+  line-height: 1.55;
+}
+
+.auth-gate-actions,
+.auth-gate-email-form {
+  display: grid;
+  gap: 8px;
+  min-width: 0;
+}
+
+.auth-gate-google,
+.auth-gate-email-row button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  min-height: 36px;
+  padding: 0 12px;
+  border: 0.5px solid var(--border-strong);
+  border-radius: var(--radius);
+  background: var(--white);
+  color: var(--ink);
+  font-family: var(--sans);
+  font-size: 0.8125rem;
+  font-weight: 500;
+  transition: background 0.15s, border-color 0.15s, color 0.15s;
+}
+
+.auth-gate-google:hover:not(:disabled),
+.auth-gate-email-row button:hover:not(:disabled) {
+  border-color: var(--gold);
+  background: var(--gold-dim);
+}
+
+.auth-gate-google:disabled,
+.auth-gate-email-row button:disabled,
+.auth-gate-email-row input:disabled {
+  cursor: not-allowed;
+  opacity: 0.55;
+}
+
+.auth-gate-email-form label {
+  color: var(--ink-3);
+  font-size: 0.75rem;
+  line-height: 1.2;
+}
+
+.auth-gate-email-row {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 6px;
+}
+
+.auth-gate-email-row input {
+  min-width: 0;
+  height: 36px;
+  padding: 0 10px;
+  border: 0.5px solid var(--border-strong);
+  border-radius: var(--radius);
+  background: var(--white);
+  color: var(--ink);
+  font-size: 0.8125rem;
+}
+
+.auth-gate-email-row input:focus {
+  outline: none;
+  border-color: var(--gold);
+  box-shadow: 0 0 0 3px var(--gold-dim);
+}
+
+.auth-gate-status {
+  min-height: 1.2em;
+  font-family: var(--mono);
+  font-size: 0.625rem;
+  letter-spacing: 0.02em;
+}
+
+.auth-gate-status[data-tone="success"] {
+  color: var(--gold);
+}
+
+.auth-gate-status[data-tone="error"] {
+  color: #dc3c3c;
+}
+
 .composer-box {
   background: var(--sand);
   border: 0.5px solid var(--border-strong);
@@ -2467,6 +2611,7 @@ select:focus {
 
 .composer-box textarea::placeholder {
   color: var(--ink-3);
+  font-style: italic;
 }
 
 .composer-actions {
@@ -3122,6 +3267,15 @@ footer,
   padding: 3px 8px;
 }
 
+.activity-table-wrap {
+  max-width: 100%;
+  overflow-x: auto;
+}
+
+.activity-table {
+  min-width: 640px;
+}
+
 /* mobile bottom nav (preserved for legacy pages) */
 .mobile-bottom-nav {
   display: none;
@@ -3456,8 +3610,9 @@ footer,
   .sidebar-toggle-btn       { display: flex; }
 
   .mobile-chat-bar          { display: flex; }
-  .assistant-shell          { grid-template-rows: auto 1fr auto; padding: 0; gap: 0; }
+  .assistant-shell          { grid-template-rows: auto 1fr auto auto; padding: 0; gap: 0; }
   .assistant-shell .chat-body { padding: 16px; }
+  .assistant-shell .auth-gate { padding: 0 16px 8px; }
   .assistant-shell .composer  { padding: 0 16px 16px; }
 
   .mobile-bottom-nav        { display: flex; }
@@ -3472,6 +3627,8 @@ footer,
   .message-empty            { padding: 32px 20px; }
   .answer-status            { grid-template-columns: 1fr; }
   .answer-status-pills      { justify-content: flex-start; }
+  .auth-gate-card           { grid-template-columns: 1fr; }
+  .auth-gate-email-row      { grid-template-columns: 1fr; }
   .situation-grid           { grid-template-columns: 1fr; }
 
   .stat-grid,
@@ -3712,6 +3869,7 @@ footer,
 
 .chat-app .sidebar-search::placeholder {
   color: #858077;
+  font-style: italic;
 }
 
 .chat-app .chat-list {
@@ -3917,6 +4075,42 @@ footer,
   background: #f7f4ed;
 }
 
+.chat-app .auth-gate-card {
+  background: #fffdf8;
+  border-color: #dcd5c8;
+  border-radius: 14px;
+  box-shadow: 0 10px 32px rgba(36, 32, 26, 0.08);
+}
+
+.chat-app .auth-gate h2,
+.chat-app .auth-gate-google,
+.chat-app .auth-gate-email-row button,
+.chat-app .auth-gate-email-row input {
+  color: #282621;
+}
+
+.chat-app .auth-gate p,
+.chat-app .auth-gate-email-form label,
+.chat-app .auth-gate-status {
+  color: #746b5f;
+}
+
+.chat-app .auth-gate-status[data-tone="success"] {
+  color: #c9a96e;
+}
+
+.chat-app .auth-gate-status[data-tone="error"] {
+  color: #dc3c3c;
+}
+
+.chat-app .auth-gate-google,
+.chat-app .auth-gate-email-row button,
+.chat-app .auth-gate-email-row input {
+  background: #fffdf8;
+  border-color: #dcd5c8;
+  border-radius: 10px;
+}
+
 .chat-app .composer-box {
   border-radius: 14px;
 }
@@ -4081,6 +4275,30 @@ footer,
   box-shadow: 0 10px 32px rgba(0, 0, 0, 0.35);
 }
 
+[data-theme="dark"] .chat-app .auth-gate-card,
+[data-theme="dark"] .chat-app .auth-gate-google,
+[data-theme="dark"] .chat-app .auth-gate-email-row button,
+[data-theme="dark"] .chat-app .auth-gate-email-row input {
+  background: #242520;
+  border-color: #4d4e48;
+}
+
+[data-theme="dark"] .chat-app .auth-gate h2,
+[data-theme="dark"] .chat-app .auth-gate-google,
+[data-theme="dark"] .chat-app .auth-gate-email-row button,
+[data-theme="dark"] .chat-app .auth-gate-email-row input {
+  color: #f0ece4;
+}
+
+[data-theme="dark"] .chat-app .auth-gate p,
+[data-theme="dark"] .chat-app .auth-gate-email-form label,
+[data-theme="dark"] .chat-app .auth-gate-status {
+  color: #a8a297;
+}
+
+[data-theme="dark"] .chat-app .auth-gate-status[data-tone="success"] { color: #c9a96e; }
+[data-theme="dark"] .chat-app .auth-gate-status[data-tone="error"] { color: #dc3c3c; }
+
 [data-theme="dark"] .chat-app .composer-hint { color: #a8a297; }
 [data-theme="dark"] .chat-app .composer-box textarea { color: #f0ece4; }
 [data-theme="dark"] .chat-app .composer-box textarea::placeholder { color: #817b70; }
@@ -4176,6 +4394,30 @@ footer,
     box-shadow: 0 10px 32px rgba(0, 0, 0, 0.35);
   }
 
+  [data-theme="system"] .chat-app .auth-gate-card,
+  [data-theme="system"] .chat-app .auth-gate-google,
+  [data-theme="system"] .chat-app .auth-gate-email-row button,
+  [data-theme="system"] .chat-app .auth-gate-email-row input {
+    background: #242520;
+    border-color: #4d4e48;
+  }
+
+  [data-theme="system"] .chat-app .auth-gate h2,
+  [data-theme="system"] .chat-app .auth-gate-google,
+  [data-theme="system"] .chat-app .auth-gate-email-row button,
+  [data-theme="system"] .chat-app .auth-gate-email-row input {
+    color: #f0ece4;
+  }
+
+  [data-theme="system"] .chat-app .auth-gate p,
+  [data-theme="system"] .chat-app .auth-gate-email-form label,
+  [data-theme="system"] .chat-app .auth-gate-status {
+    color: #a8a297;
+  }
+
+  [data-theme="system"] .chat-app .auth-gate-status[data-tone="success"] { color: #c9a96e; }
+  [data-theme="system"] .chat-app .auth-gate-status[data-tone="error"] { color: #dc3c3c; }
+
   [data-theme="system"] .chat-app .composer-hint { color: #a8a297; }
   [data-theme="system"] .chat-app .composer-box textarea { color: #f0ece4; }
   [data-theme="system"] .chat-app .composer-box textarea::placeholder { color: #817b70; }
@@ -4221,7 +4463,7 @@ footer,
   }
 
   .chat-app .assistant-shell {
-    grid-template-rows: auto minmax(0, 1fr) auto;
+    grid-template-rows: auto minmax(0, 1fr) auto auto;
     min-height: 0;
     padding: 0;
     gap: 0;
@@ -4305,6 +4547,21 @@ footer,
 
   .chat-app .message.assistant .message-bubble {
     max-width: 100%;
+  }
+
+  .chat-app .auth-gate {
+    max-width: none;
+    padding: 0 12px 8px;
+  }
+
+  .chat-app .auth-gate-card {
+    grid-template-columns: 1fr;
+    gap: 12px;
+    padding: 12px;
+  }
+
+  .chat-app .auth-gate-email-row {
+    grid-template-columns: 1fr;
   }
 
   .chat-app .composer {
@@ -4611,6 +4868,7 @@ footer,
 
 .onboarding-name-input::placeholder {
   color: var(--ink-4);
+  font-style: italic;
 }
 
 .onboarding-submit {
