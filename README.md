@@ -100,8 +100,8 @@ The product is usable anonymously - visitors can preview the chat and send 3 ano
 │   │   └── core.js        # Theme engine, toast, shared utilities
 │   ├── styles.css         # Design tokens + dark mode via [data-theme]
 │   ├── chat.html          # Workspace (served at `/`)
-│   ├── index.html, system.html, method.html, vision.html, contact.html,
-│   │   examples.html, trust.html, collaboration.html, dashboard.html
+│   ├── index.html, about.html, method.html, vision.html, contact.html,
+│   │   examples.html, collaboration.html, dashboard.html
 ├── server.js              # Express entry point for local dev — mirrors vercel.json routing
 ├── vercel.json
 └── package.json
