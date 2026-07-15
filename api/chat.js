@@ -5,7 +5,7 @@ import fs from "fs/promises";
 import path from "path";
 import { fileURLToPath } from "url";
 import crypto from "crypto";
-import { consumeUsage, getRateLimitKey, getRequestSessionId } from "./rate-limit.js";
+import { consumeUsage, getQuotaForUser, getRateLimitKey, getRequestSessionId } from "./rate-limit.js";
 import { getAuthUser } from "./auth-utils.js";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
@@ -595,7 +595,7 @@ function sanitizeMessage(message) {
 function sanitizeImageAttachments(attachments, authUser) {
   if (!Array.isArray(attachments) || attachments.length === 0) return [];
   if (!authUser) {
-    const error = new Error("Image upload requires Google sign-in.");
+    const error = new Error("Image upload requires sign-in.");
     error.status = 401;
     throw error;
   }
@@ -675,8 +675,9 @@ export default async function handler(req, res) {
   }
 
   const sanitizedSessionId = getRequestSessionId(req, sessionId);
+  const quota = getQuotaForUser(auth.user);
   const rateLimitKey = auth.user ? `user:${auth.user.id}` : getRateLimitKey(req, sanitizedSessionId);
-  const usage = await consumeUsage(rateLimitKey);
+  const usage = await consumeUsage(rateLimitKey, quota);
   res.setHeader("X-RateLimit-Limit", String(usage.limit));
   res.setHeader("X-RateLimit-Remaining", String(usage.remaining));
   res.setHeader("X-RateLimit-Reset", String(Math.ceil(usage.resetAt / 1000)));
@@ -685,14 +686,19 @@ export default async function handler(req, res) {
     if (usage.blockedBy === "rate_limit_store") {
       return res.status(503).json({
         error: "Usage protection is not configured.",
-        text: "OmanX is temporarily unavailable because production rate limiting is not configured.",
+        text: "OmanX is temporarily unavailable because usage protection is not available.",
         usage,
       });
     }
 
+    const authRequired = quota.tier === "anonymous";
     return res.status(429).json({
       error: "Daily message limit reached.",
-      text: "You've reached today's anonymous message limit. Please come back tomorrow.",
+      code: authRequired ? "anonymous_preview_limit" : "authenticated_daily_limit",
+      text: authRequired
+        ? "You've used your 3 free preview messages. Sign in to continue with 50 messages each day."
+        : "You've reached today's 50-message daily limit. Please come back tomorrow.",
+      authRequired,
       usage,
     });
   }

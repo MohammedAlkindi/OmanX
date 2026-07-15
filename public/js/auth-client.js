@@ -129,6 +129,24 @@ export async function signInWithGoogle() {
   if (error) throw error;
 }
 
+export async function signInWithMagicLink(email) {
+  await initAuth();
+  if (!supabase) throw new Error('Email sign-in is not configured yet.');
+
+  const normalizedEmail = String(email || '').trim().toLowerCase();
+  if (!normalizedEmail) throw new Error('Enter your email to get a secure sign-in link.');
+
+  const { error } = await supabase.auth.signInWithOtp({
+    email: normalizedEmail,
+    options: {
+      emailRedirectTo: getAuthRedirectUrl(),
+      shouldCreateUser: true,
+    },
+  });
+
+  if (error) throw error;
+}
+
 export async function signOut() {
   await initAuth();
   if (!supabase) return;
