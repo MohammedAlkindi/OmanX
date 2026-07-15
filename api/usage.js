@@ -1,4 +1,4 @@
-import { getRateLimitKey, getRequestSessionId, getUsage } from "./rate-limit.js";
+import { getRateLimitKey, getRequestSessionId, getUsage, RATE_LIMIT_GUEST_MAX, RATE_LIMIT_SIGNED_IN_MAX } from "./rate-limit.js";
 import { getAuthUser, publicUser } from "./auth-utils.js";
 
 export default async function handler(req, res) {
@@ -19,10 +19,17 @@ export default async function handler(req, res) {
     return res.status(401).json({ error: auth.error });
   }
 
+  const isSignedIn = !!auth.user;
   const sessionId = getRequestSessionId(req);
-  const key = auth.user ? `user:${auth.user.id}` : getRateLimitKey(req, sessionId);
-  const usage = await getUsage(key);
+  const key = isSignedIn ? `user:${auth.user.id}` : getRateLimitKey(req, sessionId);
+  const usage = await getUsage(key, {
+    limit: isSignedIn ? RATE_LIMIT_SIGNED_IN_MAX : RATE_LIMIT_GUEST_MAX,
+  });
 
   res.setHeader("Cache-Control", "no-store");
-  return res.json({ usage, user: publicUser(auth.user), quotaKey: auth.user ? "user" : "anonymous" });
+  return res.json({
+    usage: { ...usage, access: isSignedIn ? "signed-in" : "guest" },
+    user: publicUser(auth.user),
+    access: isSignedIn ? "signed-in" : "guest",
+  });
 }

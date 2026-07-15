@@ -1,7 +1,9 @@
 import { Redis } from "@upstash/redis";
 import crypto from "crypto";
 
-export const RATE_LIMIT_MAX = Number(process.env.RATE_LIMIT_DAILY_MAX || 20);
+export const RATE_LIMIT_SIGNED_IN_MAX = Number(process.env.RATE_LIMIT_SIGNED_IN_DAILY_MAX || process.env.RATE_LIMIT_DAILY_MAX || 20);
+export const RATE_LIMIT_GUEST_MAX = Number(process.env.RATE_LIMIT_GUEST_DAILY_MAX || 3);
+export const RATE_LIMIT_MAX = RATE_LIMIT_SIGNED_IN_MAX;
 export const RATE_LIMIT_WINDOW_MS = 24 * 60 * 60 * 1000;
 
 const _rateLimitMap = new Map();
@@ -100,7 +102,7 @@ export function getRateLimitKey(req, sessionId = "") {
   return "ip:unknown";
 }
 
-function toUsage({ allowed = true, count = 0, limit = RATE_LIMIT_MAX, resetAt = Date.now() + RATE_LIMIT_WINDOW_MS, source = "memory", window = "day", blockedBy = null } = {}) {
+function toUsage({ allowed = true, count = 0, limit = RATE_LIMIT_SIGNED_IN_MAX, resetAt = Date.now() + RATE_LIMIT_WINDOW_MS, source = "memory", window = "day", blockedBy = null } = {}) {
   const used = Math.min(count, limit);
   const remaining = Math.max(limit - count, 0);
   return {
@@ -117,12 +119,12 @@ function toUsage({ allowed = true, count = 0, limit = RATE_LIMIT_MAX, resetAt = 
   };
 }
 
-function missingPersistentStoreUsage({ window = "day" } = {}) {
+function missingPersistentStoreUsage({ window = "day", limit = RATE_LIMIT_SIGNED_IN_MAX } = {}) {
   warnMissingPersistentRateLimitStore();
   return toUsage({
     allowed: false,
-    count: RATE_LIMIT_MAX,
-    limit: RATE_LIMIT_MAX,
+    count: limit,
+    limit,
     resetAt: Date.now() + RATE_LIMIT_WINDOW_MS,
     source: "missing-persistent-store",
     window,
@@ -130,11 +132,11 @@ function missingPersistentStoreUsage({ window = "day" } = {}) {
   });
 }
 
-function unavailablePersistentStoreUsage({ window = "day" } = {}) {
+function unavailablePersistentStoreUsage({ window = "day", limit = RATE_LIMIT_SIGNED_IN_MAX } = {}) {
   return toUsage({
     allowed: false,
-    count: RATE_LIMIT_MAX,
-    limit: RATE_LIMIT_MAX,
+    count: limit,
+    limit,
     resetAt: Date.now() + RATE_LIMIT_WINDOW_MS,
     source: "unavailable-persistent-store",
     window,
@@ -142,7 +144,7 @@ function unavailablePersistentStoreUsage({ window = "day" } = {}) {
   });
 }
 
-function memoryBucketUsage(key, { consume = false, limit = RATE_LIMIT_MAX, windowMs = RATE_LIMIT_WINDOW_MS, window = "day" } = {}) {
+function memoryBucketUsage(key, { consume = false, limit = RATE_LIMIT_SIGNED_IN_MAX, windowMs = RATE_LIMIT_WINDOW_MS, window = "day" } = {}) {
   const now = Date.now();
   const cutoff = now - windowMs;
   const entry = _rateLimitMap.get(key) || [];
@@ -171,7 +173,7 @@ function memoryBucketUsage(key, { consume = false, limit = RATE_LIMIT_MAX, windo
   });
 }
 
-async function redisBucketUsage(key, { consume = false, limit = RATE_LIMIT_MAX, windowMs = RATE_LIMIT_WINDOW_MS, window = "day" } = {}) {
+async function redisBucketUsage(key, { consume = false, limit = RATE_LIMIT_SIGNED_IN_MAX, windowMs = RATE_LIMIT_WINDOW_MS, window = "day" } = {}) {
   const redis = getRedis();
   if (!redis) return null;
 
@@ -194,39 +196,39 @@ async function redisBucketUsage(key, { consume = false, limit = RATE_LIMIT_MAX, 
   });
 }
 
-export async function getUsage(key) {
+export async function getUsage(key, { limit = RATE_LIMIT_SIGNED_IN_MAX } = {}) {
   const dailyKey = `daily:${key}`;
   if (requiresPersistentRateLimitStore() && !hasPersistentRateLimitStore()) {
-    return missingPersistentStoreUsage({ window: "day" });
+    return missingPersistentStoreUsage({ window: "day", limit });
   }
 
   try {
-    const usage = await redisBucketUsage(dailyKey, { consume: false, limit: RATE_LIMIT_MAX, windowMs: RATE_LIMIT_WINDOW_MS, window: "day" });
+    const usage = await redisBucketUsage(dailyKey, { consume: false, limit, windowMs: RATE_LIMIT_WINDOW_MS, window: "day" });
     if (usage) return usage;
   } catch (error) {
     console.warn("[OmanX] Redis usage read failed:", error.message);
     if (requiresPersistentRateLimitStore()) {
-      return unavailablePersistentStoreUsage({ window: "day" });
+      return unavailablePersistentStoreUsage({ window: "day", limit });
     }
   }
-  return memoryBucketUsage(dailyKey, { consume: false, limit: RATE_LIMIT_MAX, windowMs: RATE_LIMIT_WINDOW_MS, window: "day" });
+  return memoryBucketUsage(dailyKey, { consume: false, limit, windowMs: RATE_LIMIT_WINDOW_MS, window: "day" });
 }
 
-export async function consumeUsage(key) {
+export async function consumeUsage(key, { limit = RATE_LIMIT_SIGNED_IN_MAX } = {}) {
   const dailyKey = `daily:${key}`;
   if (requiresPersistentRateLimitStore() && !hasPersistentRateLimitStore()) {
-    return missingPersistentStoreUsage({ window: "day" });
+    return missingPersistentStoreUsage({ window: "day", limit });
   }
 
   try {
-    const dailyUsage = await redisBucketUsage(dailyKey, { consume: true, limit: RATE_LIMIT_MAX, windowMs: RATE_LIMIT_WINDOW_MS, window: "day" });
+    const dailyUsage = await redisBucketUsage(dailyKey, { consume: true, limit, windowMs: RATE_LIMIT_WINDOW_MS, window: "day" });
     if (dailyUsage) return dailyUsage;
   } catch (error) {
     console.warn("[OmanX] Redis usage write failed:", error.message);
     if (requiresPersistentRateLimitStore()) {
-      return unavailablePersistentStoreUsage({ window: "day" });
+      return unavailablePersistentStoreUsage({ window: "day", limit });
     }
   }
 
-  return memoryBucketUsage(dailyKey, { consume: true, limit: RATE_LIMIT_MAX, windowMs: RATE_LIMIT_WINDOW_MS, window: "day" });
+  return memoryBucketUsage(dailyKey, { consume: true, limit, windowMs: RATE_LIMIT_WINDOW_MS, window: "day" });
 }

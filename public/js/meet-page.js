@@ -1,3 +1,3 @@
 import { initCore } from './core.js';
 
-initCore({ page: 'trust' });
+initCore({ page: 'meet' });

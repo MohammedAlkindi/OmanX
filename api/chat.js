@@ -5,7 +5,7 @@ import fs from "fs/promises";
 import path from "path";
 import { fileURLToPath } from "url";
 import crypto from "crypto";
-import { consumeUsage, getRateLimitKey, getRequestSessionId } from "./rate-limit.js";
+import { consumeUsage, getRateLimitKey, getRequestSessionId, RATE_LIMIT_GUEST_MAX, RATE_LIMIT_SIGNED_IN_MAX } from "./rate-limit.js";
 import { getAuthUser } from "./auth-utils.js";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
@@ -36,7 +36,6 @@ const DEST_KB_PATHS = {
 
 
 const DEFAULT_MODEL = process.env.ANTHROPIC_MODEL || "claude-sonnet-4-6";
-const ALLOWED_MODELS = new Set(["claude-sonnet-4-6", "claude-haiku-4-5-20251001"]);
 const VALID_DESTINATIONS = new Set(["us", "uk", "au"]);
 const ALLOWED_IMAGE_TYPES = new Set(["image/jpeg", "image/png", "image/webp"]);
 const MAX_IMAGE_ATTACHMENTS = Number(process.env.IMAGE_UPLOAD_MAX_COUNT || 1);
@@ -647,7 +646,7 @@ export default async function handler(req, res) {
   if (req.method === "OPTIONS") return res.status(200).end();
   if (req.method !== "POST") return res.status(405).json({ error: "Method not allowed" });
 
-  const { message, history, model: clientModel, conciseMode, userContext, language, destination: clientDestination, webSearch: clientWebSearch, sessionId, attachments } = req.body || {};
+  const { message, history, conciseMode, userContext, language, destination: clientDestination, webSearch: clientWebSearch, sessionId, attachments } = req.body || {};
   if (!message || typeof message !== "string") {
     return res.status(400).json({ error: "Missing 'message' string." });
   }
@@ -674,9 +673,13 @@ export default async function handler(req, res) {
     return res.status(error.status || 400).json({ error: error.message });
   }
 
+  const isSignedIn = !!auth.user;
   const sanitizedSessionId = getRequestSessionId(req, sessionId);
-  const rateLimitKey = auth.user ? `user:${auth.user.id}` : getRateLimitKey(req, sanitizedSessionId);
-  const usage = await consumeUsage(rateLimitKey);
+  const rateLimitKey = isSignedIn ? `user:${auth.user.id}` : getRateLimitKey(req, sanitizedSessionId);
+  const usage = await consumeUsage(rateLimitKey, {
+    limit: isSignedIn ? RATE_LIMIT_SIGNED_IN_MAX : RATE_LIMIT_GUEST_MAX,
+  });
+  usage.access = isSignedIn ? "signed-in" : "guest";
   res.setHeader("X-RateLimit-Limit", String(usage.limit));
   res.setHeader("X-RateLimit-Remaining", String(usage.remaining));
   res.setHeader("X-RateLimit-Reset", String(Math.ceil(usage.resetAt / 1000)));
@@ -691,13 +694,16 @@ export default async function handler(req, res) {
     }
 
     return res.status(429).json({
-      error: "Daily message limit reached.",
-      text: "You've reached today's anonymous message limit. Please come back tomorrow.",
+      error: isSignedIn ? "Daily question limit reached." : "Sign in required.",
+      code: isSignedIn ? "daily_limit_reached" : "sign_in_required",
+      text: isSignedIn
+        ? "You've reached today's question limit. Please come back tomorrow."
+        : `You've used your ${RATE_LIMIT_GUEST_MAX} guest questions. Sign in with Google to keep asking.`,
       usage,
     });
   }
 
-  const model = ALLOWED_MODELS.has(clientModel) ? clientModel : DEFAULT_MODEL;
+  const model = DEFAULT_MODEL;
   const sanitizedUserContext = userContext ? sanitizeMessage(String(userContext)).slice(0, 2000) : "";
   const useConcise = conciseMode === true;
   const responseLanguage = (typeof language === 'string' && language !== 'auto') ? language : null;

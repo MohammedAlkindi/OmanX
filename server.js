@@ -24,6 +24,7 @@ const ROUTE_METHODS = new Map([
   ['/product', new Set(['GET'])],
   ['/workspace', new Set(['GET'])],
   ['/chat', new Set(['GET'])],
+  ['/meet', new Set(['GET'])],
   ['/system', new Set(['GET'])],
   ['/method', new Set(['GET'])],
   ['/vision', new Set(['GET'])],
@@ -75,6 +76,7 @@ app.get('/api/metrics', metricsHandler);
 app.get('/index.html', (req, res) => res.redirect(301, '/product'));
 app.get('/product.html', (req, res) => res.redirect(301, '/product'));
 app.get('/chat.html', (req, res) => res.redirect(301, '/'));
+app.get('/meet.html', (req, res) => res.redirect(301, '/meet'));
 app.get('/system.html', (req, res) => res.redirect(301, '/system'));
 app.get('/method.html', (req, res) => res.redirect(301, '/method'));
 app.get('/vision.html', (req, res) => res.redirect(301, '/vision'));
@@ -82,7 +84,7 @@ app.get('/contact.html', (req, res) => res.redirect(301, '/contact'));
 app.get('/examples.html', (req, res) => res.redirect(301, '/examples'));
 app.get('/settings.html', (req, res) => res.redirect(301, '/'));
 app.get('/collaboration.html', (req, res) => res.redirect(301, '/collaboration'));
-app.get('/trust.html', (req, res) => res.redirect(301, '/trust'));
+app.get('/trust.html', (req, res) => res.redirect(301, '/system'));
 app.get('/dashboard.html', (req, res) => res.redirect(301, '/dashboard'));
 
 // Page routes
@@ -95,6 +97,10 @@ app.get('/product', (req, res) => {
 });
 
 app.get(['/workspace', '/chat'], (req, res) => res.redirect(301, '/'));
+
+app.get('/meet', (req, res) => {
+  res.sendFile(path.join(PUBLIC_DIR, 'meet.html'));
+});
 
 app.get('/system', (req, res) => {
   res.sendFile(path.join(PUBLIC_DIR, 'system.html'));
@@ -116,9 +122,7 @@ app.get('/examples', (req, res) => {
   res.sendFile(path.join(PUBLIC_DIR, 'examples.html'));
 });
 
-app.get('/trust', (req, res) => {
-  res.sendFile(path.join(PUBLIC_DIR, 'trust.html'));
-});
+app.get('/trust', (req, res) => res.redirect(301, '/system'));
 
 app.get('/settings', (req, res) => res.redirect(301, '/'));
 

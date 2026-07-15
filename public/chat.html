@@ -12,6 +12,10 @@
     <meta name="description" content="Guidance for Omani scholars studying abroad." />
     <link rel="stylesheet" href="/styles.css" />
     <script defer src="/_vercel/insights/script.js"></script>
+    <script>
+      window.si = window.si || function () { (window.siq = window.siq || []).push(arguments); };
+    </script>
+    <script defer src="/_vercel/speed-insights/script.js"></script>
   </head>
   <body class="chat-app">
     <!-- Navigation — sticky, frosted -->
@@ -26,6 +30,7 @@
       <div class="nav-drawer" data-mobile-panel>
         <a href="/">Chat</a>
         <a href="/product">Product</a>
+        <a href="/meet">Meet a Scholar</a>
         <a href="/system">System</a>
         <a href="/vision">Roadmap</a>
         <a href="/contact">Contact</a>
@@ -51,22 +56,14 @@
                 <span class="sidebar-nav-icon">+</span>
                 <span>New chat</span>
               </button>
-              <button class="sidebar-nav-item active" type="button">
-                <span class="sidebar-nav-icon">?</span>
-                <span>Chats</span>
-              </button>
+              <a class="sidebar-nav-item" href="/meet">
+                <span class="sidebar-nav-icon">i</span>
+                <span>Meet a Scholar</span>
+              </a>
               <a class="sidebar-nav-item" href="/system">
                 <span class="sidebar-nav-icon">#</span>
                 <span>System</span>
               </a>
-              <a class="sidebar-nav-item" href="/trust">
-                <span class="sidebar-nav-icon">i</span>
-                <span>Trust</span>
-              </a>
-              <button class="sidebar-nav-item" data-settings-toggle type="button">
-                <span class="sidebar-nav-icon">*</span>
-                <span>Customize</span>
-              </button>
             </div>
 
             <div class="sidebar-section-label">Search</div>
@@ -188,13 +185,6 @@
                   </select>
                 </div>
                 <div class="settings-field">
-                  <label for="settings-model">Default model</label>
-                  <select id="settings-model" class="settings-select" data-setting-model>
-                    <option value="claude-sonnet-4-6">Sonnet 4.6 - Recommended</option>
-                    <option value="claude-haiku-4-5-20251001">Haiku 4.5 - Faster</option>
-                  </select>
-                </div>
-                <div class="settings-field">
                   <label for="settings-context">Additional context</label>
                   <textarea id="settings-context" class="settings-textarea" data-setting-context rows="3" placeholder="Example: I am graduating in May and need OPT guidance."></textarea>
                 </div>
@@ -215,29 +205,29 @@
                 <div class="settings-section-label">Account</div>
                 <div class="settings-info-row">
                   <span data-auth-status>Not signed in</span>
-                  <strong data-auth-quota-label>Anonymous quota</strong>
+                  <strong data-auth-access-label>Guest access</strong>
                 </div>
                 <button type="button" class="btn-settings-secondary" data-auth-sign-in>
                   <svg class="google-icon" width="16" height="16" viewBox="0 0 18 18" aria-hidden="true"><path fill="#4285F4" d="M17.64 9.2c0-.637-.057-1.251-.164-1.84H9v3.481h4.844a4.14 4.14 0 0 1-1.796 2.716v2.259h2.908c1.702-1.567 2.684-3.874 2.684-6.615z"/><path fill="#34A853" d="M9 18c2.43 0 4.467-.806 5.956-2.18l-2.908-2.259c-.806.54-1.837.86-3.048.86-2.344 0-4.328-1.584-5.036-3.711H.957v2.332A8.997 8.997 0 0 0 9 18z"/><path fill="#FBBC05" d="M3.964 10.71A5.41 5.41 0 0 1 3.682 9c0-.593.102-1.17.282-1.71V4.958H.957A8.996 8.996 0 0 0 0 9c0 1.452.348 2.827.957 4.042l3.007-2.332z"/><path fill="#EA4335" d="M9 3.58c1.321 0 2.508.454 3.44 1.345l2.582-2.58C13.463.891 11.426 0 9 0A8.997 8.997 0 0 0 .957 4.958L3.964 7.29C4.672 5.163 6.656 3.58 9 3.58z"/></svg>
                   Continue with Google
                 </button>
                 <button type="button" class="btn-settings-secondary" data-auth-sign-out hidden>Sign out</button>
-                <div class="settings-note">Sign in for durable quotas, image uploads, and synced chat history.</div>
+                <div class="settings-note">Guests can ask 3 questions. Sign in to keep asking, attach screenshots, and keep chats across devices.</div>
 
                 <hr class="settings-divider" />
 
-                <div class="settings-section-label">Service protection</div>
+                <div class="settings-section-label">Daily questions</div>
                 <div class="usage-panel" data-usage-panel>
                   <div class="usage-row">
-                    <span>Anonymous daily limit</span>
+                    <span>Questions today</span>
                     <strong data-usage-percent>Loading</strong>
                   </div>
                   <div class="usage-meter" aria-hidden="true">
                     <span data-usage-meter></span>
                   </div>
-                  <div class="usage-detail" data-usage-detail>Checking your current usage.</div>
+                  <div class="usage-detail" data-usage-detail>Checking how many questions are left.</div>
                 </div>
-                <div class="settings-note">This protects OmanX while chat remains anonymous. Durable per-user quotas require sign-in.</div>
+                <div class="settings-note">Guest questions reset daily. Sign in when you need a longer conversation.</div>
               </div>
 
               <hr class="settings-divider" />
@@ -250,8 +240,8 @@
                   <strong data-history-storage-label>Stored locally</strong>
                 </div>
                 <div class="settings-info-row">
-                  <span>Sync</span>
-                  <strong data-sync-status>Sign in to sync</strong>
+                  <span>Across devices</span>
+                  <strong data-sync-status>Sign in to save</strong>
                 </div>
                 <button type="button" class="btn-settings-secondary" data-export-all-chats>Export all conversations</button>
                 <label class="toggle-row">
@@ -259,7 +249,7 @@
                   <span class="toggle-label">Share conversations to improve OmanX</span>
                   <span class="toggle-track"><span class="toggle-thumb"></span></span>
                 </label>
-                <div class="settings-note" data-sync-note>Sign in to sync conversations across your devices. Anonymous history stays local.</div>
+                <div class="settings-note" data-sync-note>Your chats stay on this device until you sign in.</div>
                 <button type="button" class="btn-settings-danger" data-delete-all-chats>Delete all questions</button>
               </div>
 
@@ -342,12 +332,12 @@
 
         <div class="onboarding-step" data-ob-step="auth" hidden>
           <p class="onboarding-title">Keep this history across devices?</p>
-          <p class="onboarding-hint">Anonymous chat is ready now. Google sign-in is optional for synced history, durable quotas, and screenshot uploads.</p>
+          <p class="onboarding-hint">You can ask 3 questions first. Sign in to keep chats across devices, attach screenshots, and continue longer conversations.</p>
           <button class="btn-settings-secondary onboarding-auth-secondary" data-onboarding-auth type="button">
             <svg class="google-icon" width="18" height="18" viewBox="0 0 18 18" aria-hidden="true"><path fill="#4285F4" d="M17.64 9.2c0-.637-.057-1.251-.164-1.84H9v3.481h4.844a4.14 4.14 0 0 1-1.796 2.716v2.259h2.908c1.702-1.567 2.684-3.874 2.684-6.615z"/><path fill="#34A853" d="M9 18c2.43 0 4.467-.806 5.956-2.18l-2.908-2.259c-.806.54-1.837.86-3.048.86-2.344 0-4.328-1.584-5.036-3.711H.957v2.332A8.997 8.997 0 0 0 9 18z"/><path fill="#FBBC05" d="M3.964 10.71A5.41 5.41 0 0 1 3.682 9c0-.593.102-1.17.282-1.71V4.958H.957A8.996 8.996 0 0 0 0 9c0 1.452.348 2.827.957 4.042l3.007-2.332z"/><path fill="#EA4335" d="M9 3.58c1.321 0 2.508.454 3.44 1.345l2.582-2.58C13.463.891 11.426 0 9 0A8.997 8.997 0 0 0 .957 4.958L3.964 7.29C4.672 5.163 6.656 3.58 9 3.58z"/></svg>
             Continue with Google
           </button>
-          <button class="onboarding-skip" data-onboarding-skip-auth type="button">Stay anonymous</button>
+          <button class="onboarding-skip" data-onboarding-skip-auth type="button">Continue as guest</button>
         </div>
 
         <div class="onboarding-step" data-ob-step="1">
