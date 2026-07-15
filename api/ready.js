@@ -1,10 +1,11 @@
 // api/ready.js - OmanX readiness check endpoint
 
-import { hasPersistentRateLimitStore, requiresPersistentRateLimitStore } from "./rate-limit.js";
+import { checkPersistentRateLimitStore, requiresPersistentRateLimitStore } from "./rate-limit.js";
 
 export default async function handler(req, res) {
-  const rateLimitStoreReady = hasPersistentRateLimitStore();
   const rateLimitStoreRequired = requiresPersistentRateLimitStore();
+  const rateLimitStore = await checkPersistentRateLimitStore();
+  const rateLimitStoreReady = rateLimitStore.ready;
   const ready = !rateLimitStoreRequired || rateLimitStoreReady;
 
   return res.status(ready ? 200 : 503).json({
@@ -15,10 +16,8 @@ export default async function handler(req, res) {
       rateLimitStore: {
         ready: rateLimitStoreReady,
         required: rateLimitStoreRequired,
-        source: rateLimitStoreReady ? "upstash" : "memory",
-        message: rateLimitStoreReady
-          ? "Persistent rate limit store configured."
-          : "Set UPSTASH_REDIS_REST_URL and UPSTASH_REDIS_REST_TOKEN before production use.",
+        source: rateLimitStore.source,
+        message: rateLimitStore.message,
       },
     },
   });

@@ -13,6 +13,32 @@ export function hasPersistentRateLimitStore() {
   return Boolean(url && token);
 }
 
+export async function checkPersistentRateLimitStore() {
+  if (!hasPersistentRateLimitStore()) {
+    return {
+      ready: false,
+      source: "memory",
+      message: "Set UPSTASH_REDIS_REST_URL and UPSTASH_REDIS_REST_TOKEN before production use.",
+    };
+  }
+
+  try {
+    await getRedis().ping();
+    return {
+      ready: true,
+      source: "upstash",
+      message: "Persistent rate limit store configured and reachable.",
+    };
+  } catch (error) {
+    console.error("[OmanX] Redis readiness check failed:", error.message);
+    return {
+      ready: false,
+      source: "unreachable-persistent-store",
+      message: "Persistent rate limit store is configured but unreachable.",
+    };
+  }
+}
+
 export function requiresPersistentRateLimitStore() {
   return process.env.VERCEL === "1" || process.env.NODE_ENV === "production";
 }
@@ -104,6 +130,18 @@ function missingPersistentStoreUsage({ window = "day" } = {}) {
   });
 }
 
+function unavailablePersistentStoreUsage({ window = "day" } = {}) {
+  return toUsage({
+    allowed: false,
+    count: RATE_LIMIT_MAX,
+    limit: RATE_LIMIT_MAX,
+    resetAt: Date.now() + RATE_LIMIT_WINDOW_MS,
+    source: "unavailable-persistent-store",
+    window,
+    blockedBy: "rate_limit_store",
+  });
+}
+
 function memoryBucketUsage(key, { consume = false, limit = RATE_LIMIT_MAX, windowMs = RATE_LIMIT_WINDOW_MS, window = "day" } = {}) {
   const now = Date.now();
   const cutoff = now - windowMs;
@@ -167,6 +205,9 @@ export async function getUsage(key) {
     if (usage) return usage;
   } catch (error) {
     console.warn("[OmanX] Redis usage read failed:", error.message);
+    if (requiresPersistentRateLimitStore()) {
+      return unavailablePersistentStoreUsage({ window: "day" });
+    }
   }
   return memoryBucketUsage(dailyKey, { consume: false, limit: RATE_LIMIT_MAX, windowMs: RATE_LIMIT_WINDOW_MS, window: "day" });
 }
@@ -182,6 +223,9 @@ export async function consumeUsage(key) {
     if (dailyUsage) return dailyUsage;
   } catch (error) {
     console.warn("[OmanX] Redis usage write failed:", error.message);
+    if (requiresPersistentRateLimitStore()) {
+      return unavailablePersistentStoreUsage({ window: "day" });
+    }
   }
 
   return memoryBucketUsage(dailyKey, { consume: true, limit: RATE_LIMIT_MAX, windowMs: RATE_LIMIT_WINDOW_MS, window: "day" });
