@@ -54,7 +54,7 @@ Tavily queries are constrained to an explicit allowlist of ~15 government and un
 Only non-compliance, single-turn, no-attachment requests get a response cache entry (SHA-256 of model + prompt + context, 10-minute TTL, capped at 500 entries). Compliance responses are never cached, because policy pages change and a stale visa answer is worse than a slow one.
 
 **Auth is additive, not required**
-The product is usable anonymously — anonymous sessions get rate-limited by browser session and keep chat history on the device. Google OAuth via Supabase ([api/auth-utils.js](api/auth-utils.js)) gates image uploads, keys rate limits by user, and syncs chat history through the RLS-protected `public.omanx_chat_sync` table once signed in. There's no account-gated content.
+The product is usable anonymously - visitors can preview the chat and send 3 anonymous messages before being invited to sign in. Supabase Auth supports Google OAuth and passwordless email links; either method gates image uploads, keys the signed-in 50-message daily quota by user id, and syncs chat history through the RLS-protected `public.omanx_chat_sync` table once signed in. There's no hard login wall on page load.
 
 ---
 
@@ -65,8 +65,8 @@ The product is usable anonymously — anonymous sessions get rate-limited by bro
 | AI | Anthropic Claude — `claude-sonnet-4-6` (default), `claude-haiku-4-5-20251001` (opt-in) | Model allowlist enforced server-side; client can't request an arbitrary model string |
 | Live search | Tavily API | Domain-restricted, optional — degrades to KB-only silently if `TAVILY_API_KEY` absent |
 | Knowledge base | `data/{us,uk,au,mohe}.json` | Hot-reloaded on file mtime change, TF-IDF-indexed |
-| Rate limiting | Upstash Redis (sorted-set sliding window) | Local dev can fall back to memory; production/Vercel requires Upstash and fails closed if it is missing |
-| Auth | Supabase (Google OAuth) | Optional; enables image attachments, durable user quotas, and signed-in chat sync |
+| Rate limiting | Upstash Redis (sorted-set sliding window) | Anonymous preview: 3/day; signed-in: 50/day. Local dev can fall back to memory only when Redis is not configured; production/Vercel fails closed if Upstash is missing or unavailable |
+| Auth | Supabase (Google OAuth + passwordless email links) | Optional; enables image attachments, durable user quotas, and signed-in chat sync |
 | Frontend | Vanilla JS ES modules, no bundler, no framework | `public/js/chat-page.js`, `chat-store.js`, `core.js` |
 | Persistence | `localStorage` + Supabase | Local-first chat history; signed-in users sync snapshots through `/api/chats` |
 | Hosting | Vercel — serverless functions + static frontend | `vercel.json` maps `/api/*`, canonical redirects for legacy `.html` routes |
@@ -100,8 +100,8 @@ The product is usable anonymously — anonymous sessions get rate-limited by bro
 │   │   └── core.js        # Theme engine, toast, shared utilities
 │   ├── styles.css         # Design tokens + dark mode via [data-theme]
 │   ├── chat.html          # Workspace (served at `/`)
-│   ├── index.html, system.html, method.html, vision.html, contact.html,
-│   │   examples.html, trust.html, collaboration.html, dashboard.html
+│   ├── index.html, about.html, method.html, vision.html, contact.html,
+│   │   examples.html, collaboration.html, dashboard.html
 ├── server.js              # Express entry point for local dev — mirrors vercel.json routing
 ├── vercel.json
 └── package.json
@@ -127,7 +127,8 @@ ANTHROPIC_API_KEY=sk-ant-...
 |---|---|
 | `TAVILY_API_KEY` | Live web search disabled; compliance answers use KB only |
 | `UPSTASH_REDIS_REST_URL` / `UPSTASH_REDIS_REST_TOKEN` | Required in production; local dev falls back to memory if unset |
-| `SUPABASE_URL` / `SUPABASE_PUBLISHABLE_KEY` | Google sign-in, image uploads, and chat sync disabled |
+| `RATE_LIMIT_ANONYMOUS_DAILY_MAX` / `RATE_LIMIT_AUTHENTICATED_DAILY_MAX` | Defaults to 3 anonymous preview messages and 50 signed-in messages per day |
+| `SUPABASE_URL` / `SUPABASE_PUBLISHABLE_KEY` | Sign-in, image uploads, and chat sync disabled |
 | `ALLOWED_ORIGIN` | CORS is unrestricted (fine for local dev) |
 | `ANTHROPIC_MODEL` | Overrides the default model |
 

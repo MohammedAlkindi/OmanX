@@ -5,7 +5,11 @@ import fs from "fs/promises";
 import path from "path";
 import { fileURLToPath } from "url";
 import crypto from "crypto";
+<<<<<<< HEAD
 import { consumeUsage, getRateLimitKey, getRequestSessionId, RATE_LIMIT_GUEST_MAX, RATE_LIMIT_SIGNED_IN_MAX } from "./rate-limit.js";
+=======
+import { consumeUsage, getQuotaForUser, getRateLimitKey, getRequestSessionId } from "./rate-limit.js";
+>>>>>>> a036d86ba418cb7318b8b8d8d41d9a46b7af31b4
 import { getAuthUser } from "./auth-utils.js";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
@@ -594,7 +598,7 @@ function sanitizeMessage(message) {
 function sanitizeImageAttachments(attachments, authUser) {
   if (!Array.isArray(attachments) || attachments.length === 0) return [];
   if (!authUser) {
-    const error = new Error("Image upload requires Google sign-in.");
+    const error = new Error("Image upload requires sign-in.");
     error.status = 401;
     throw error;
   }
@@ -675,11 +679,17 @@ export default async function handler(req, res) {
 
   const isSignedIn = !!auth.user;
   const sanitizedSessionId = getRequestSessionId(req, sessionId);
+<<<<<<< HEAD
   const rateLimitKey = isSignedIn ? `user:${auth.user.id}` : getRateLimitKey(req, sanitizedSessionId);
   const usage = await consumeUsage(rateLimitKey, {
     limit: isSignedIn ? RATE_LIMIT_SIGNED_IN_MAX : RATE_LIMIT_GUEST_MAX,
   });
   usage.access = isSignedIn ? "signed-in" : "guest";
+=======
+  const quota = getQuotaForUser(auth.user);
+  const rateLimitKey = auth.user ? `user:${auth.user.id}` : getRateLimitKey(req, sanitizedSessionId);
+  const usage = await consumeUsage(rateLimitKey, quota);
+>>>>>>> a036d86ba418cb7318b8b8d8d41d9a46b7af31b4
   res.setHeader("X-RateLimit-Limit", String(usage.limit));
   res.setHeader("X-RateLimit-Remaining", String(usage.remaining));
   res.setHeader("X-RateLimit-Reset", String(Math.ceil(usage.resetAt / 1000)));
@@ -688,17 +698,27 @@ export default async function handler(req, res) {
     if (usage.blockedBy === "rate_limit_store") {
       return res.status(503).json({
         error: "Usage protection is not configured.",
-        text: "OmanX is temporarily unavailable because production rate limiting is not configured.",
+        text: "OmanX is temporarily unavailable because usage protection is not available.",
         usage,
       });
     }
 
+    const authRequired = quota.tier === "anonymous";
     return res.status(429).json({
+<<<<<<< HEAD
       error: isSignedIn ? "Daily question limit reached." : "Sign in required.",
       code: isSignedIn ? "daily_limit_reached" : "sign_in_required",
       text: isSignedIn
         ? "You've reached today's question limit. Please come back tomorrow."
         : `You've used your ${RATE_LIMIT_GUEST_MAX} guest questions. Sign in with Google to keep asking.`,
+=======
+      error: "Daily message limit reached.",
+      code: authRequired ? "anonymous_preview_limit" : "authenticated_daily_limit",
+      text: authRequired
+        ? "You've used your 3 free preview messages. Sign in to continue with 50 messages each day."
+        : "You've reached today's 50-message daily limit. Please come back tomorrow.",
+      authRequired,
+>>>>>>> a036d86ba418cb7318b8b8d8d41d9a46b7af31b4
       usage,
     });
   }

@@ -3,10 +3,11 @@
 import { checkPersistentRateLimitStore, requiresPersistentRateLimitStore } from "./rate-limit.js";
 
 export default async function handler(req, res) {
+  const store = await checkPersistentRateLimitStore();
+  const rateLimitStoreReady = store.ready;
   const rateLimitStoreRequired = requiresPersistentRateLimitStore();
-  const rateLimitStore = await checkPersistentRateLimitStore();
-  const rateLimitStoreReady = rateLimitStore.ready;
-  const ready = !rateLimitStoreRequired || rateLimitStoreReady;
+  const rateLimitStoreConfigured = store.source === "upstash";
+  const ready = rateLimitStoreReady || (!rateLimitStoreRequired && !rateLimitStoreConfigured);
 
   return res.status(ready ? 200 : 503).json({
     ready,
@@ -16,8 +17,10 @@ export default async function handler(req, res) {
       rateLimitStore: {
         ready: rateLimitStoreReady,
         required: rateLimitStoreRequired,
-        source: rateLimitStore.source,
-        message: rateLimitStore.message,
+        configured: rateLimitStoreConfigured,
+        source: store.source,
+        message: store.message,
+        ...(store.error ? { error: store.error } : {}),
       },
     },
   });
