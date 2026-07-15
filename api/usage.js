@@ -1,4 +1,4 @@
-import { getRateLimitKey, getRequestSessionId, getUsage } from "./rate-limit.js";
+import { getQuotaForUser, getRateLimitKey, getRequestSessionId, getUsage } from "./rate-limit.js";
 import { getAuthUser, publicUser } from "./auth-utils.js";
 
 export default async function handler(req, res) {
@@ -20,9 +20,10 @@ export default async function handler(req, res) {
   }
 
   const sessionId = getRequestSessionId(req);
+  const quota = getQuotaForUser(auth.user);
   const key = auth.user ? `user:${auth.user.id}` : getRateLimitKey(req, sessionId);
-  const usage = await getUsage(key);
+  const usage = await getUsage(key, quota);
 
   res.setHeader("Cache-Control", "no-store");
-  return res.json({ usage, user: publicUser(auth.user), quotaKey: auth.user ? "user" : "anonymous" });
+  return res.json({ usage, user: publicUser(auth.user), quotaKey: quota.tier });
 }
