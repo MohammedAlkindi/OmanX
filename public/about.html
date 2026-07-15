@@ -8,8 +8,8 @@
     <link rel="icon" type="image/png" sizes="16x16" href="/assets/favicon-16x16.png" />
     <link rel="icon" type="image/svg+xml" href="/assets/icon.svg" />
     <link rel="manifest" href="/assets/site.webmanifest" />
-    <title>OmanX — Trust</title>
-    <meta name="description" content="How OmanX handles reliability, boundaries, and high-stakes guidance behavior." />
+    <title>OmanX — About</title>
+    <meta name="description" content="How OmanX works, and how it handles reliability, boundaries, and trust for high-stakes guidance." />
     <link rel="stylesheet" href="/styles.css" />
     <script defer src="/_vercel/insights/script.js"></script>
   </head>
@@ -25,7 +25,7 @@
       <div class="nav-drawer" data-mobile-panel>
         <a href="/">Home</a>
         <a href="/">Product</a>
-        <a href="/system">System</a>
+        <a href="/about">About</a>
         <a href="/vision">Roadmap</a>
         <a href="/contact">Contact</a>
       </div>
@@ -35,8 +35,94 @@
 
       <section class="page-hero">
         <div class="container">
+          <div class="eyebrow">About OmanX</div>
+          <h1>How it works, and why it can be trusted.</h1>
+          <p>This page covers the system OmanX runs on and the boundaries that keep its guidance reliable.</p>
+        </div>
+      </section>
+
+      <!-- ============================= -->
+      <!-- System                        -->
+      <!-- ============================= -->
+
+      <section class="section-tight" id="system">
+        <div class="container">
+          <div class="eyebrow">System documentation</div>
+          <h2>System</h2>
+          <p>OmanX is a decision infrastructure layer for Omani scholars managing institutional constraints across admissions, sponsorship, compliance, and academic progression.</p>
+        </div>
+      </section>
+
+      <section class="section-tight">
+        <div class="container-narrow">
+          <div class="section-label">Capabilities</div>
+          <!-- content-stack renders as 1px-gap stacked cards -->
+          <div class="content-stack">
+            <article class="card content-section">
+              <h3>University pathway guidance</h3>
+              <p>Transforms fragmented application and enrollment questions into ordered decision sequences, deadlines, and escalation points.</p>
+            </article>
+            <article class="card content-section">
+              <h3>Sponsorship and scholarship constraints</h3>
+              <p>Maps scholarship terms, sponsor requirements, and academic obligations into explicit constraints so recommendations remain policy-aligned.</p>
+            </article>
+            <article class="card content-section">
+              <h3>Visa and compliance context</h3>
+              <p>Flags compliance-sensitive topics and outputs conservative guidance with verification boundaries and accountable offices.</p>
+            </article>
+            <article class="card content-section">
+              <h3>Structured decision outputs</h3>
+              <p>Every response is organized into a decision artifact with constraints, interpretation, recommended next step, and stated assumptions.</p>
+              <p><a href="/examples">See example artifacts →</a></p>
+            </article>
+          </div>
+        </div>
+      </section>
+
+      <section class="section-tight">
+        <div class="container">
+          <div class="section-label">How the system works</div>
+          <div class="feature-grid compact-grid-3">
+            <article class="feature-card">
+              <h3>Destination routing</h3>
+              <p>OmanX detects whether a question belongs to the United States, United Kingdom, or Australia, then combines that destination dataset with shared MoHE scholarship rules.</p>
+            </article>
+            <article class="feature-card">
+              <h3>Risk classification</h3>
+              <p>Everyday questions stay fast and conversational. Visa, work, scholarship, insurance, legal, academic standing, and housing disputes move through stricter compliance handling.</p>
+            </article>
+            <article class="feature-card">
+              <h3>Source layering</h3>
+              <p>Saved OmanX policy entries provide structure. Live official-source search is used for compliance topics when enabled, especially where deadlines or current rules may change.</p>
+            </article>
+          </div>
+        </div>
+      </section>
+
+      <section class="section-tight">
+        <div class="container-narrow">
+          <div class="section-label">Current boundaries</div>
+          <div class="content-stack">
+            <article class="card content-section">
+              <h3>Local-first history</h3>
+              <p>Chat history is stored in the browser today. This keeps the beta lightweight and private, but it also means history does not automatically follow a student across devices.</p>
+            </article>
+            <article class="card content-section">
+              <h3>Human confirmation remains required</h3>
+              <p>OmanX can help a scholar organize facts, identify likely offices, and avoid obvious risky steps. It does not replace a DSO, university advisor, MoHE representative, attorney, doctor, or official government source.</p>
+            </article>
+          </div>
+        </div>
+      </section>
+
+      <!-- ============================= -->
+      <!-- Trust & boundaries            -->
+      <!-- ============================= -->
+
+      <section class="section-tight" id="trust">
+        <div class="container">
           <div class="eyebrow">Trust &amp; boundaries</div>
-          <h1>Clear boundaries make guidance more reliable.</h1>
+          <h2>Clear boundaries make guidance more reliable.</h2>
           <p>OmanX is designed to support decision quality, preserve context, and signal when official verification is required.</p>
         </div>
       </section>
@@ -104,19 +190,11 @@
 
     </main>
 
-    <!-- Mobile nav preserved -->
-    <nav class="mobile-bottom-nav">
-      <a data-page-link="home" href="/">Home</a>
-      <a data-page-link="chat" href="/">Product</a>
-      <a data-page-link="trust" href="/trust">Trust</a>
-      <a data-page-link="vision" href="/vision">Roadmap</a>
-    </nav>
-
     <footer>
       <div class="container footer-inner">
         <div class="footer-logo">Oman<span>X</span></div>
         <div class="footer-links">
-          <a href="/system">System</a>
+          <a href="/about">About</a>
           <a href="/vision">Roadmap</a>
           <a href="/contact">Contact</a>
           <a href="mailto:alkindi.ceo@gmail.com">alkindi.ceo@gmail.com</a>
@@ -125,6 +203,6 @@
       </div>
     </footer>
 
-    <script type="module" src="/js/trust-page.js"></script>
+    <script type="module" src="/js/about-page.js"></script>
   </body>
 </html>
