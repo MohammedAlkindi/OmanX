@@ -7,6 +7,7 @@ import { fileURLToPath } from "url";
 import crypto from "crypto";
 import { consumeUsage, getQuotaForUser, getRateLimitKey, getRequestSessionId } from "./rate-limit.js";
 import { getAuthUser } from "./auth-utils.js";
+import { TRUSTED_DOMAINS, sourceCategory } from "./trusted-sources.js";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
@@ -40,18 +41,6 @@ const VALID_DESTINATIONS = new Set(["us", "uk", "au"]);
 const ALLOWED_IMAGE_TYPES = new Set(["image/jpeg", "image/png", "image/webp"]);
 const MAX_IMAGE_ATTACHMENTS = Number(process.env.IMAGE_UPLOAD_MAX_COUNT || 1);
 const MAX_IMAGE_BYTES = Number(process.env.IMAGE_UPLOAD_MAX_BYTES || 3 * 1024 * 1024);
-
-// Authoritative domains we trust for live policy lookups
-const TRUSTED_DOMAINS = [
-  // US
-  "uscis.gov", "ice.gov", "dhs.gov", "studyinthestates.dhs.gov",
-  "state.gov", "travel.state.gov", "studentaid.gov", "irs.gov", "dol.gov",
-  // UK
-  "gov.uk", "ukcisa.org.uk",
-  // AU
-  "homeaffairs.gov.au", "immi.homeaffairs.gov.au", "studyaustralia.gov.au",
-  "teqsa.gov.au", "asqa.gov.au", "oso.gov.au",
-];
 
 const _destCache = {}; // { us: {kb, mtime, path}, uk: {...}, au: {...} }
 const _moheCache = { kb: null, mtime: 0, path: null };
@@ -475,18 +464,6 @@ async function webSearch(query) {
   } catch (err) {
     console.warn("[OmanX] Web search error:", err.message);
     return [];
-  }
-}
-
-function sourceCategory(url = "") {
-  try {
-    const hostname = new URL(url).hostname.replace(/^www\./, "");
-    if (hostname.endsWith(".gov") || hostname.includes("gov.uk") || hostname.includes("homeaffairs.gov.au")) return "Government";
-    if (hostname.includes("mohe") || hostname.endsWith(".edu.om")) return "MoHE";
-    if (hostname.endsWith(".edu") || hostname.includes(".ac.uk") || hostname.includes(".edu.au")) return "University";
-    return "Official web";
-  } catch {
-    return "Official web";
   }
 }
 
