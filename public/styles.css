@@ -2428,6 +2428,17 @@ button.pill:hover { border-color: var(--gold); color: var(--gold); }
   scrollbar-color: var(--border-strong) transparent;
 }
 
+/* Empty state is sized to fit without scrolling, so lock it down —
+   this also hides the scroll-to-bottom button via the sibling selector below. */
+.chat-body:has(.message-empty) {
+  padding-top: 8px;
+  overflow: hidden;
+}
+
+.chat-body:has(.message-empty) + .scroll-bottom-btn {
+  display: none !important;
+}
+
 .chat-body::-webkit-scrollbar { width: 3px; }
 .chat-body::-webkit-scrollbar-track { background: transparent; }
 .chat-body::-webkit-scrollbar-thumb { background: var(--border-strong); border-radius: 2px; }
@@ -2624,8 +2635,8 @@ button.pill:hover { border-color: var(--gold); color: var(--gold); }
   flex-direction: column;
   align-items: center;
   text-align: center;
-  padding: 48px 32px;
-  gap: 20px;
+  padding: 16px 32px 8px;
+  gap: 14px;
   max-width: 600px;
   width: 100%;
   align-self: center;
@@ -2633,7 +2644,7 @@ button.pill:hover { border-color: var(--gold); color: var(--gold); }
 
 .empty-brand {
   font-family: var(--serif);
-  font-size: 2.25rem;
+  font-size: 1.75rem;
   font-weight: 400;
   color: var(--ink);
   letter-spacing: -0.05em;
@@ -2674,7 +2685,7 @@ button.pill:hover { border-color: var(--gold); color: var(--gold); }
 
 .prompt-card {
   text-align: left;
-  padding: 14px 16px;
+  padding: 11px 14px;
   border: 0.5px solid var(--border-strong);
   border-radius: 4px;
   background: var(--white);
@@ -2682,7 +2693,7 @@ button.pill:hover { border-color: var(--gold); color: var(--gold); }
   transition: border-color 0.15s, background 0.15s;
   display: flex;
   flex-direction: column;
-  gap: 6px;
+  gap: 4px;
   animation: fadeUp 0.3s ease both;
 }
 
@@ -3930,7 +3941,7 @@ footer,
   :root { --page-pad: 24px; --section-pad: 48px; }
 
   .prompt-grid              { grid-template-columns: 1fr; }
-  .message-empty            { padding: 32px 20px; }
+  .message-empty            { padding: 12px 20px 8px; gap: 10px; }
   .answer-status            { grid-template-columns: 1fr; }
   .answer-status-pills      { justify-content: flex-start; }
   .auth-gate-card           { grid-template-columns: 1fr; }
