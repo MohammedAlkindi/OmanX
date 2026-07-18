@@ -1,6 +1,7 @@
 import { initCore, qs, qsa, formatDateTime, formatRelative, showToast, uid, downloadFile, copyText, setTheme, getTheme } from './core.js';
 import { loadChats, saveChats, getActiveChatId, setActiveChatId, createChat, updateChat, deleteChat, loadSettings, saveSettings, getSessionId, getSyncUserId, setSyncUserId } from './chat-store.js';
 import { getAccessToken, initAuth, onAuthChange, signInWithGoogle, signInWithMagicLink, signOut } from './auth-client.js';
+import { computeDeadlines, describeDaysUntil } from './deadlines.js';
 
 const prompts = [
   { label: 'Arrival', text: 'What do I need to complete in my first 72 hours on campus?' },
@@ -660,6 +661,25 @@ function bindEvents() {
     persistSettings();
   });
 
+  // Key dates — re-render so the deadline panel reflects the new date immediately.
+  qs('[data-setting-visa-type]')?.addEventListener('change', (e) => {
+    state.settings.visaType = e.target.value;
+    persistSettings();
+    renderMessages();
+  });
+
+  qs('[data-setting-program-end]')?.addEventListener('change', (e) => {
+    state.settings.programEndDate = e.target.value;
+    persistSettings();
+    renderMessages();
+  });
+
+  qs('[data-setting-visa-expiry]')?.addEventListener('change', (e) => {
+    state.settings.visaExpiryDate = e.target.value;
+    persistSettings();
+    renderMessages();
+  });
+
   // concise mode
   qs('[data-setting-concise]')?.addEventListener('change', (e) => {
     state.settings.conciseMode = e.target.checked;
@@ -765,6 +785,15 @@ function populateSettingsPanel() {
 
   const webSearchEl = qs('[data-setting-web-search]');
   if (webSearchEl) webSearchEl.checked = webSearch !== false;
+
+  const visaTypeEl = qs('[data-setting-visa-type]');
+  if (visaTypeEl) visaTypeEl.value = state.settings.visaType || '';
+
+  const programEndEl = qs('[data-setting-program-end]');
+  if (programEndEl) programEndEl.value = state.settings.programEndDate || '';
+
+  const visaExpiryEl = qs('[data-setting-visa-expiry]');
+  if (visaExpiryEl) visaExpiryEl.value = state.settings.visaExpiryDate || '';
 
   updateThemePicker(getTheme());
   updateUserChip();
@@ -1593,7 +1622,66 @@ function buildProfileContext(userContext = '') {
     parts.push(`Study destination: ${DEST_FULL_LABEL[state.settings.destination] || state.settings.destination}.`);
   }
   if (userContext) parts.push(userContext);
+
+  // Give the assistant the same dates the on-screen panel is showing, so an
+  // answer can reference them instead of contradicting what the scholar sees.
+  const deadlines = currentDeadlines();
+  if (deadlines.length) {
+    const lines = deadlines.map((d) => `- ${d.title}: ${d.date} (${describeDaysUntil(d.daysUntil)})`);
+    parts.push(
+      `Known upcoming dates for this student (derived from dates they entered; always tell them to confirm with their DSO or international office):\n${lines.join('\n')}`
+    );
+  }
   return parts.join('\n');
+}
+
+/** Deadlines for the current profile, using today's date. */
+function currentDeadlines() {
+  return computeDeadlines({
+    destination: state.settings.destination,
+    visaType: state.settings.visaType,
+    programEndDate: state.settings.programEndDate,
+    visaExpiryDate: state.settings.visaExpiryDate,
+    today: new Date().toISOString().slice(0, 10),
+  });
+}
+
+const URGENCY_LABEL = {
+  passed: 'Passed',
+  open: 'Open now',
+  urgent: 'Urgent',
+  soon: 'Soon',
+  upcoming: 'Upcoming',
+};
+
+function deadlinePanelMarkup() {
+  // Two items, not three: the empty state has to fit the viewport alongside the
+  // prompt grid (see the fix in 1d662bf), and each deadline is a tall block.
+  const deadlines = currentDeadlines().slice(0, 2);
+  if (!deadlines.length) return '';
+
+  const items = deadlines.map((d) => {
+    const when = new Intl.DateTimeFormat('en', { dateStyle: 'medium', timeZone: 'UTC' })
+      .format(new Date(`${d.date}T00:00:00Z`));
+    return `
+      <li class="deadline-item" data-urgency="${escapeHtml(d.urgency)}">
+        <div class="deadline-item-head">
+          <span class="deadline-badge">${escapeHtml(URGENCY_LABEL[d.urgency] || d.urgency)}</span>
+          <span class="deadline-when">${escapeHtml(when)} &middot; ${escapeHtml(describeDaysUntil(d.daysUntil))}</span>
+        </div>
+        <p class="deadline-title">${escapeHtml(d.title)}</p>
+        <p class="deadline-detail">${escapeHtml(d.detail)}</p>
+        <a class="deadline-source" href="${escapeHtml(d.sourceUrl)}" target="_blank" rel="noopener noreferrer">${escapeHtml(d.sourceTitle)}</a>
+      </li>`;
+  }).join('');
+
+  return `
+    <section class="deadline-panel" aria-label="Your upcoming deadlines">
+      <p class="deadline-panel-title">Based on the dates you entered</p>
+      <ul class="deadline-list">${items}</ul>
+      <p class="deadline-disclaimer">These are reminders calculated from your dates, not official determinations. Always confirm with your DSO, international office, or MoHE before acting.</p>
+    </section>
+  `;
 }
 
 function emptyStateMarkup() {
@@ -1606,6 +1694,7 @@ function emptyStateMarkup() {
       <div class="empty-brand">Oman<span>X</span></div>
       <p class="empty-sub">Good to see you${escapeHtml(name)}. Ask about visas, work, housing, insurance, or scholarship rules in ${escapeHtml(destination)}.</p>
       <p class="empty-trust">OmanX shows sources, flags risky situations, and gives next steps before you act.</p>
+      ${deadlinePanelMarkup()}
       <div class="prompt-grid">
         ${prompts.map((p) => `<button type="button" class="prompt-card" data-quick-prompt="${escapeHtml(p.text)}"><span class="prompt-card-label">${escapeHtml(p.label)}</span><span class="prompt-card-text">${escapeHtml(p.text)}</span></button>`).join('')}
       </div>
