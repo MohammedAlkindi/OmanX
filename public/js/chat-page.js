@@ -3,6 +3,17 @@ import { loadChats, saveChats, getActiveChatId, setActiveChatId, createChat, upd
 import { getAccessToken, initAuth, onAuthChange, signInWithGoogle, signInWithMagicLink, signOut } from './auth-client.js';
 import { computeDeadlines, describeDaysUntil } from './deadlines.js';
 
+// Declared at module top: the first render() runs synchronously on load, and a
+// `const` further down the file is still in its temporal dead zone at that
+// point — which crashes the whole page whenever the active chat is empty.
+const URGENCY_LABEL = {
+  passed: 'Passed',
+  open: 'Open now',
+  urgent: 'Urgent',
+  soon: 'Soon',
+  upcoming: 'Upcoming',
+};
+
 const prompts = [
   { label: 'Arrival', text: 'What do I need to complete in my first 72 hours on campus?' },
   { label: 'Work rules', text: 'Can I work off campus this semester, and what facts do you need to check first?' },
@@ -1645,14 +1656,6 @@ function currentDeadlines() {
     today: new Date().toISOString().slice(0, 10),
   });
 }
-
-const URGENCY_LABEL = {
-  passed: 'Passed',
-  open: 'Open now',
-  urgent: 'Urgent',
-  soon: 'Soon',
-  upcoming: 'Upcoming',
-};
 
 function deadlinePanelMarkup() {
   // Two items, not three: the empty state has to fit the viewport alongside the
