@@ -11,6 +11,21 @@ export const AUTHENTICATED_RATE_LIMIT_MAX = readPositiveInt("RATE_LIMIT_AUTHENTI
 export const RATE_LIMIT_MAX = ANONYMOUS_RATE_LIMIT_MAX;
 export const RATE_LIMIT_WINDOW_MS = 24 * 60 * 60 * 1000;
 
+// Bounds a full Redis bucket operation (several sequential commands) so a
+// slow or unreachable Upstash endpoint fails closed quickly instead of
+// holding the request open until the platform's function timeout.
+const REDIS_TIMEOUT_MS = 5000;
+
+function withTimeout(promise, ms, label) {
+  return new Promise((resolve, reject) => {
+    const timer = setTimeout(() => reject(new Error(`${label} timed out after ${ms}ms`)), ms);
+    promise.then(
+      (value) => { clearTimeout(timer); resolve(value); },
+      (error) => { clearTimeout(timer); reject(error); },
+    );
+  });
+}
+
 const _rateLimitMap = new Map();
 let _redis = null;
 let _warnedNoRedis = false;
@@ -218,7 +233,7 @@ export async function checkPersistentRateLimitStore() {
 
   try {
     const redis = getRedis();
-    await redis.ping();
+    await withTimeout(redis.ping(), REDIS_TIMEOUT_MS, "rate limit health check");
     return { ready: true, source: "upstash", message: "Persistent rate limit store is reachable." };
   } catch (error) {
     warnUnavailablePersistentRateLimitStore(error, "health check");
@@ -239,7 +254,11 @@ export async function getUsage(key, { limit = RATE_LIMIT_MAX, tier = "anonymous"
 
   if (hasPersistentRateLimitStore()) {
     try {
-      const usage = await redisBucketUsage(dailyKey, { consume: false, limit, windowMs: RATE_LIMIT_WINDOW_MS, window: "day", tier });
+      const usage = await withTimeout(
+        redisBucketUsage(dailyKey, { consume: false, limit, windowMs: RATE_LIMIT_WINDOW_MS, window: "day", tier }),
+        REDIS_TIMEOUT_MS,
+        "rate limit read"
+      );
       if (usage) return usage;
     } catch (error) {
       return unavailablePersistentStoreUsage({ limit, tier, window: "day", operation: "read", error });
@@ -257,7 +276,11 @@ export async function consumeUsage(key, { limit = RATE_LIMIT_MAX, tier = "anonym
 
   if (hasPersistentRateLimitStore()) {
     try {
-      const dailyUsage = await redisBucketUsage(dailyKey, { consume: true, limit, windowMs: RATE_LIMIT_WINDOW_MS, window: "day", tier });
+      const dailyUsage = await withTimeout(
+        redisBucketUsage(dailyKey, { consume: true, limit, windowMs: RATE_LIMIT_WINDOW_MS, window: "day", tier }),
+        REDIS_TIMEOUT_MS,
+        "rate limit write"
+      );
       if (dailyUsage) return dailyUsage;
     } catch (error) {
       return unavailablePersistentStoreUsage({ limit, tier, window: "day", operation: "write", error });
