@@ -1295,6 +1295,103 @@ select:focus {
   line-height: 1.5;
 }
 
+/* news page */
+.news-trust-note {
+  margin-top: 24px;
+  max-width: 680px;
+  padding: 16px 18px;
+  border-left: 3px solid var(--gold);
+  background: var(--sand);
+  color: var(--ink-2);
+  font-size: 0.875rem;
+  line-height: 1.6;
+}
+
+.news-toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-bottom: 24px;
+}
+
+.news-filter-bar {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+button.pill {
+  cursor: pointer;
+  background: var(--white);
+  transition: border-color 0.15s, color 0.15s, background 0.15s;
+}
+
+button.pill:hover { border-color: var(--gold); color: var(--gold); }
+
+.news-updated {
+  font-family: var(--mono);
+  font-size: 0.75rem;
+  color: var(--ink-4);
+}
+
+.news-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 1px;
+  background: var(--border);
+}
+
+.news-card {
+  background: var(--white);
+  padding: 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.news-card-meta {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.news-card-category,
+.news-card-date {
+  font-family: var(--mono);
+  font-size: 0.6875rem;
+  color: var(--ink-4);
+}
+
+.news-card h3 {
+  font-size: 1.0625rem;
+  line-height: 1.4;
+}
+
+.news-card h3 a {
+  color: var(--ink);
+  transition: color 0.15s;
+}
+
+.news-card h3 a:hover { color: var(--gold); }
+
+.news-card p {
+  color: var(--ink-2);
+  font-size: 0.875rem;
+  line-height: 1.6;
+}
+
+.news-state {
+  padding: 48px 0;
+  text-align: center;
+  color: var(--ink-3);
+  font-size: 0.9375rem;
+}
+
+.news-state button { margin-top: 16px; }
+
 /* roadmap item */
 .roadmap-item {
   display: grid;
@@ -3793,6 +3890,7 @@ footer,
   .metric-grid              { grid-template-columns: 1fr 1fr; }
   .workspace-grid           { grid-template-columns: 1fr 1fr; }
   .ambassador-grid          { grid-template-columns: 1fr 1fr; }
+  .news-grid                { grid-template-columns: 1fr 1fr; }
   .feature-grid.compact-grid-3 { grid-template-columns: 1fr 1fr; }
   .feature-grid.compact-grid-4 { grid-template-columns: 1fr 1fr; }
   .settings-grid            { grid-template-columns: 1fr 1fr; }
@@ -3844,6 +3942,7 @@ footer,
   .metric-grid              { grid-template-columns: 1fr 1fr; }
   .workspace-grid           { grid-template-columns: 1fr; }
   .ambassador-grid          { grid-template-columns: 1fr; }
+  .news-grid                { grid-template-columns: 1fr; }
   .feature-grid.compact-grid-3 { grid-template-columns: 1fr; }
   .feature-grid.compact-grid-4 { grid-template-columns: 1fr; }
   .settings-grid            { grid-template-columns: 1fr; }
@@ -4072,6 +4171,11 @@ body.chat-app {
 .sidebar-nav-primary .sidebar-nav-icon {
   background: rgba(201, 169, 110, 0.14);
   border-color: rgba(201, 169, 110, 0.4);
+}
+
+.sidebar-nav-icon svg {
+  width: 11px;
+  height: 11px;
 }
 
 .sidebar-section-label {
