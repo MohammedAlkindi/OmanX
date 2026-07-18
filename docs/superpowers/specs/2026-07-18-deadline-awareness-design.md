@@ -48,7 +48,15 @@ ascending and filtered to a horizon (default 180 days ahead, 30 days back so a
 just-missed deadline still shows).
 
 `urgency` is derived from `daysUntil`: `passed` (< 0), `urgent` (0–30), `soon` (31–90),
-`upcoming` (> 90).
+`upcoming` (> 90), plus `open` — see below.
+
+**Opening windows vs hard cutoffs.** Some rules mark a window opening rather than a deadline
+passing: the OPT filing window, the six-month point for planning post-study options. Modelling
+these as point-in-time deadlines is wrong — they would vanish from the panel 30 days after
+opening, exactly during the months when acting on them matters. Such rules declare
+`relevantUntil` (an anchor plus offset saying when the window shuts); while today falls inside
+the window the item is reported with urgency `open` and is exempt from the look-back filter.
+Hard cutoffs keep the normal behaviour and disappear once they are 30 days past.
 
 ### Rule table
 
@@ -81,8 +89,17 @@ off the server.
 ### Render surfaces
 
 1. **Chat empty state** (`emptyStateMarkup()`): a deadline panel above the prompt grid,
-   showing at most three items, only when dates are set and something falls in the horizon.
+   showing at most **two** items, only when dates are set and something falls in the horizon.
    Absent entirely otherwise — no empty widget, no nag.
+
+   The panel is deliberately compact: two lines per deadline (urgency badge, date, relative
+   time, title, source link) with a single shared disclaimer, and no per-item explanation.
+   An earlier draft rendered the full rule explanation and a per-item confirmation line for
+   three deadlines; measured in the browser that was 519px tall and pushed the prompt grid
+   entirely out of the viewport, undoing the empty-state fit fixed in `1d662bf`. The compact
+   form measures 169px. The explanatory text still reaches the scholar — through the answer,
+   via `buildProfileContext()`, which is where it is useful rather than as a wall of text
+   they must read before asking anything.
 2. **`buildProfileContext()`**: upcoming deadlines are appended to the profile context sent
    with each message, so the assistant can reference them when answering rather than
    contradicting the panel on screen.
@@ -108,6 +125,15 @@ forever rather than passing until a date rolls over:
 - timezone stability: same result regardless of `TZ`
 - garbage input (`null`, `'not-a-date'`, `undefined`) returns `[]` and does not throw
 - every returned item carries a non-empty `sourceUrl`
+- an open window survives the look-back filter; a closed one does not; a passed hard cutoff
+  is still dropped
+
+Unit tests cannot cover the render path, so the panel was also driven in a real browser.
+That caught a crash the tests could not: `URGENCY_LABEL` was declared as a `const` below
+`deadlinePanelMarkup()`, but the first `render()` runs synchronously at module load, so the
+constant was still in its temporal dead zone — which blanked the entire chat page on any load
+where the active chat was empty (i.e. right after "New chat", or a refresh on one). The
+constant is now declared at module top with a comment recording why.
 
 ## Out of scope
 
