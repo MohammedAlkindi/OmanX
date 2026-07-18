@@ -2723,7 +2723,7 @@ button.pill:hover { border-color: var(--gold); color: var(--gold); }
   list-style: none;
   display: flex;
   flex-direction: column;
-  gap: 10px;
+  gap: 8px;
 }
 
 .deadline-item {
@@ -2787,16 +2787,14 @@ button.pill:hover { border-color: var(--gold); color: var(--gold); }
   font-size: 0.75rem;
   font-weight: 300;
   color: var(--ink-3);
-  line-height: 1.55;
-  margin-top: 2px;
-}
-
-.deadline-action {
-  font-family: var(--sans);
-  font-size: 0.75rem;
-  color: var(--ink-2);
   line-height: 1.5;
-  margin-top: 4px;
+  margin-top: 2px;
+  /* Clamped so a long rule explanation cannot push the prompt grid out of the
+     viewport — the empty state has to fit without scrolling. */
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
 }
 
 .deadline-source {

@@ -1655,7 +1655,9 @@ const URGENCY_LABEL = {
 };
 
 function deadlinePanelMarkup() {
-  const deadlines = currentDeadlines().slice(0, 3);
+  // Two items, not three: the empty state has to fit the viewport alongside the
+  // prompt grid (see the fix in 1d662bf), and each deadline is a tall block.
+  const deadlines = currentDeadlines().slice(0, 2);
   if (!deadlines.length) return '';
 
   const items = deadlines.map((d) => {
@@ -1669,7 +1671,6 @@ function deadlinePanelMarkup() {
         </div>
         <p class="deadline-title">${escapeHtml(d.title)}</p>
         <p class="deadline-detail">${escapeHtml(d.detail)}</p>
-        <p class="deadline-action">${escapeHtml(d.action)}</p>
         <a class="deadline-source" href="${escapeHtml(d.sourceUrl)}" target="_blank" rel="noopener noreferrer">${escapeHtml(d.sourceTitle)}</a>
       </li>`;
   }).join('');
