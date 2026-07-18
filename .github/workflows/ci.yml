@@ -1,0 +1,29 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  checks:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: "npm"
+
+      - run: npm install
+
+      - name: Syntax check
+        run: npm run check:syntax
+
+      - name: Unit tests
+        run: npm test
+
+      - name: Vercel serverless function count (Hobby plan limit)
+        run: npm run check:functions

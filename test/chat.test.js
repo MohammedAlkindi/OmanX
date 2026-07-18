@@ -1,6 +1,6 @@
 import { test, describe } from "node:test";
 import assert from "node:assert/strict";
-import { detectDestination, isCompliance, searchKB } from "./chat.js";
+import { detectDestination, isCompliance, searchKB } from "../api/chat.js";
 
 describe("detectDestination", () => {
   test("defaults to US when no destination signals are present", () => {

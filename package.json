@@ -7,7 +7,9 @@
   "scripts": {
     "start": "node server.js",
     "dev": "node --watch server.js",
-    "test": "node --test"
+    "test": "node --test",
+    "check:syntax": "node scripts/check-syntax.js",
+    "check:functions": "node scripts/check-vercel-function-count.js"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.104.1",
