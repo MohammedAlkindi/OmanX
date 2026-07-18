@@ -1663,6 +1663,10 @@ function deadlinePanelMarkup() {
   const deadlines = currentDeadlines().slice(0, 2);
   if (!deadlines.length) return '';
 
+  // Deliberately compact: two lines per deadline. The empty state has to fit
+  // the viewport alongside the prompt grid, and the full explanation of each
+  // rule reaches the scholar through the answer (see buildProfileContext)
+  // rather than as a wall of text they have to read before asking anything.
   const items = deadlines.map((d) => {
     const when = new Intl.DateTimeFormat('en', { dateStyle: 'medium', timeZone: 'UTC' })
       .format(new Date(`${d.date}T00:00:00Z`));
@@ -1672,9 +1676,7 @@ function deadlinePanelMarkup() {
           <span class="deadline-badge">${escapeHtml(URGENCY_LABEL[d.urgency] || d.urgency)}</span>
           <span class="deadline-when">${escapeHtml(when)} &middot; ${escapeHtml(describeDaysUntil(d.daysUntil))}</span>
         </div>
-        <p class="deadline-title">${escapeHtml(d.title)}</p>
-        <p class="deadline-detail">${escapeHtml(d.detail)}</p>
-        <a class="deadline-source" href="${escapeHtml(d.sourceUrl)}" target="_blank" rel="noopener noreferrer">${escapeHtml(d.sourceTitle)}</a>
+        <p class="deadline-title">${escapeHtml(d.title)}<a class="deadline-source" href="${escapeHtml(d.sourceUrl)}" target="_blank" rel="noopener noreferrer" title="${escapeHtml(d.sourceTitle)}">source</a></p>
       </li>`;
   }).join('');
 
@@ -1682,7 +1684,7 @@ function deadlinePanelMarkup() {
     <section class="deadline-panel" aria-label="Your upcoming deadlines">
       <p class="deadline-panel-title">Based on the dates you entered</p>
       <ul class="deadline-list">${items}</ul>
-      <p class="deadline-disclaimer">These are reminders calculated from your dates, not official determinations. Always confirm with your DSO, international office, or MoHE before acting.</p>
+      <p class="deadline-disclaimer">Reminders calculated from your dates, not official determinations. Confirm with your DSO or international office before acting.</p>
     </section>
   `;
 }
