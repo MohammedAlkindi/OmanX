@@ -22,9 +22,10 @@
     { "src": "/contact", "dest": "/contact.html" },
     { "src": "/examples", "dest": "/examples.html" },
     { "src": "/collaboration", "dest": "/collaboration.html" },
+    { "src": "/news", "dest": "/news.html" },
     { "src": "/settings(\\.html)?", "status": 301, "headers": { "Location": "/" } },
     { "src": "/index\\.html", "status": 301, "headers": { "Location": "/product" } },
-    { "src": "/(chat|meet|system|method|vision|contact|examples|collaboration|dashboard)\\.html", "status": 301, "headers": { "Location": "/$1" } },
+    { "src": "/(chat|meet|system|method|vision|contact|examples|collaboration|dashboard|news)\\.html", "status": 301, "headers": { "Location": "/$1" } },
     { "src": "/(.*)", "dest": "/$1" }
   ]
 }

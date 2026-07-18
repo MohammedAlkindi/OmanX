@@ -14,6 +14,7 @@ import usageHandler from './api/usage.js';
 import chatsHandler from './api/chats.js';
 import authConfigHandler from './api/auth/config.js';
 import authSessionHandler from './api/auth/session.js';
+import newsHandler from './api/news.js';
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const PORT = Number(process.env.PORT || 3000);
 
@@ -34,6 +35,7 @@ const ROUTE_METHODS = new Map([
   ['/examples', new Set(['GET'])],
   ['/collaboration', new Set(['GET'])],
   ['/dashboard', new Set(['GET'])],
+  ['/news', new Set(['GET'])],
   ['/api/chat', new Set(['POST'])],
   ['/api/chats', new Set(['GET', 'PUT', 'OPTIONS'])],
   ['/api/auth/config', new Set(['GET'])],
@@ -43,6 +45,7 @@ const ROUTE_METHODS = new Map([
   ['/api/health', new Set(['GET'])],
   ['/api/ready', new Set(['GET'])],
   ['/api/metrics', new Set(['GET'])],
+  ['/api/news', new Set(['GET'])],
 ]);
 
 // Middleware
@@ -73,6 +76,7 @@ app.get('/api/usage', usageHandler);
 app.get('/api/health', healthHandler);
 app.get('/api/ready', readyHandler);
 app.get('/api/metrics', metricsHandler);
+app.get('/api/news', newsHandler);
 // Canonical redirects from file-based routes
 app.get('/index.html', (req, res) => res.redirect(301, '/product'));
 app.get('/product.html', (req, res) => res.redirect(301, '/product'));
@@ -88,6 +92,7 @@ app.get('/settings.html', (req, res) => res.redirect(301, '/'));
 app.get('/collaboration.html', (req, res) => res.redirect(301, '/collaboration'));
 app.get('/trust.html', (req, res) => res.redirect(301, '/system'));
 app.get('/dashboard.html', (req, res) => res.redirect(301, '/dashboard'));
+app.get('/news.html', (req, res) => res.redirect(301, '/news'));
 
 // Page routes
 app.get('/', (req, res) => {
@@ -134,6 +139,10 @@ app.get('/collaboration', (req, res) => {
 
 app.get('/dashboard', (req, res) => {
   res.sendFile(path.join(PUBLIC_DIR, 'dashboard.html'));
+});
+
+app.get('/news', (req, res) => {
+  res.sendFile(path.join(PUBLIC_DIR, 'news.html'));
 });
 
 // Legacy redirects
