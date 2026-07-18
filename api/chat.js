@@ -8,6 +8,7 @@ import crypto from "crypto";
 import { consumeUsage, getQuotaForUser, getRateLimitKey, getRequestSessionId } from "./rate-limit.js";
 import { getAuthUser } from "./auth-utils.js";
 import { TRUSTED_DOMAINS, sourceCategory } from "./_trusted-sources.js";
+import { logAnalyticsEvent } from "./_analytics.js";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
@@ -730,6 +731,7 @@ export default async function handler(req, res) {
 
   const cached = cacheKey ? cacheGet(cacheKey) : null;
   if (cached) {
+    await logAnalyticsEvent({ destination, compliance: false, kbMatched: false, webSearched: false, authenticated: !!auth.user });
     if (wantsStream) {
       res.setHeader('Content-Type', 'text/event-stream');
       res.setHeader('Cache-Control', 'no-cache');
@@ -822,6 +824,7 @@ export default async function handler(req, res) {
       if (cacheKey) cacheSet(cacheKey, fullText.trim());
       const sources = buildSources(kbResults, webResults);
       const escalation = compliance && isUrgent(sanitizedMessage) ? buildEscalationCard(sanitizedMessage, destination) : null;
+      await logAnalyticsEvent({ destination, compliance, kbMatched: kbResults.length > 0, webSearched: webResults.length > 0, authenticated: !!auth.user });
       res.write(`data: ${JSON.stringify({ done: true, compliance, webSearched: webResults.length > 0, sources, escalation, destination, usage })}\n\n`);
       res.end();
     } catch (err) {
@@ -841,6 +844,7 @@ export default async function handler(req, res) {
     const response = await client.messages.create(requestParams);
     const text = response.content?.[0]?.text?.trim() || "No response generated.";
     if (cacheKey) cacheSet(cacheKey, text);
+    await logAnalyticsEvent({ destination, compliance, kbMatched: kbResults.length > 0, webSearched: webResults.length > 0, authenticated: !!auth.user });
     return res.json({ text, cached: false, compliance, webSearched: webResults.length > 0, sources: buildSources(kbResults, webResults), usage });
   } catch (err) {
     console.error("[OmanX] Anthropic error:", err?.message, err?.stack);
