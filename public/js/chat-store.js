@@ -118,7 +118,12 @@ const SETTINGS_DEFAULTS = {
 export function loadSettings() {
   try {
     const stored = JSON.parse(safeGetItem(SETTINGS_KEY));
-    return stored ? { ...SETTINGS_DEFAULTS, ...stored } : { ...SETTINGS_DEFAULTS };
+    const settings = stored ? { ...SETTINGS_DEFAULTS, ...stored } : { ...SETTINGS_DEFAULTS };
+    // Conversation sharing has no pipeline behind it yet, so the toggle ships disabled.
+    // Drop any opt-in stored while it was live — it was never acted on, and it must not
+    // be mistaken for real consent once analytics land.
+    settings.dataConsent = false;
+    return settings;
   } catch {
     return { ...SETTINGS_DEFAULTS };
   }

@@ -1987,6 +1987,30 @@ button.pill:hover { border-color: var(--gold); color: var(--gold); }
   color: var(--ink-2);
 }
 
+.toggle-badge {
+  margin-left: auto;
+  padding: 1px 6px;
+  border-radius: 999px;
+  background: var(--sand);
+  color: var(--ink-4);
+  font-family: var(--mono);
+  font-size: 0.5625rem;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+}
+
+.toggle-row.is-disabled {
+  cursor: not-allowed;
+}
+
+.toggle-row.is-disabled .toggle-label {
+  color: var(--ink-4);
+}
+
+.toggle-row.is-disabled .toggle-track {
+  opacity: 0.5;
+}
+
 /* override .card on sidebar */
 .card.sidebar {
   background: var(--sand);
@@ -4389,6 +4413,17 @@ body.chat-app {
 .chat-app .toggle-label,
 .chat-app .usage-row strong {
   color: #eee9df;
+}
+
+/* The settings panel is dark in both themes, so the shared --ink-4/--sand
+   disabled tones land near-invisible here. Dim against the panel instead. */
+.chat-app .toggle-row.is-disabled .toggle-label {
+  color: #a7a196;
+}
+
+.chat-app .toggle-badge {
+  background: #33342e;
+  color: #c9c2b7;
 }
 
 .chat-app .settings-link-row:hover,

@@ -687,11 +687,8 @@ function bindEvents() {
     persistSettings();
   });
 
-  // data consent
-  qs('[data-setting-data-consent]')?.addEventListener('change', (e) => {
-    state.settings.dataConsent = e.target.checked;
-    persistSettings();
-  });
+  // data consent — toggle is disabled until conversation sharing actually exists.
+  // Re-add the change handler here alongside the real upload path, not before it.
 
   // delete all chats
   qs('[data-delete-all-chats]')?.addEventListener('click', () => {
