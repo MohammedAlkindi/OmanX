@@ -67,7 +67,7 @@ async function getMoheKb() {
   return _moheCache.kb;
 }
 
-function detectDestination(userContext, message) {
+export function detectDestination(userContext, message) {
   const text = `${userContext || ""} ${message || ""}`.toLowerCase();
   if (
     text.includes("united kingdom") || text.includes(" uk ") || text.includes("uk,") ||
@@ -141,7 +141,7 @@ const COMPLIANCE_TRIGGERS = [
   "genuine student", "temporary graduate", "teqsa", "asqa", "fortnight",
 ];
 
-function isCompliance(message) {
+export function isCompliance(message) {
   if (!message) return false;
   const q = message.toLowerCase();
   return COMPLIANCE_TRIGGERS.some((t) => q.includes(t));
@@ -378,7 +378,7 @@ function cosineSimilarity(vecA, vecB) {
 // Rebuilt automatically when the KB is hot-reloaded.
 const _tfidfCache = new Map();
 
-function searchKB(knowledgeJson, query) {
+export function searchKB(knowledgeJson, query) {
   if (!knowledgeJson) return [];
 
   const docs = Array.isArray(knowledgeJson.documents)
