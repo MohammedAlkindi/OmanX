@@ -32,7 +32,7 @@ let _cache = { ts: 0, payload: null };
 
 async function fetchDestinationNews(destination) {
   const key = process.env.TAVILY_API_KEY;
-  if (!key) return [];
+  if (!key) return { ok: false, items: [] };
 
   try {
     const res = await fetch("https://api.tavily.com/search", {
@@ -53,11 +53,11 @@ async function fetchDestinationNews(destination) {
 
     if (!res.ok) {
       console.warn(`[OmanX] News search failed for ${destination}:`, res.status);
-      return [];
+      return { ok: false, items: [] };
     }
 
     const data = await res.json();
-    return (data.results || [])
+    const items = (data.results || [])
       .map((r) => ({
         title: r.title || "",
         url: r.url || "",
@@ -67,9 +67,10 @@ async function fetchDestinationNews(destination) {
         category: sourceCategory(r.url),
       }))
       .filter(isRelevant);
+    return { ok: true, items };
   } catch (err) {
     console.warn(`[OmanX] News search error for ${destination}:`, err.message);
-    return [];
+    return { ok: false, items: [] };
   }
 }
 
@@ -87,12 +88,18 @@ function sortByRecency(items) {
 async function buildNewsPayload() {
   const configured = Boolean(process.env.TAVILY_API_KEY);
   if (!configured) {
-    return { configured: false, fetchedAt: Date.now(), items: [] };
+    return { configured: false, fetchedAt: Date.now(), items: [], cacheable: false };
   }
 
   const destinations = Object.keys(DESTINATION_QUERIES);
   const results = await Promise.all(destinations.map(fetchDestinationNews));
-  return { configured: true, fetchedAt: Date.now(), items: sortByRecency(results.flat()) };
+  // Only cache when every destination's fetch actually succeeded — an auth
+  // failure or outage shouldn't get frozen into a false "no news" result for
+  // a full cache cycle.
+  const cacheable = results.every((r) => r.ok);
+  const items = sortByRecency(results.flatMap((r) => r.items));
+
+  return { configured: true, fetchedAt: Date.now(), items, cacheable };
 }
 
 export default async function handler(req, res) {
@@ -105,8 +112,8 @@ export default async function handler(req, res) {
       return res.json(_cache.payload);
     }
 
-    const payload = await buildNewsPayload();
-    if (payload.configured) {
+    const { cacheable, ...payload } = await buildNewsPayload();
+    if (cacheable) {
       _cache = { ts: Date.now(), payload };
     }
     return res.json(payload);
