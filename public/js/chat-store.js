@@ -113,6 +113,11 @@ const SETTINGS_DEFAULTS = {
   destination: 'auto',
   dataConsent: false,
   webSearch: true,
+  // Key dates for deadline awareness. Deliberately local-only: immigration
+  // dates never leave the browser.
+  programEndDate: '',
+  visaExpiryDate: '',
+  visaType: '',
 };
 
 export function loadSettings() {

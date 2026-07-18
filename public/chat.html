@@ -141,6 +141,25 @@
                   </select>
                 </div>
                 <div class="settings-field">
+                  <label for="settings-visa-type">Visa type</label>
+                  <select id="settings-visa-type" class="settings-select" data-setting-visa-type>
+                    <option value="">Not set</option>
+                    <option value="f1">F-1 student (US)</option>
+                    <option value="j1">J-1 exchange visitor (US)</option>
+                    <option value="other">Other / not listed</option>
+                  </select>
+                </div>
+                <div class="settings-field">
+                  <label for="settings-program-end">Program end date</label>
+                  <input id="settings-program-end" class="settings-input" type="date" data-setting-program-end />
+                  <p class="settings-hint">Used to work out your OPT filing window and grace period. Stays on this device.</p>
+                </div>
+                <div class="settings-field">
+                  <label for="settings-visa-expiry">Visa or I-20 expiry date</label>
+                  <input id="settings-visa-expiry" class="settings-input" type="date" data-setting-visa-expiry />
+                  <p class="settings-hint">Used for extension and post-study visa reminders. Stays on this device.</p>
+                </div>
+                <div class="settings-field">
                   <label for="settings-scholarship">Scholarship status</label>
                   <select id="settings-scholarship" class="settings-select" data-setting-scholarship>
                     <option value="">Not set</option>
