@@ -3391,6 +3391,25 @@ footer,
   color: var(--ink-4);
 }
 
+.footer-social {
+  display: flex;
+  justify-content: center;
+  gap: 16px;
+  margin-top: 20px;
+  padding-top: 20px;
+  border-top: 0.5px solid var(--border);
+}
+
+.footer-social a {
+  display: inline-flex;
+  color: var(--ink-4);
+  transition: color 0.15s;
+}
+
+.footer-social a:hover { color: var(--ink); }
+
+.footer-social svg { width: 18px; height: 18px; }
+
 
 /* ============================================================
    14. UTILITIES
