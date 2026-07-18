@@ -1,4 +1,6 @@
-// api/trusted-sources.js - Shared trusted-domain allowlist and source classification
+// api/_trusted-sources.js - Shared trusted-domain allowlist and source classification
+// Underscore-prefixed so Vercel doesn't deploy it as its own serverless function
+// (every other file directly under api/ becomes a route by default).
 // Used by api/chat.js (compliance search) and api/news.js (destination news feed)
 // so the two never drift on which domains count as "official".
 

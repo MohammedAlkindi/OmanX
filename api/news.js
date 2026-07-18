@@ -3,7 +3,7 @@
 // search in api/chat.js. Cached in-memory since policy news doesn't need
 // per-request freshness.
 
-import { DESTINATION_DOMAINS, sourceCategory } from "./trusted-sources.js";
+import { DESTINATION_DOMAINS, sourceCategory } from "./_trusted-sources.js";
 
 const DESTINATION_QUERIES = {
   us: "F-1 international student visa OPT CPT SEVIS policy announcement",

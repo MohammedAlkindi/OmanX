@@ -7,7 +7,7 @@ import { fileURLToPath } from "url";
 import crypto from "crypto";
 import { consumeUsage, getQuotaForUser, getRateLimitKey, getRequestSessionId } from "./rate-limit.js";
 import { getAuthUser } from "./auth-utils.js";
-import { TRUSTED_DOMAINS, sourceCategory } from "./trusted-sources.js";
+import { TRUSTED_DOMAINS, sourceCategory } from "./_trusted-sources.js";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
