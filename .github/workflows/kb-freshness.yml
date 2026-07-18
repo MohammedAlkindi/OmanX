@@ -1,0 +1,22 @@
+name: KB Freshness
+
+on:
+  schedule:
+    # Every Monday 09:00 UTC. Quarterly review cadence doesn't need daily
+    # checking, but a red run in the Actions tab is the notification
+    # mechanism here, so it needs to run often enough to be noticed.
+    - cron: "0 9 * * 1"
+  workflow_dispatch: {}
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+
+      - name: Check compliance data freshness
+        run: node scripts/check-kb-freshness.js

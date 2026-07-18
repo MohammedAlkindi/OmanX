@@ -9,7 +9,8 @@
     "dev": "node --watch server.js",
     "test": "node --test",
     "check:syntax": "node scripts/check-syntax.js",
-    "check:functions": "node scripts/check-vercel-function-count.js"
+    "check:functions": "node scripts/check-vercel-function-count.js",
+    "check:kb-freshness": "node scripts/check-kb-freshness.js"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.104.1",
