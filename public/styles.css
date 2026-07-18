@@ -2298,6 +2298,24 @@ select:focus {
   color: #b91c1c;
 }
 
+/* service outage banner — shown when usage protection is offline */
+.service-banner {
+  margin: 16px 0 0;
+  padding: 10px 14px;
+  font-size: 0.85rem;
+  line-height: 1.5;
+  color: var(--ink-2);
+  border: 0.5px solid rgba(180, 83, 9, 0.25);
+  border-left: 3px solid #b45309;
+  border-radius: var(--radius);
+  background: rgba(180, 83, 9, 0.06);
+}
+
+.service-banner strong {
+  display: block;
+  color: #b45309;
+}
+
 /* message area */
 .chat-body {
   overflow-y: auto;

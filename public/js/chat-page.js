@@ -1035,9 +1035,16 @@ function formatReset(usage) {
   return seconds ? `${minutes}m ${seconds}s` : `${minutes}m`;
 }
 
+function renderServiceBanner() {
+  const banner = qs('[data-service-banner]');
+  if (!banner) return;
+  banner.hidden = state.usage?.blockedBy !== 'rate_limit_store';
+}
+
 function renderUsagePanel() {
   const panel = qs('[data-usage-panel]');
   renderComposerUsageNote();
+  renderServiceBanner();
   if (!panel) return;
   const percentEl = qs('[data-usage-percent]', panel);
   const meterEl = qs('[data-usage-meter]', panel);

@@ -1,5 +1,16 @@
 import { createClient } from "@supabase/supabase-js";
 
+// Bounds every Supabase HTTP call so a slow auth backend cannot hold a
+// serverless invocation open until the platform kills it.
+const SUPABASE_TIMEOUT_MS = 5000;
+
+function fetchWithTimeout(url, options = {}) {
+  return fetch(url, {
+    ...options,
+    signal: options.signal ?? AbortSignal.timeout(SUPABASE_TIMEOUT_MS),
+  });
+}
+
 let _supabase = null;
 
 export function getSupabasePublicConfig() {
@@ -18,6 +29,9 @@ function getSupabaseClient() {
       autoRefreshToken: false,
       detectSessionInUrl: false,
       persistSession: false,
+    },
+    global: {
+      fetch: fetchWithTimeout,
     },
   });
   return _supabase;
@@ -40,6 +54,7 @@ export function createSupabaseUserClient(token) {
       persistSession: false,
     },
     global: {
+      fetch: fetchWithTimeout,
       headers: {
         Authorization: `Bearer ${token}`,
       },
@@ -67,7 +82,12 @@ export async function getAuthUser(req) {
     return { user: null, token, error: "Supabase authentication is not configured.", configured: false };
   }
 
-  const { data, error } = await supabase.auth.getUser(token);
+  let data, error;
+  try {
+    ({ data, error } = await supabase.auth.getUser(token));
+  } catch {
+    return { user: null, token, error: "Could not verify your session. Please try again.", configured: true };
+  }
   if (error || !data?.user) {
     return { user: null, token, error: "Invalid or expired session.", configured: true };
   }
