@@ -148,6 +148,46 @@ export function isCompliance(message) {
   return COMPLIANCE_TRIGGERS.some((t) => q.includes(t));
 }
 
+// COMPLIANCE_TRIGGERS matches vocabulary, so it misses the way scholars
+// actually describe an emergency. "I am out of status", "I am being
+// deported next month" and "I was evicted from my apartment today" all
+// scored false, which skipped the knowledge base, the live search and the
+// escalation card on the highest-stakes sentences in the domain.
+//
+// These are phrased as situations rather than topics, and they are the
+// cases where being wrong costs a scholar their status.
+const SITUATION_TRIGGERS = [
+  "out of status", "lose status", "lost status", "losing status",
+  "without authorization", "unauthorized work", "under the table",
+  "off the books", "paid cash", "cash in hand",
+  "offered me cash", "pay me cash", "for cash", "employer",
+  "deported", "deport", "detained", "detain", "removal proceedings",
+  "evicted", "evict", "kicked out",
+  "drop a class", "dropping a class", "drop out", "withdraw from",
+  "failed", "failing", "not been to class", "stopped attending",
+  "skipping class", "missed class",
+  "refused", "rejected", "denied", "terminated", "revoked", "cancelled",
+  "how long can i stay", "how many hours", "more hours", "extra hours",
+  "start work", "start working", "started working", "new job",
+  "move apartment", "move apartments", "moving apartment", "change address",
+  "moved to a new",
+];
+
+// The gate for retrieval and escalation. Deliberately wider than
+// isCompliance: a false positive costs one search, a false negative costs
+// a scholar their visa status. Urgency alone is sufficient — escalation
+// used to require compliance AND urgency, so an urgent message the topical
+// classifier missed produced no card at all.
+export function needsGrounding(message) {
+  if (!message) return false;
+  const q = message.toLowerCase();
+  return (
+    isCompliance(message) ||
+    isUrgent(message) ||
+    SITUATION_TRIGGERS.some((t) => q.includes(t))
+  );
+}
+
 const URGENCY_TRIGGERS = [
   // time pressure
   "expires", "expiring", "expired", "expiration", "expiry",
@@ -162,6 +202,11 @@ const URGENCY_TRIGGERS = [
   "dismissed", "dismissal", "suspended", "suspension", "expelled", "expulsion",
   "reinstatement", "reinstate",
   "sevis terminated", "sevis termination",
+  // Bare stems: "My SEVIS record was terminated" and "My visa application
+  // was refused" both scored non-urgent because only the exact two-word
+  // phrases above were listed.
+  "terminated", "termination", "refused", "refusal",
+  "rejected", "denied", "revoked", "cancelled",
   "unlawful presence", "grace period",
   "lost my status", "lose my status",
   "overstayed", "overstay",
@@ -177,7 +222,7 @@ const URGENCY_TRIGGERS = [
   "lawsuit", "sued", "court hearing",
 ];
 
-function isUrgent(message) {
+export function isUrgent(message) {
   if (!message) return false;
   const q = message.toLowerCase();
   return URGENCY_TRIGGERS.some((t) => q.includes(t));
@@ -717,7 +762,10 @@ export default async function handler(req, res) {
     });
   }
 
-  const compliance = isCompliance(sanitizedMessage);
+  // needsGrounding, not isCompliance: the retrieval path must open for
+  // situational phrasings and for anything urgent, not only for messages
+  // that happen to contain compliance vocabulary.
+  const compliance = needsGrounding(sanitizedMessage);
   const destination = (typeof clientDestination === "string" && VALID_DESTINATIONS.has(clientDestination))
     ? clientDestination
     : detectDestination(sanitizedUserContext, sanitizedMessage);
@@ -823,7 +871,9 @@ export default async function handler(req, res) {
       }
       if (cacheKey) cacheSet(cacheKey, fullText.trim());
       const sources = buildSources(kbResults, webResults);
-      const escalation = compliance && isUrgent(sanitizedMessage) ? buildEscalationCard(sanitizedMessage, destination) : null;
+      // Urgency alone is sufficient. Requiring compliance as well meant an
+      // urgent message the topical classifier missed produced no card.
+      const escalation = isUrgent(sanitizedMessage) ? buildEscalationCard(sanitizedMessage, destination) : null;
       await logAnalyticsEvent({ destination, compliance, kbMatched: kbResults.length > 0, webSearched: webResults.length > 0, authenticated: !!auth.user });
       res.write(`data: ${JSON.stringify({ done: true, compliance, webSearched: webResults.length > 0, sources, escalation, destination, usage })}\n\n`);
       res.end();
