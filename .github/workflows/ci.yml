@@ -27,3 +27,10 @@ jobs:
 
       - name: Vercel serverless function count (Hobby plan limit)
         run: npm run check:functions
+
+      # Not a duplicate of the weekly kb-freshness workflow. That one asks
+      # "has this data gone stale over time"; this one blocks a PR that
+      # breaks the metadata the staleness check depends on — a missing or
+      # unparseable lastUpdated used to pass silently.
+      - name: Knowledge base review metadata
+        run: npm run check:kb-freshness

@@ -26,6 +26,7 @@ const DEFAULT_FREQUENCY_DAYS = 90;
 
 const files = fs.readdirSync(DATA_DIR).filter((f) => f.endsWith(".json"));
 let overdue = 0;
+let invalid = 0;
 
 for (const file of files) {
   const filePath = path.join(DATA_DIR, file);
@@ -33,11 +34,23 @@ for (const file of files) {
   const meta = json.metadata;
 
   if (!meta?.lastUpdated) {
-    console.warn(`? ${file}: no metadata.lastUpdated field, skipping`);
+    // Not "skipping" — a compliance file with no review date is a file
+    // nobody can tell is stale, which is the condition this check exists
+    // to catch.
+    console.error(`[INVALID] ${file}: no metadata.lastUpdated field. Every knowledge base file must declare when it was last reviewed.`);
+    invalid++;
     continue;
   }
 
   const lastUpdated = new Date(meta.lastUpdated);
+  // An unparseable date yields NaN, and `NaN > cadenceDays` is false, so a
+  // corrupted lastUpdated used to log "NaNd ago" and exit 0 — the check
+  // reported healthy precisely when it could no longer tell.
+  if (Number.isNaN(lastUpdated.getTime())) {
+    console.error(`[INVALID] ${file}: metadata.lastUpdated is not a parseable date (got ${JSON.stringify(meta.lastUpdated)}). Expected YYYY-MM-DD.`);
+    invalid++;
+    continue;
+  }
   const ageDays = Math.floor((Date.now() - lastUpdated.getTime()) / (24 * 60 * 60 * 1000));
 
   const frequencyKey = (meta.updateFrequency || "").toLowerCase();
@@ -56,9 +69,12 @@ for (const file of files) {
   );
 }
 
+if (invalid > 0) {
+  console.error(`\n${invalid} data file(s) have missing or unparseable review metadata, so their freshness cannot be determined.`);
+}
 if (overdue > 0) {
   console.error(`\n${overdue} data file(s) are past their stated review cadence. Review and update data/*.json metadata.lastUpdated.`);
-  process.exit(1);
 }
+if (invalid > 0 || overdue > 0) process.exit(1);
 
 console.log("\nAll knowledge base files are within their stated review cadence.");
