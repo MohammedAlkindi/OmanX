@@ -7,7 +7,7 @@ import { fileURLToPath } from "url";
 import crypto from "crypto";
 import { consumeUsage, getQuotaForUser, getRateLimitKey, getRequestSessionId } from "./_rate-limit.js";
 import { getAuthUser } from "./_auth-utils.js";
-import { TRUSTED_DOMAINS, sourceCategory } from "./_trusted-sources.js";
+import { TRUSTED_DOMAINS, DESTINATION_DOMAINS, sourceCategory } from "./_trusted-sources.js";
 import { logAnalyticsEvent } from "./_analytics.js";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
@@ -477,7 +477,13 @@ export function searchKB(knowledgeJson, query) {
     .slice(0, 3);
 }
 
-async function webSearch(query) {
+// Scoped to the detected destination. Searching every country's domains
+// meant a UK Student Route question could retrieve a uscis.gov OPT page,
+// which the prompt then instructs the model to prefer over the correct UK
+// knowledge-base entry. Falls back to the full allowlist only when the
+// destination is unrecognised.
+async function webSearch(query, destination) {
+  const domains = DESTINATION_DOMAINS[destination] || TRUSTED_DOMAINS;
   const key = process.env.TAVILY_API_KEY;
   if (!key) return [];
 
@@ -490,7 +496,7 @@ async function webSearch(query) {
         query: `${query} official government university MoHE source`,
         search_depth: "basic",
         include_answer: false,
-        include_domains: TRUSTED_DOMAINS,
+        include_domains: domains,
         max_results: 3,
       }),
       signal: AbortSignal.timeout(8000),
@@ -817,7 +823,7 @@ export default async function handler(req, res) {
     if (allowWebSearch) writeStatus("Searching official sources...", "web");
     [kbResults, webResults] = await Promise.all([
       getKB(destination).then((kb) => (kb ? searchKB(kb, sanitizedMessage) : [])),
-      allowWebSearch ? webSearch(`${sanitizedMessage}\n${sanitizedUserContext}`.slice(0, 2000)) : Promise.resolve([]),
+      allowWebSearch ? webSearch(`${sanitizedMessage}\n${sanitizedUserContext}`.slice(0, 2000), destination) : Promise.resolve([]),
     ]);
     if (allowWebSearch) {
       writeStatus(
