@@ -71,8 +71,23 @@ function getRedis() {
   return _redis;
 }
 
+// x-forwarded-for is writable by the caller, so it cannot be the first
+// choice. Vercel stamps x-vercel-forwarded-for at its edge and overwrites
+// anything the client sent under that name, which makes it the only
+// header here that a request cannot forge.
+const PLATFORM_IP_HEADERS = ["x-vercel-forwarded-for", "x-real-ip"];
+
+function firstHop(value) {
+  return typeof value === "string" && value.trim() ? value.split(",")[0].trim() : "";
+}
+
 export function getClientIp(req) {
-  return req.headers["x-forwarded-for"]?.split(",")[0].trim() || req.socket?.remoteAddress || "unknown";
+  const headers = req?.headers || {};
+  for (const name of PLATFORM_IP_HEADERS) {
+    const ip = firstHop(headers[name]);
+    if (ip) return ip;
+  }
+  return firstHop(headers["x-forwarded-for"]) || req?.socket?.remoteAddress || "unknown";
 }
 
 function hashKeyPart(value) {
@@ -99,11 +114,22 @@ export function getRequestSessionId(req, bodySessionId) {
   return sanitizeSessionId(bodySessionId || getQueryParam(req, "sessionId"));
 }
 
+// The anonymous bucket must be keyed on something the caller cannot choose.
+// sessionId arrives in the request body, so when it selected the bucket, a
+// caller rotating it per request got an unlimited quota — and, in the other
+// direction, two unrelated callers sharing a sessionId shared one quota.
+// IP is therefore the ceiling; the session is consulted only when no address
+// is available at all, so that such traffic is still bucketed somehow rather
+// than collapsing into a single global key.
+//
+// Tradeoff, accepted deliberately: scholars behind one campus NAT now share
+// the anonymous allowance. Signing in moves them to a per-user key with a
+// much higher limit, which is the intended path for repeat users anyway.
 export function getRateLimitKey(req, sessionId = "") {
-  const sanitizedSessionId = sanitizeSessionId(sessionId);
   const ip = getClientIp(req);
-  if (sanitizedSessionId) return `session:${hashKeyPart(sanitizedSessionId)}`;
   if (ip && ip !== "unknown") return `ip:${hashKeyPart(ip)}`;
+  const sanitizedSessionId = sanitizeSessionId(sessionId);
+  if (sanitizedSessionId) return `session:${hashKeyPart(sanitizedSessionId)}`;
   return "ip:unknown";
 }
 
