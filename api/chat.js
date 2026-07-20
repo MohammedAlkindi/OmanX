@@ -5,8 +5,8 @@ import fs from "fs/promises";
 import path from "path";
 import { fileURLToPath } from "url";
 import crypto from "crypto";
-import { consumeUsage, getQuotaForUser, getRateLimitKey, getRequestSessionId } from "./rate-limit.js";
-import { getAuthUser } from "./auth-utils.js";
+import { consumeUsage, getQuotaForUser, getRateLimitKey, getRequestSessionId } from "./_rate-limit.js";
+import { getAuthUser } from "./_auth-utils.js";
 import { TRUSTED_DOMAINS, sourceCategory } from "./_trusted-sources.js";
 import { logAnalyticsEvent } from "./_analytics.js";
 

@@ -1,6 +1,6 @@
 // api/ready.js - OmanX readiness check endpoint
 
-import { checkPersistentRateLimitStore, requiresPersistentRateLimitStore } from "./rate-limit.js";
+import { checkPersistentRateLimitStore, requiresPersistentRateLimitStore } from "./_rate-limit.js";
 
 export default async function handler(req, res) {
   const store = await checkPersistentRateLimitStore();

@@ -1,4 +1,4 @@
-import { getSupabasePublicConfig } from "../auth-utils.js";
+import { getSupabasePublicConfig } from "../_auth-utils.js";
 
 export default function handler(req, res) {
   if (req.method === "OPTIONS") return res.status(200).end();

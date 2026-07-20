@@ -1,5 +1,5 @@
-import { getQuotaForUser, getRateLimitKey, getRequestSessionId, getUsage } from "./rate-limit.js";
-import { getAuthUser, publicUser } from "./auth-utils.js";
+import { getQuotaForUser, getRateLimitKey, getRequestSessionId, getUsage } from "./_rate-limit.js";
+import { getAuthUser, publicUser } from "./_auth-utils.js";
 
 export default async function handler(req, res) {
   const allowedOrigin = process.env.ALLOWED_ORIGIN;
