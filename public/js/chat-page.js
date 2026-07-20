@@ -1384,7 +1384,7 @@ function renderMessages() {
       ${message.role === 'assistant' ? renderSources(message.sources) : ''}
       ${message.role === 'assistant' ? renderEscalationCard(message.escalation) : ''}
       <div class="message-meta">
-        <span>${message.role === 'assistant' ? 'OmanX' : state.settings.studentName}</span>
+        <span>${message.role === 'assistant' ? 'OmanX' : escapeHtml(state.settings.studentName)}</span>
         <span>${formatDateTime(message.createdAt)}</span>
         ${message.role === 'assistant' && message.destination && DEST_LABEL[message.destination] ? `<span class="dest-badge">${DEST_LABEL[message.destination]}</span>` : ''}
         ${message.role === 'assistant' ? `
@@ -2068,7 +2068,7 @@ function renderAnswerStatus(message) {
   const sourceLabel = sourceCount
     ? `${sourceCount} source${sourceCount === 1 ? '' : 's'} used`
     : 'No source shown';
-  const webLabel = message.webSearched ? 'Current rules checked' : 'Saved rules used';
+  const webLabel = message.webSearched ? 'Live sources searched' : 'Saved rules used';
   const destinationLabel = message.destination && DEST_LABEL[message.destination]
     ? DEST_LABEL[message.destination]
     : DEST_LABEL[state.settings.destination] || 'Auto';
@@ -2097,7 +2097,7 @@ function renderSources(sources) {
     const safeUrl = /^https?:\/\//i.test(s.url) ? s.url : '#';
     return `<a class="source-chip source-chip-web" href="${escapeHtml(safeUrl)}" target="_blank" rel="noopener noreferrer" title="${escapeHtml(s.title || s.url)}"><span class="source-kind">${escapeHtml(s.category || 'Official web')}</span>${escapeHtml(s.domain || s.url)}</a>`;
   }).join('');
-  return `<div class="message-sources"><span class="sources-label">Verified sources</span><div class="source-chip-list">${chips}</div></div>`;
+  return `<div class="message-sources"><span class="sources-label">Sources used</span><div class="source-chip-list">${chips}</div></div>`;
 }
 
 function renderMessageAttachments(attachments) {
