@@ -41,6 +41,29 @@ if (excluded.length) {
   for (const f of excluded) console.log(`  - ${f}`);
 }
 
+// A file counted as a function but exporting no default handler is not a
+// route — it is a shared helper that Vercel is deploying anyway, burning a
+// slot and publishing a URL that 500s on every request. api/rate-limit.js
+// and api/auth-utils.js sat in exactly that state and consumed 2 of 12.
+// Matched statically rather than by importing: these modules read env vars
+// and construct clients at module scope, which must not run in CI.
+const HANDLER_PATTERN = /export\s+default\s/;
+const missingHandler = counted.filter(
+  (f) => !HANDLER_PATTERN.test(fs.readFileSync(path.join(API_DIR, f), "utf8"))
+);
+
+if (missingHandler.length) {
+  console.error(
+    `\nFAIL: ${missingHandler.length} file(s) under api/ are deployed as Serverless ` +
+    `Functions but export no default handler:\n` +
+    missingHandler.map((f) => `  - ${f}`).join("\n") +
+    `\n\nThese are helpers, not routes. Each one wastes a function slot and serves ` +
+    `a public URL that fails at runtime. Rename to an underscore prefix ` +
+    `(e.g. api/_my-helper.js) and update its imports.`
+  );
+  process.exit(1);
+}
+
 if (counted.length > VERCEL_HOBBY_FUNCTION_LIMIT) {
   console.error(
     `\nFAIL: ${counted.length} functions exceeds the Vercel Hobby plan limit of ${VERCEL_HOBBY_FUNCTION_LIMIT}.\n` +
@@ -48,6 +71,14 @@ if (counted.length > VERCEL_HOBBY_FUNCTION_LIMIT) {
     `so Vercel doesn't deploy them as routes.`
   );
   process.exit(1);
+}
+
+if (counted.length === VERCEL_HOBBY_FUNCTION_LIMIT) {
+  console.warn(
+    `\nWARNING: at ${counted.length}/${VERCEL_HOBBY_FUNCTION_LIMIT}. There is no headroom — ` +
+    `adding any new route will fail the deployment with ` +
+    `exceeded_serverless_functions_per_deployment. Free a slot before adding one.`
+  );
 }
 
 console.log("\nOK");

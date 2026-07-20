@@ -113,8 +113,11 @@ const SETTINGS_DEFAULTS = {
   destination: 'auto',
   dataConsent: false,
   webSearch: true,
-  // Key dates for deadline awareness. Deliberately local-only: immigration
-  // dates never leave the browser.
+  // Key dates for deadline awareness. Stored only here — they are never
+  // synced to the server or written to analytics. They are, however, sent
+  // with each question as part of the profile context built in
+  // chat-page.js buildProfileContext(), so the assistant can reference the
+  // same dates the on-screen panel shows. The settings copy says so.
   programEndDate: '',
   visaExpiryDate: '',
   visaType: '',

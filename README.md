@@ -82,8 +82,8 @@ The product is usable anonymously - visitors can preview the chat and send 3 ano
 ├── api/
 │   ├── chat.js           # Core pipeline: routing, KB search, Tavily, streaming, escalation
 │   ├── chats.js          # Signed-in chat history sync snapshot API
-│   ├── rate-limit.js      # Upstash sliding-window limiter + local memory fallback
-│   ├── auth-utils.js      # Supabase bearer-token verification
+│   ├── _rate-limit.js     # Upstash sliding-window limiter + local memory fallback
+│   ├── _auth-utils.js     # Supabase bearer-token verification
 │   ├── auth/
 │   │   ├── config.js      # Public Supabase config for the client
 │   │   └── session.js

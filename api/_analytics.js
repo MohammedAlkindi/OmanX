@@ -10,7 +10,7 @@
 // affects the chat response.
 
 import { createClient } from "@supabase/supabase-js";
-import { getSupabasePublicConfig } from "./auth-utils.js";
+import { getSupabasePublicConfig } from "./_auth-utils.js";
 
 const TABLE_NAME = "omanx_analytics_events";
 const ANALYTICS_TIMEOUT_MS = 3000;

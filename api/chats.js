@@ -1,4 +1,4 @@
-import { createSupabaseUserClient, getAuthUser } from "./auth-utils.js";
+import { createSupabaseUserClient, getAuthUser } from "./_auth-utils.js";
 
 const TABLE_NAME = "omanx_chat_sync";
 const MAX_CHATS = 50;
